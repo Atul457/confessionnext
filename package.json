@@ -18,6 +18,7 @@
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "next": "13.0.3",
+    "next-auth": "^4.16.4",
     "react": "18.2.0",
     "react-awesome-lightbox": "^1.8.1",
     "react-bootstrap": "^2.1.2",
@@ -40,6 +41,7 @@
     "redux": "^4.2.0",
     "redux-debounced": "^0.5.0",
     "redux-thunk": "^2.4.2",
+    "v8": "^0.1.0",
     "yup": "^0.32.11"
   }
 }
