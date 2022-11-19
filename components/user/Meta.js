@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
+import { HeaderScripts } from './Scripts'
 
 const Meta = () => {
     return (
@@ -46,6 +47,29 @@ const Meta = () => {
             />
             <meta name="theme-color" content="#000000" />
             <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+
+            <HeaderScripts />
+            
+            <link
+                rel="stylesheet"
+                href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css"
+            />
+
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+            <link
+                href="https://fonts.googleapis.com/css2?family=Montserrat&family=Roboto&family=Poppins:wght@200;400;500;600;700&display=swap"
+                rel="stylesheet"
+            />
+            <link
+                href="https://fonts.googleapis.com/css2?family=Kalam&family=Montserrat:wght@400&family=Raleway:wght@700&family=Roboto&display=swap"
+                rel="stylesheet"
+            />
+            <link
+                href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+                rel="stylesheet"
+            />
+
         </Head>
     )
 }

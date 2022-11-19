@@ -13,7 +13,7 @@ const Categories = ({
   classNames = "",
   onlyForForums = false,
   isSearchPage = false,
-  forumpage = (isWindowPresent() && !window.location.pathname.includes("forum"))
+  forumpage = (isWindowPresent() && window.location.pathname.includes("forum"))
 }) => {
 
   // Hooks and vars
@@ -168,6 +168,7 @@ const Category = props => {
         }
       })
     }
+
 
     // Navigation logic
     if (!forumpage) {

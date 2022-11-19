@@ -15,12 +15,6 @@ const Sidebar = () => {
                     {/* CATEGORYCONT */}
                     <aside className="posSticky">
                         <Categories />
-                        {/* <Category
-                            showConfessionCats={true}
-                            categories={props.categories}
-                            activeCatIndex={AC2S}
-                            updateActiveCategory={updateActiveCategory}
-                        /> */}
                     </aside>
                     {/* CATEGORYCONT */}
                 </div>

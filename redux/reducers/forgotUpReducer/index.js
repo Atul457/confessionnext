@@ -1,7 +1,5 @@
 import forgotUPassActions from "../../actions/forgotUPassword"
 
-
-
 const statuses = {
     LOADING: "LOADING",
     ERROR: "ERROR",

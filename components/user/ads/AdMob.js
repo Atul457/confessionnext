@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { isWindowPresent } from '../../../utils/checkDom';
 
 
-export default function AdMob({ mainContId }) {
+const AdMob = ({ mainContId }) => {
 
     let moreContent;
 
@@ -37,7 +37,7 @@ export default function AdMob({ mainContId }) {
 }
 
 
-export const WhatsNewAds = ({ mainContId }) => {
+const WhatsNewAds = ({ mainContId }) => {
 
     let moreContent;
 
@@ -70,7 +70,7 @@ export const WhatsNewAds = ({ mainContId }) => {
     );
 }
 
-export const LastCommentAd = ({ mainContId }) => {
+const LastCommentAd = ({ mainContId }) => {
 
     let moreContent;
 
@@ -103,3 +103,67 @@ export const LastCommentAd = ({ mainContId }) => {
         </div>
     );
 }
+
+
+const AdSense_ = () => {
+
+    useEffect(() => {
+        if (isWindowPresent()) {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+        }
+    }, [])
+
+    if (!envConfig.isProdMode) return null
+
+    return (
+        <ins className="adsbygoogle"
+            style={{ "display": "block" }}
+            data-ad-client="ca-pub-7031631451622714"
+            data-ad-slot="6867532774"
+            data-ad-format="auto"
+            data-full-width-responsive="true"></ins>
+    )
+}
+
+const AdSenseSideAd = () => {
+
+    const maxWidthToShowAd = 1200
+    let windowWidth = window.innerWidth,
+        showAd = windowWidth > maxWidthToShowAd
+
+    useEffect(() => {
+        if (isWindowPresent()) {
+            if (showAd) (window.adsbygoogle = window.adsbygoogle || []).push({});
+            const handleShowAd = () => {
+                windowWidth = window.innerWidth
+                if (windowWidth < maxWidthToShowAd) showAd = false
+                if (windowWidth > maxWidthToShowAd) showAd = true
+            }
+
+            window.addEventListener("resize", handleShowAd)
+        }
+        return () => {
+            if (isWindowPresent()) {
+                window.removeEventListener("resize", handleShowAd)
+            }
+        }
+    }, [])
+
+    if (!envConfig.isProdMode) return null
+
+    if (showAd)
+        return (
+            <ins className="adsbygoogle"
+                style={{ "display": "block" }}
+                data-ad-client="ca-pub-7031631451622714"
+                data-ad-slot="8349198779"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+        )
+
+    return null
+}
+
+
+export default AdMob
+export { AdSense_, AdSenseSideAd, LastCommentAd, WhatsNewAds }

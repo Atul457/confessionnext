@@ -1,14 +1,21 @@
 // Helpers
-import { async } from "@firebase/util"
-import { fetchData } from "../../../commonApi"
-import { areAtLastPage, isAdminLoggedIn, resHandler } from "../../../helpers/helpers"
-import { getKeyProfileLoc } from "../../../helpers/profileHelper"
-import { deleteForumAcFn, deleteForumCommSubcomAcFn, deleteForum_AcFn, forumHandlers, handleSingleForumCommAcFn, mutateForumFn, usersToTagAcFn } from "../../../redux/actions/forumsAc/forumsAc"
-import { searchAcFn } from "../../../redux/actions/searchAc/searchAc"
-import auth from "../../../user/behindScenes/Auth/AuthCheck"
-import SetAuth from "../../../user/behindScenes/SetAuth"
+// import { async } from "@firebase/util"
+// import { http } from "../../../commonApi"
+// import { areAtLastPage, isAdminLoggedIn, resHandler } from "../../../helpers/helpers"
+// import { getKeyProfileLoc } from "../../../helpers/profileHelper"
+// import { deleteForumAcFn, deleteForumCommSubcomAcFn, deleteForum_AcFn, forumHandlers, handleSingleForumCommAcFn, mutateForumFn, usersToTagAcFn } from "../../../redux/actions/forumsAc/forumsAc"
+// import { searchAcFn } from "../../../redux/actions/searchAc/searchAc"
+// import auth from "../../../user/behindScenes/Auth/AuthCheck"
+// import SetAuth from "../../../user/behindScenes/SetAuth"
+import { deleteForumAcFn, deleteForumCommSubcomAcFn, deleteForum_AcFn, forumHandlers, handleSingleForumCommAcFn, mutateForumFn, usersToTagAcFn } from "../../redux/actions/forumsAc/forumsAc"
+import { searchAcFn } from "../../redux/actions/searchAc/searchAc"
 import { apiStatus } from "../../utils/api"
-import { showSubCommentsFn, subComIniVal } from "../detailPage/comments/ForumCommProvider"
+import auth from "../../utils/auth"
+import { areAtLastPage, showSubCommentsFn, subComIniVal } from "../../utils/helpers"
+import { http } from "../../utils/http"
+// import { showSubCommentsFn, subComIniVal } from "../detailPage/comments/ForumCommProvider"
+
+const { isUserLoggedIn, getKeyProfileLoc, setAuth } = auth
 
 // Sends comment
 const doCommentService = async ({
@@ -79,7 +86,7 @@ const doCommentService = async ({
     try {
 
         dispatch(postComment({ status: apiStatus.LOADING, usedById }))
-        const response = await fetchData(obj),
+        const response = await http(obj),
             { message, comment } = resHandler(response)
 
         dispatch(postComment({
@@ -195,7 +202,7 @@ const likeDislikeService = async ({
                     data
                 }))
 
-            await fetchData(obj)
+            await http(obj)
 
         } catch (error) {
             console.log(error);
@@ -228,7 +235,7 @@ const pinForumService = async ({
     }
 
     try {
-        let res = await fetchData(obj)
+        let res = await http(obj)
         res = resHandler(res)
     } catch (error) {
         console.log(error)
@@ -252,7 +259,9 @@ const deleteForumCommService = async ({
 
     if (isSubComment) {
         let indexArr = [];
-        const ids = document.querySelectorAll(`.abc${commentId}`);
+        let ids;
+        if (isWindowPresent())
+            ids = document.querySelectorAll(`.abc${commentId}`);
         ids.forEach(curr => indexArr.push(curr.getAttribute("index")))
         indexArr = [...new Set(indexArr)]
         indexArr = indexArr.reverse();
@@ -279,7 +288,7 @@ const deleteForumCommService = async ({
     }
 
     try {
-        let res = await fetchData(obj)
+        let res = await http(obj)
         res = resHandler(res)
         // toastMethods.toaster2Info(res?.message ?? "Comment deleted successfully")
     } catch (error) {
@@ -310,7 +319,7 @@ const getUsersToTagService = async ({
     }
 
     try {
-        let res = await fetchData(obj)
+        let res = await http(obj)
         res = resHandler(res)
         dispatch(usersToTagAcFn({
             data: res.users,
@@ -344,7 +353,7 @@ const deleteForumService = async ({
             status: apiStatus.LOADING
         }))
 
-        let res = await fetchData(obj)
+        let res = await http(obj)
         res = resHandler(res)
 
         dispatch(deleteForumAcFn({
@@ -398,7 +407,7 @@ const getForumsNConfessions = async ({ SearchReducer, selectedCategory }) => {
         dispatch(searchAcFn({
             status: apiStatus.LOADING
         }))
-        let res = await fetchData(obj)
+        let res = await http(obj)
         res = resHandler(res)
         dispatch(searchAcFn({
             data: append ? [...SearchReducer?.data, ...res.posts] : res.posts,
@@ -426,7 +435,7 @@ const getTagsService = async ({
     }
     try {
         dispatch(forumHandlers.handleForumsTagsAcFn({ status: apiStatus.LOADING }))
-        let res = await fetchData(obj)
+        let res = await http(obj)
         res = resHandler(res)
         const tags = res.tags?.map(curr => ({ value: curr, label: curr }))
         dispatch(forumHandlers.handleForumsTagsAcFn({ data: tags, status: apiStatus.FULFILLED }))

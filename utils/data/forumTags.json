@@ -1,0 +1,22 @@
+[
+    {
+        "tag_name": "Horror",
+        "color_code": "#A9DAFF"
+    },
+    {
+        "tag_name": "Travel",
+        "color_code": "#82E1D0"
+    },
+    {
+        "tag_name": "Sci-Fi",
+        "color_code": "#007DD9"
+    },
+    {
+        "tag_name": "Gaming",
+        "color_code": "#E1CC82"
+    },
+    {
+        "tag_name": "Action",
+        "color_code": "#F19AFF"
+    }
+]

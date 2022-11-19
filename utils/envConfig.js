@@ -1,5 +1,5 @@
 const envConfig = {
-    isProdMode: process.env.REACT_APP_ISPROD_MODE === "true",
+    isProdMode: process.env.REACT_APP_ISPROD_MODE === true,
     tagManagerLiveKey: process.env.REACT_APP_TAGMANAGER_LIVE_KEY,
     tagManagerDevKey: process.env.REACT_APP_TAGMANAGER_DEV_KEY,
     pixelId: process.env.REACT_APP_PIXELID,

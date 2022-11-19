@@ -38,6 +38,15 @@ const setAuth = (data) => {
 
 }
 
+const getToken = () => {
+    return getKeyProfileLoc("token", true);
+}
+
+const getAdminToken = () => {
+    return getKeyProfileLoc("token", true, true);
+}
+
+
 const adminAuthCheck = () => {
 
     if (isWindowPresent()) {
@@ -124,6 +133,27 @@ const getKeyProfileLoc = (key, isToken = false, isAdmin = false) => {
 
 }
 
+// LOGS OUT THE USER
+const logout = async () => {
+    setAuth(0);
+    localStorage.clear()
+    setTokenSentFlag(false)
+    removeFCMToken(false)
+
+    let obj = {
+        data: {},
+        token: token,
+        method: "get",
+        url: "logout"
+    }
+    try {
+        await http(obj)
+        window.location.href = "/login";
+    } catch (err) {
+        window.location.href = "/login";
+    }
+}
+
 
 const auth = {
     checkAuth,
@@ -135,7 +165,10 @@ const auth = {
     getKeyProfileLoc,
     updateKeyProfileLoc,
     isAdminLoggedIn,
-    isUserLoggedIn
+    isUserLoggedIn,
+    getToken,
+    getAdminToken,
+    logout
 }
 
 export default auth;

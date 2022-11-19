@@ -1,0 +1,17 @@
+[
+    {
+        "id": 1,
+        "type_name": "public",
+        "color_code": "#A9FFEA"
+    },
+    {
+        "id": 2,
+        "type_name": "private",
+        "color_code": "#A9DAFF"
+    },
+    {
+         "id": 3,
+        "type_name": "closed",
+        "color_code": "#E18282"
+    }
+]

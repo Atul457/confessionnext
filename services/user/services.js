@@ -2,7 +2,7 @@ import auth from "../../utils/auth";
 import { apiStatus, getMessageToShow, resHandler } from "../../utils/api";
 import { forumHandlers } from "../../redux/actions/forumsAc/forumsAc";
 import { http } from "../../utils/http";
-import { setConfessions } from "../../redux/actions/confession/confessionAc";
+import { setConfessions, updateConfession } from "../../redux/actions/confession/confessionAc";
 
 // Vars
 const {
@@ -73,14 +73,57 @@ const getConfessionsService = async ({
             data: confessions,
             count: res?.count,
             page,
-            hasMore: confessions.length
+            hasMore: confessions.length,
+            append
         }))
 
     } catch (err) {
-        //SERVER ERROR
+        console.log({ err })
+        //Server error
         dispatch(setConfessions({ status: apiStatus.REJECTED, message: getMessageToShow(err?.message) }))
     }
 }
 
 
-export { getCategoriesService, getConfessionsService }
+const likeDislikeService = async ({
+    isLiked,
+    post,
+    dispatch
+}) => {
+
+    let is_liked, ip_address, check_ip, token = '', data;
+    is_liked = isLiked ? 1 : 2;
+    ip_address = localStorage.getItem("ip")
+    check_ip = ip_address.split(".").length
+    if (isUserLoggedIn) {
+        token = localStorage.getItem("userDetails");
+        token = JSON.parse(token).token;
+    }
+
+    if (check_ip === 4) {
+        let obj = {
+            data: { is_liked, ip_address },
+            token: token,
+            method: "post",
+            url: `likedislike/${post.confession_id}`
+        }
+        try {
+            data = {
+                like: isLiked ? post.like + 1 : post.like - 1,
+                is_liked: isLiked ? 1 : 2
+            }
+
+            dispatch(updateConfession({ index: post?.index, data }))
+            await http(obj)
+
+        } catch (error) {
+            console.log(error);
+            console.log("Some error occured");
+        }
+    } else {
+        console.log("Invalid ip");
+    }
+}
+
+
+export { getCategoriesService, getConfessionsService, likeDislikeService }

@@ -7,3 +7,7 @@ const Forums = () => {
 }
 
 export default Forums
+
+Forums.additionalProps = {
+    containsSideAd: true
+}
