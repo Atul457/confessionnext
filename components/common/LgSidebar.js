@@ -6,8 +6,6 @@ import AppLogo from './AppLogo'
 
 export default function LgSidebar(props) {
 
-    console.log(props)
-    
     return (
         <div className="leftColumn">
             <div className="leftColumnWrapper">

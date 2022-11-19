@@ -1,4 +1,4 @@
-import React, { createContext, useEffect } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 // Common Imports
@@ -67,6 +67,12 @@ const UserLayout = ({ children, additionalProps = false }) => {
     // Hooks and vars
     const dispatch = useDispatch()
     const { getKeyProfileLoc, checkAuth } = auth
+    const [userDetails, setUserDetails] = useState('');
+
+    useEffect(() => {
+        setUserDetails(checkAuth() ? JSON.parse(localStorage.getItem("userDetails")) : '')
+    }, [])
+
 
     // Retrieves the categories from the backend, and if authenticated fetches the userDetails also
     useEffect(() => {

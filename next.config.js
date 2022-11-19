@@ -19,7 +19,10 @@ const nextConfig = {
     REACT_APP_LIVE_HOMEPAGE: "https://thetalkplace.com/",
     REACT_APP_DEV_HOMEPAGE: "https://cloudart.com.au/confessionNew",
     REACT_APP_RECAPTCHA_KEY: "https://www.google.com/recaptcha/api.js?render=6LcFvPEfAAAAAL7pDU8PGSIvTJfysBDrXlBRMWgt",
-  }
+  },
+  images: {
+    domains: ['cloudart.com.au'],
+  },
 }
 
 module.exports = nextConfig

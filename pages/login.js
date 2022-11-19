@@ -3,7 +3,6 @@ import GoogleLogin from 'react-google-login';
 import FacebookLogin from 'react-facebook-login/dist/facebook-login-render-props';
 import ForgotPassModal from '../components/user/modals/ForgotPassModal';
 import { useDispatch } from 'react-redux';
-import LgSidebar from '../components/common/LgSidebar';
 import { useRouter } from 'next/router';
 import auth from '../utils/auth';
 import Link from 'next/link';
@@ -71,7 +70,7 @@ const Login = () => {
 
     useEffect(() => {
         if (authenticated === 1) {
-            history("/home");
+            history("/");
         }
     }, [authenticated])
 
@@ -270,7 +269,8 @@ const Login = () => {
                 }
                 setIsLoading(false);
                 loginResponseCont.innerText = res.data.message;
-            } catch {
+            } catch (err) {
+                console.log(err?.message)
                 setIsLoading(false);
                 setErrorOrSuccess(false);
                 loginResponseCont.innerText = "Server Error, Please try again after some time...";
@@ -302,6 +302,7 @@ const Login = () => {
             return false;
         }
         else {
+
             setIsLoading(true);
             loginEmail.innerHTML = '';
             loginPassword.innerHTML = '';
@@ -320,12 +321,12 @@ const Login = () => {
                 url: "login"
             }
             try {
-                const res = await fetchData(obj)
+                const res = await http(obj)
                 if (res.data.status === true) {
                     let userDetails = res.data.body
                     let freshUserDetails = { ...userDetails, profile: { ...userDetails.profile, ...{ comments: userDetails.comments } } };
                     localStorage.setItem("userDetails", JSON.stringify(freshUserDetails));
-                    SetAuth(1);
+                    setAuth(1);
                     setIsLoading(false);
                     setErrorOrSuccess(true);
                     setAuthenticated(1);
@@ -339,7 +340,8 @@ const Login = () => {
                     loginResponseCont.innerHTML = res.data.message;
                     setIsLoading(false);
                 }
-            } catch {
+            } catch (err) {
+                console.log(err?.message)
                 setErrorOrSuccess(false);
                 setIsLoading(false);
                 loginResponseCont.innerHTML = "Server Error, Please try again after some time...";

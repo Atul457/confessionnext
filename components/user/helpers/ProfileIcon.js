@@ -1,6 +1,10 @@
 import Image from 'next/image';
 
-export const ProfileIcon = ({ profileImg = "", isNotFriend = 0 }) => {
+export const ProfileIcon = ({
+    profileImg = "",
+    isNotFriend = 0,
+    openFrReqModalFn_Post = () => { }
+}) => {
 
     // isNotFriend :
     // 0 : SHOW NOTHING
@@ -11,6 +15,7 @@ export const ProfileIcon = ({ profileImg = "", isNotFriend = 0 }) => {
     let profileImage, profileBPlate;
 
     profileImage = profileImg !== '' ? profileImg : "/images/userAcc.svg";
+    const userIcon = "/images/userAcc.svg"
 
     const getHtml = () => {
 
@@ -61,7 +66,7 @@ export const ProfileIcon = ({ profileImg = "", isNotFriend = 0 }) => {
                 <Image
                     width={20}
                     height={20}
-                    src={alRequested}
+                    src="/images/alRequested.svg"
                     type="button"
                     alt="alreadyFriendsIcon"
                     className='registeredUserIndicator' />

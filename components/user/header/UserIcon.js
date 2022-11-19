@@ -1,20 +1,40 @@
 import Image from 'next/image';
 import Link from 'next/link'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { searchAcFn } from '../../../redux/actions/searchAc/searchAc';
 import auth from '../../../utils/auth';
+import { isWindowPresent } from '../../../utils/checkDom';
 
+const { getKeyProfileLoc, checkAuth } = auth
 
 const UserIcon = () => {
 
-    const { getKeyProfileLoc, checkAuth } = auth
-    const SearchReducer = useSelector(store => store.SearchReducer);
+    const [requestsIndicator, setRequestIndicator] = useState(0);
+    const store = useSelector(store => store);
+    const SearchReducer = store.SearchReducer
     const image = getKeyProfileLoc("image")
     const name = getKeyProfileLoc("name")
     const email = getKeyProfileLoc("email")
     const dispatch = useDispatch()
+    const notificationReducer = store.notificationReducer;
+    const [showProfileOption, setShowProfileOption] = useState(false);
+    const [newCommentsCount, setNewCommentsCount] = useState(0);
 
+    useEffect(() => {
+        if (isWindowPresent())
+            setRequestIndicator(localStorage.getItem("requestsCount") ? parseInt(localStorage.getItem("requestsCount")) : 0)
+    }, [])
+
+
+    // Functions
+
+    // OPENS SOCIAL LINKS MODAL
+    const openSocialLinksModal = () => {
+        dispatch(openSLinksModalActionCreators.openModal());
+    }
+
+    // Toggles search box
     const toggleSearchBox = () => {
         if (SearchReducer.visible) {
             return dispatch(searchAcFn({
@@ -25,6 +45,17 @@ const UserIcon = () => {
         dispatch(searchAcFn({
             visible: true
         }))
+    }
+
+    const toggleNotificationCont = () => {
+        if (!notificationReducer.isVisible)
+            return dispatch(openNotiPopup())
+
+        dispatch(closeNotiPopup());
+    }
+
+    const HandleShowHide = () => {
+        setShowProfileOption(!showProfileOption)
     }
 
     return (
