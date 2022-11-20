@@ -48,7 +48,7 @@ const getCategoriesService = async ({ dispatch = () => { } }) => {
 const getConfessionsService = async ({
     act = "all",
     page = 1,
-    append = false,
+    append = false, 
     dispatch
 }) => {
 

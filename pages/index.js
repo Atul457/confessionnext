@@ -38,7 +38,7 @@ const { checkAuth } = auth;
 
 export default function Home({ userDetails }) {
   // Hooks and vars
-  console.log(userDetails)
+  // console.log(userDetails)
   let noOfChar = maxCharAllowedOnPostComment;
   const [categoryShow, setCategoryShow] = useState(false);
   const [adSlots, setAdSlots] = useState([]);

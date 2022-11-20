@@ -23,7 +23,7 @@ import { getTagsService } from "../services/user/forumServices";
 
 // Utils
 import { isWindowPresent } from "../utils/checkDom";
-import auth from "../utils/auth";
+import auth, { handleUserDetails } from "../utils/auth";
 import { envConfig } from "../utils/envConfig";
 import { http } from "../utils/http";
 import { getIP } from "../utils/helpers";
@@ -34,8 +34,10 @@ import { forumHandlers } from "../redux/actions/forumsAc/forumsAc";
 // Data
 import forumTypes from "../utils/data/forumTypes.json";
 import LgSidebar from "../components/common/LgSidebar";
-import Loader from "../components/common/Loader";
+// import Loader from "../components/common/Loader";
 import { authOptions } from "../pages/api/auth/[...nextauth]";
+import { next_auth_status } from "../utils/provider";
+import { resHandler } from "../utils/api";
 
 // Google tag manager
 if (isWindowPresent()) {
@@ -59,7 +61,7 @@ if (envConfig.isProdMode) {
 // Set the ip to localstorage by fetching it from third party
 getIP();
 
-const { checkAuth, setAuth } = auth;
+const { checkAuth, setAuth, getKeyProfileLoc } = auth;
 
 export const AuthContext = createContext(checkAuth());
 
@@ -77,52 +79,62 @@ const UserLayout = ({ children, additionalProps = false }) => {
     userDetails: userDetails ?? {},
   });
   const dispatch = useDispatch();
-  const { getKeyProfileLoc, checkAuth } = auth;
-  //   const [userDetails, setUserDetails] = useState("");
 
   useEffect(() => {
-    // setUserDetails(
-    //   checkAuth() ? JSON.parse(localStorage.getItem("userDetails")) : ""
-    // );
-  }, []);
+    if (status !== next_auth_status.loading) {
+      if (status === next_auth_status.authenticated) {
+        const getProfileData = async () => {
+          if (session) {
+            let obj = {
+              data: {},
+              token: getKeyProfileLoc("token"),
+              method: "get",
+              url: "getprofile",
+            };
+            try {
+              console.log(obj);
+              let res = await http(obj);
+              res = resHandler(res);
+              console.log({ res });
+              if (res.data.status === true) {
+                if (userDetails !== "") {
+                  const user = res.body.profile;
+                  const userDet = {
+                    id: user.user_id,
+                    ...user,
+                    token: res?.body?.token,
+                    comments: res?.body?.comments,
+                    mes: "hello",
+                  };
+                  // console.log(userDet);
+                  if (isWindowPresent()) {
+                    localStorage.setItem(
+                      "userDetails",
+                      JSON.stringify(userDet)
+                    );
+                  }
+                }
+              }
+            } catch (err) {
+              console.log(err?.message);
+            }
+          }
+        };
+        getProfileData();
+        // handleUserDetails({
+        //   userDetails: JSON.stringify(userDetails ?? {}),
+        //   remove: false,
+        // });
+        return;
+      }
+      if (status === next_auth_status.unauthenticated)
+        handleUserDetails({ remove: true });
+    }
+  }, [status]);
 
   // Retrieves the categories from the backend, and if authenticated fetches the userDetails also
   useEffect(() => {
     getTagsService({ dispatch });
-
-    const getProfileData = async () => {
-      //   if (checkAuth()) {
-      //     let obj = {
-      //       data: {},
-      //       token: getKeyProfileLoc("token", true),
-      //       method: "get",
-      //       url: "getprofile",
-      //     };
-      //     try {
-      //       const res = await http(obj);
-      //       if (res.data.status === true) {
-      //         if (userDetails !== "") {
-      //           let freshUserDetails = {
-      //             ...userDetails,
-      //             profile: {
-      //               ...res.data.user,
-      //               ...{ comments: res.data?.comments },
-      //             },
-      //           };
-      //           if (isWindowPresent())
-      //             localStorage.setItem(
-      //               "userDetails",
-      //               JSON.stringify(freshUserDetails)
-      //             );
-      //         }
-      //       }
-      //     } catch (err) {
-      //       console.log(err);
-      //     }
-      //   }
-    };
-    getProfileData();
-
     // Loads recaptcha v3
     const loadScriptByURL = (id, url, callback) => {
       if (isWindowPresent()) {

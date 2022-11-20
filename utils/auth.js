@@ -34,11 +34,11 @@ const setAuth = (data) => {
 };
 
 const getToken = () => {
-  return getKeyProfileLoc("token", true);
+  return getKeyProfileLoc("token");
 };
 
 const getAdminToken = () => {
-  return getKeyProfileLoc("token", true, true);
+  return getKeyProfileLoc("token", true);
 };
 
 const adminAuthCheck = () => {
@@ -107,15 +107,14 @@ const updateKeyProfileLoc = (key, value, isToken = false) => {
   }
 };
 
-const getKeyProfileLoc = (key, isToken = false, isAdmin = false) => {
+const getKeyProfileLoc = (key, isAdmin = false) => {
   if (isWindowPresent()) {
     let userData = "";
     userData = localStorage.getItem(isAdmin ? "adminDetails" : "userDetails");
     userData = JSON.parse(userData);
-    if (isAdmin ? adminAuthCheck() : checkAuth())
-      userData = isToken
-        ? userData?.token ?? "not found"
-        : userData.profile[key];
+    console.log(userData, "userData");
+    console.log("key", key);
+    if (isAdmin ? adminAuthCheck() : checkAuth()) userData = userData[key];
     return userData;
   }
   return false;
@@ -142,6 +141,11 @@ const logout = async () => {
   }
 };
 
+const handleUserDetails = ({ userDetails = {}, remove = false }) => {
+  if (remove) return localStorage.removeItem("userDetails");
+  localStorage.setItem("userDetails", userDetails);
+};
+
 const auth = {
   checkAuth,
   setAuth,
@@ -157,5 +161,7 @@ const auth = {
   getAdminToken,
   logout,
 };
+
+export { handleUserDetails };
 
 export default auth;
