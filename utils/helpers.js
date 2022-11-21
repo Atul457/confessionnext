@@ -3,6 +3,9 @@ import moment from "moment";
 import { isWindowPresent } from "./checkDom";
 import { apiStatus } from "./api";
 import axios from "axios";
+import auth from "./auth";
+
+const { isUserLoggedIn, getKeyProfileLoc } = auth
 
 const getIP = async () => {
   try {
@@ -16,6 +19,11 @@ const getIP = async () => {
     console.log(err?.message, "ip could not be loaded");
   }
 };
+
+// Generates message
+const messageGenerator = (status = false, message = '', data = {}) => {
+  return { status, message, data }
+}
 
 // Copies the passed text to clipboard
 const copyTextToClipboard = (text) => {
@@ -172,6 +180,47 @@ const reportedFormStatus = {
   reported: 1,
 };
 
+const getLocalStorageKey = key => {
+  let value = localStorage.getItem(key) ?? false;
+  return value;
+}
+
+const setLocalStoragekey = (key, value) => {
+  if (!key || value === undefined) return messageGenerator(false, "key or value is undefined")
+  localStorage.setItem(key, value)
+  return messageGenerator(false, "data is saved to localstorage", { key: value })
+}
+
+// Checks whether or not avatar image is used on profile currently
+const isAvatarSelectedCurr = () => {
+  let imgurl = "",
+    check
+  if (isUserLoggedIn) {
+    imgurl = getKeyProfileLoc("image")
+    if (imgurl && imgurl.indexOf("avatar") !== -1)
+      avatars.forEach((curr, index) => {
+        let src = curr.src
+        src = src.split("/")
+        imgurl = `${imgurl}`.split("/")
+        src = src[src.length - 1]
+        imgurl = imgurl[imgurl.length - 1]
+        if (src === imgurl) {
+          check = messageGenerator(true, "Avatar is selected", {
+            currentSelected: curr.src,
+            avatarImageIndex: index
+          })
+          return false
+        }
+      })
+  }
+
+  if (!check || check === "") {
+    check = messageGenerator(false, "Avatar is not selected")
+  }
+
+  return check
+}
+
 const myForum = 2;
 
 const isAllowedToComment = (currForum) => {
@@ -182,7 +231,7 @@ const isAllowedToComment = (currForum) => {
     (!isClosed && (isAllowedType || isApproved)) ||
     currForum?.isReported === myForum ||
     currForum?.isAllowedToComment === true;
-  return auth() && allowToComment;
+  return isUserLoggedIn && allowToComment;
 };
 
 const customStyles = {
@@ -288,4 +337,8 @@ export {
   getIP,
   extValidator,
   pulsationHelper,
+  getLocalStorageKey,
+  setLocalStoragekey,
+  isAvatarSelectedCurr,
+  isAllowedToComment
 };

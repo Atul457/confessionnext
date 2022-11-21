@@ -1,12 +1,13 @@
 // Helpers
-import { deleteForumAcFn, deleteForumCommSubcomAcFn, deleteForum_AcFn, forumHandlers, handleSingleForumCommAcFn, mutateForumFn, usersToTagAcFn } from "../../redux/actions/forumsAc/forumsAc"
-import { searchAcFn } from "../../redux/actions/searchAc/searchAc"
-import { apiStatus } from "../../utils/api"
-import auth from "../../utils/auth"
-import { areAtLastPage, showSubCommentsFn, subComIniVal } from "../../utils/helpers"
-import { http } from "../../utils/http"
+import { deleteForumAcFn, deleteForumCommSubcomAcFn, deleteForum_AcFn, forumHandlers, handleSingleForumCommAcFn, mutateForumFn, usersToTagAcFn } from "../../../../redux/actions/forumsAc/forumsAc"
+import { searchAcFn } from "../../../../redux/actions/searchAc/searchAc"
+import { apiStatus, resHandler } from "../../../../utils/api"
+import auth from "../../../../utils/auth"
+import { areAtLastPage } from "../../../../utils/helpers"
+import { http } from "../../../../utils/http"
+import { showSubCommentsFn, subComIniVal } from "../detailPage/comments/ForumCommProvider"
 
-const { isUserLoggedIn, getKeyProfileLoc, setAuth } = auth
+const { checkAuth, isAdminLoggedIn, getKeyProfileLoc, setAuth } = auth
 
 // Sends comment
 const doCommentService = async ({
@@ -53,8 +54,8 @@ const doCommentService = async ({
     if (error !== "") dispatch(postComment({ message: "", status: apiStatus.IDLE, usedById }))
     commentBoxRef.innerHTML = ""
 
-    if (!auth()) {
-        SetAuth(0);
+    if (!checkAuth()) {
+        setAuth(0);
         return navigate("/login");
     }
 
@@ -148,6 +149,28 @@ const doCommentService = async ({
             dispatch(postComment({ message: err?.message ?? 'Something went wrong', status: apiStatus.REJECTED }))
         }, 1000)
     }
+}
+
+const getCategoriesService = async ({ dispatch = () => { } }) => {
+    const isAdminLoginPage = isAdminLoggedIn()
+    return await new Promise(async (resolve, reject) => {
+        var token = "";
+        token = getKeyProfileLoc("token", true, true) ?? (getKeyProfileLoc("token", true, false) ?? "")
+        let obj = {
+            data: {},
+            token: token,
+            method: isAdminLoginPage ? "post" : "get",
+            url: isAdminLoginPage ? "admin/getcategories" : "getcategories"
+        }
+        try {
+            let res = await http(obj)
+            res = resHandler(res)
+            dispatch(forumHandlers.handleForumCatsAcFn({ data: res?.categories }))
+            resolve(res);
+        } catch (err) {
+            reject(err);
+        }
+    })
 }
 
 const likeDislikeService = async ({
@@ -250,9 +273,7 @@ const deleteForumCommService = async ({
 
     if (isSubComment) {
         let indexArr = [];
-        let ids;
-        if (isWindowPresent())
-            ids = document.querySelectorAll(`.abc${commentId}`);
+        const ids = document.querySelectorAll(`.abc${commentId}`);
         ids.forEach(curr => indexArr.push(curr.getAttribute("index")))
         indexArr = [...new Set(indexArr)]
         indexArr = indexArr.reverse();
@@ -438,6 +459,9 @@ const getTagsService = async ({
     }
 }
 
+
+
+
 export {
     doCommentService,
     likeDislikeService,
@@ -446,5 +470,6 @@ export {
     getForumsNConfessions,
     deleteForumCommService,
     deleteForumService,
-    getTagsService
+    getTagsService,
+    getCategoriesService
 }

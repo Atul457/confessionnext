@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState, cloneElement } from "react";
+import React, { createContext, useEffect, cloneElement } from "react";
 import { useDispatch } from "react-redux";
 
 // Common Imports
@@ -34,10 +34,11 @@ import { forumHandlers } from "../redux/actions/forumsAc/forumsAc";
 // Data
 import forumTypes from "../utils/data/forumTypes.json";
 import LgSidebar from "../components/common/LgSidebar";
-// import Loader from "../components/common/Loader";
 import { authOptions } from "../pages/api/auth/[...nextauth]";
 import { next_auth_status } from "../utils/provider";
 import { resHandler } from "../utils/api";
+import { signOut } from "next-auth/react";
+
 
 // Google tag manager
 if (isWindowPresent()) {
@@ -61,7 +62,7 @@ if (envConfig.isProdMode) {
 // Set the ip to localstorage by fetching it from third party
 getIP();
 
-const { checkAuth, setAuth, getKeyProfileLoc } = auth;
+const { checkAuth, setAuth } = auth;
 
 export const AuthContext = createContext(checkAuth());
 
@@ -74,63 +75,62 @@ const UserLayout = ({ children, additionalProps = false }) => {
 
   // Hooks and vars
   const { data: session, status } = useSession();
+  const logout = isWindowPresent() ? localStorage.getItem("logout") : "0"
   const userDetails = session?.user;
   const updatedChildren = cloneElement(children, {
-    userDetails: userDetails ?? {},
+    userDetails: userDetails,
   });
+
   const dispatch = useDispatch();
 
   useEffect(() => {
-    if (status !== next_auth_status.loading) {
-      if (status === next_auth_status.authenticated) {
-        const getProfileData = async () => {
-          if (session) {
-            let obj = {
-              data: {},
-              token: getKeyProfileLoc("token"),
-              method: "get",
-              url: "getprofile",
-            };
-            try {
-              console.log(obj);
-              let res = await http(obj);
-              res = resHandler(res);
-              console.log({ res });
-              if (res.data.status === true) {
-                if (userDetails !== "") {
-                  const user = res.body.profile;
-                  const userDet = {
-                    id: user.user_id,
-                    ...user,
-                    token: res?.body?.token,
-                    comments: res?.body?.comments,
-                    mes: "hello",
-                  };
-                  // console.log(userDet);
-                  if (isWindowPresent()) {
-                    localStorage.setItem(
-                      "userDetails",
-                      JSON.stringify(userDet)
-                    );
-                  }
-                }
-              }
-            } catch (err) {
-              console.log(err?.message);
-            }
-          }
+    if (session && status === next_auth_status.authenticated) {
+      const getProfileData = async () => {
+
+        // Means that may have been inactivated or deleted form db
+        const logout = localStorage.getItem("logout")
+        if (session && logout === "1") {
+          localStorage.clear()
+          return await signOut({ redirect: false })
+        }
+
+        let obj = {
+          data: {},
+          clientSide: true,
+          token: session?.user?.token,
+          method: "get",
+          url: "getprofile",
         };
-        getProfileData();
-        // handleUserDetails({
-        //   userDetails: JSON.stringify(userDetails ?? {}),
-        //   remove: false,
-        // });
-        return;
+        try {
+          let res = await http(obj);
+          res = resHandler(res);
+          if (res.status === true) {
+            const user = res.user;
+            const userDet = {
+              id: user.user_id,
+              ...user,
+              token: session?.user?.token,
+              comments: res?.comments
+            };
+            localStorage.setItem(
+              "userDetails",
+              JSON.stringify(userDet)
+            );
+          } else {
+            console.log(res)
+          }
+        } catch (err) {
+          console.log(err?.message);
+        }
       }
-      if (status === next_auth_status.unauthenticated)
-        handleUserDetails({ remove: true });
+      getProfileData();
     }
-  }, [status]);
+    else if (status === next_auth_status.unauthenticated) {
+      handleUserDetails({ remove: true });
+    }
+
+  }, [session, status, logout]);
+
 
   // Retrieves the categories from the backend, and if authenticated fetches the userDetails also
   useEffect(() => {
@@ -153,7 +153,7 @@ const UserLayout = ({ children, additionalProps = false }) => {
       }
     };
 
-    loadScriptByURL("recaptcha-key", envConfig.recaptchaKey, function () {});
+    loadScriptByURL("recaptcha-key", envConfig.recaptchaKey, function () { });
 
     // End of load recaptcha v3
     let { handleForumsTypesAcFn } = forumHandlers;
@@ -162,8 +162,10 @@ const UserLayout = ({ children, additionalProps = false }) => {
     getCategoriesService({ dispatch });
   }, []);
 
+
+
   if (status === "loading" || session === undefined) {
-    return <h1 align="center">Loading</h1>;
+    return <h4 align="center">Loading</h4>;
   }
 
   return (
@@ -172,9 +174,8 @@ const UserLayout = ({ children, additionalProps = false }) => {
         <Meta />
         <main className="container-fluid">
           <div
-            className={`row outerContWrapper${
-              additionalProps?.containsSideAd ? " bg-white" : ""
-            }`}
+            className={`row outerContWrapper${!additionalProps?.authPage ? " not_auth_page" : ""
+              }`}
           >
             {additionalProps?.authPage ? null : (
               <Header userDetails={userDetails} />
@@ -187,9 +188,8 @@ const UserLayout = ({ children, additionalProps = false }) => {
             )}
 
             <div
-              className={`rightColumn${
-                additionalProps?.containsSideAd ? " side_ads_page" : ""
-              }${additionalProps?.authPage ? " auth_page" : ""}`}
+              className={`rightColumn${additionalProps?.containsSideAd ? " side_ads_page" : ""
+                }${additionalProps?.authPage ? " auth_page" : ""}${additionalProps?.containsSideAd && additionalProps?.authPage ? " not_contains_sidead" : ""}`}
             >
               <div className="rightMainFormCont rightMainFormContFeed p-0">
                 {additionalProps?.authPage ? null : (
@@ -205,7 +205,6 @@ const UserLayout = ({ children, additionalProps = false }) => {
                 )}
               </div>
             </div>
-            {/* </div> */}
 
             {additionalProps?.containsSideAd ? (
               <div className="rightsideBarAdd">
@@ -216,7 +215,9 @@ const UserLayout = ({ children, additionalProps = false }) => {
         </main>
 
         <Footer />
+        
         <FooterScripts />
+
       </AuthContext.Provider>
     </>
   );
@@ -229,7 +230,9 @@ export async function getServerSideProps(context) {
     authOptions
   );
   return {
-    props: {},
+    props: {
+      session
+    },
   };
 }
 

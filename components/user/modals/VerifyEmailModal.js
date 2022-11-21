@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
-import { fetchData } from '../../../commonApi';
-import auth from '../../behindScenes/Auth/AuthCheck';
-import everifyLogo from "../../../images/everifyLogo.png";
 import { useDispatch, useSelector } from 'react-redux';
 import { EVerifyModal } from '../../../redux/actions/everify';
+import { http } from '../../../utils/http';
+import { useSession } from 'next-auth/react';
 
 
 export default function VerifyEmailModal(props) {
 
     const verifyEState = useSelector(store => store.VerifyEmail);
+    const { data: session } = useSession()
     const dispatch = useDispatch();
     const [email, setEmail] = useState("");
     const [error, setError] = useState({ visible: true, content: "" });
     const [userDetails] = useState(() => {
-        if (auth()) {
-            let userDetails = localStorage.getItem("userDetails");
+        if (session) {
+            let userDetails = localStorage.getItem("userDetails") ?? "{}";
             userDetails = JSON.parse(userDetails);
             return userDetails;
         } else {
@@ -47,7 +47,7 @@ export default function VerifyEmailModal(props) {
 
         let regex = /^[\d\D]+@[a-zA-Z0-9.-]+\.[\d\D]{2,4}$/;
         let _email = "";
-        if (!userDetails.profile.email) {
+        if (!userDetails?.email) {
             if (email.trim() === "") {
                 setError({
                     ...error,
@@ -66,7 +66,7 @@ export default function VerifyEmailModal(props) {
 
         let obj = {
             data: { email: _email },
-            token: userDetails.token,
+            token: userDetails?.token ?? "",
             method: "post",
             url: "sendverifyemail"
         }
@@ -74,7 +74,7 @@ export default function VerifyEmailModal(props) {
         dispatch(EVerifyModal({ ...verifyEState, isLoading: true, verified: true }))
 
         try {
-            const res = await fetchData(obj)
+            const res = await http(obj)
             if (res.data.status === true) {
                 dispatch(EVerifyModal({ ...verifyEState, isLoading: false, visible: false, verified: true }))
                 return;
@@ -95,11 +95,11 @@ export default function VerifyEmailModal(props) {
                         <i className="fa fa-times" aria-hidden="true"></i>
                     </span>
                 </Modal.Header>
-                {userDetails && userDetails.profile.email ?
+                {userDetails && userDetails?.email ?
                     <>
                         <Modal.Body className="privacyBody eVerifyModal">
 
-                            <img src={everifyLogo} className='regions img' alt="" />
+                            <img src="/images/everifyLogo.png" className='regions img' alt="everifyLogo" />
 
                             {/* VERBIAGE */}
                             <div className='regions'>

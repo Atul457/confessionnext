@@ -4,21 +4,18 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 // Utils
-import auth from "../../../utils/auth";
 import NavLink from "../../../utils/NavLink";
 import { useSelector } from "react-redux";
+import { useSession } from "next-auth/react";
 
 const HeadMenus = (props) => {
+
   // Hooks and vars
+  const { data: session } = useSession();
   const currentUrl = useRouter().pathname.replace("/", "");
-  const { isUserLoggedIn } = auth;
-  const [authenticated, setAuthenticated] = useState(false);
   const store = useSelector((store) => store);
   const notificationReducer = store.notificationReducer;
 
-  useEffect(() => {
-    setAuthenticated(isUserLoggedIn);
-  }, []);
 
   return (
     <div className="d-none d-md-block pr-0">
@@ -26,8 +23,7 @@ const HeadMenus = (props) => {
         <div className="linkBtns" onClick={props?.refreshFeed}>
           <NavLink href="/" className="headerNavLinks">
             <span className="headIconCont">
-              <Image
-                fill={true}
+              <img
                 src={
                   currentUrl === ""
                     ? "/images/homeIcon.svg"
@@ -37,9 +33,8 @@ const HeadMenus = (props) => {
               />
             </span>
             <span
-              className={`headLinkName ${
-                currentUrl === "" ? "activeLinkOfHeader" : ""
-              }`}
+              className={`headLinkName ${currentUrl === "" ? "activeLinkOfHeader" : ""
+                }`}
             >
               Home
             </span>
@@ -49,30 +44,27 @@ const HeadMenus = (props) => {
         <div className="linkBtns">
           <NavLink href="/forums" className="headerNavLinks">
             <span className="headIconCont">
-              <Image
-                fill={true}
+              <img
                 src="/images/confessIconActive.svg"
                 alt="confessIconActive"
                 className="active"
               />
-              <Image
-                fill={true}
+              <img
                 src="/images/confessIcon.svg"
                 alt="confessIcon"
                 className="inactive"
               />
             </span>
             <span
-              className={`headLinkName ${
-                currentUrl === "forums" ? "activeLinkOfHeader" : ""
-              }`}
+              className={`headLinkName ${currentUrl === "forums" ? "activeLinkOfHeader" : ""
+                }`}
             >
               Forums
             </span>
           </NavLink>
         </div>
 
-        {authenticated ? (
+        {session ? (
           <div className="linkBtns">
             <Link href="/chat" className="headerNavLinks">
               <span className="headIconCont">
@@ -86,11 +78,10 @@ const HeadMenus = (props) => {
                 />
               </span>
               <span
-                className={`headLinkName ${
-                  notificationReducer.messagesCount > 0
-                    ? "newInboxMessages"
-                    : ""
-                } ${currentUrl === "chat" ? "activeLinkOfHeader" : ""}`}
+                className={`headLinkName ${notificationReducer.messagesCount > 0
+                  ? "newInboxMessages"
+                  : ""
+                  } ${currentUrl === "chat" ? "activeLinkOfHeader" : ""}`}
               >
                 Inbox
               </span>
@@ -100,8 +91,7 @@ const HeadMenus = (props) => {
           <div className="linkBtns">
             <Link href="/report" className="headerNavLinks">
               <span className="headIconCont">
-                <Image
-                  fill={true}
+                <img
                   className="contactUsIcon"
                   src={
                     currentUrl === "report"
@@ -112,9 +102,8 @@ const HeadMenus = (props) => {
                 />
               </span>
               <span
-                className={`headLinkName ${
-                  currentUrl === "report" ? "activeLinkOfHeader" : ""
-                }`}
+                className={`headLinkName ${currentUrl === "report" ? "activeLinkOfHeader" : ""
+                  }`}
               >
                 Contact us
               </span>

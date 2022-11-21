@@ -25,17 +25,12 @@ export const http = async (props) => {
     try {
       const response = await axios(config);
       if (response?.data?.status === true) {
-        resolve(response);
-        return response;
+        return resolve(response);
       } else {
         if (response?.data?.logout === true) {
-          if (isWindowPresent()) {
-            // localStorage.removeItem("authenticated");
-            // localStorage.removeItem("userDetails");
-            // window.location.href = "/login?message=1";
-          }
+          if (props.clientSide) localStorage.setItem("logout", "1")
         }
-        return response;
+        return resolve(response);
       }
     } catch (error) {
       reject(error);

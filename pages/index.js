@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 
 // Third party
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -21,24 +22,30 @@ import {
   maxImageSizeAllowed_Feed,
   showAdsAfter_Feed,
 } from "../utils/provider";
-import { envConfig } from "../utils/envConfig";
+
 import AdMob, { AdSense_ } from "../components/user/ads/AdMob";
 import { setConfessions } from "../redux/actions/confession/confessionAc";
+
+// Utils
 import useCommentsModal from "../utils/hooks/useCommentsModal";
 import useFeaturesModal from "../utils/hooks/useFeaturesModal";
 import { isWindowPresent } from "../utils/checkDom";
-import Image from "next/image";
-import { extValidator, pulsationHelper } from "../utils/helpers";
+import { extValidator, getLocalStorageKey, pulsationHelper, isAvatarSelectedCurr } from "../utils/helpers";
 import { http } from "../utils/http";
 
+// Modals
 import PrivacyModal from "../components/user/modals/PrivacyModal";
 import { scrollToTop } from "../utils/dom";
+import ReportPostModal from "../components/user/modals/ReportPostModal";
+import AvatarsIntroModal from "../components/user/modals/AvatarsIntroModal";
+import { toggleAvatarIntroModal } from "../redux/actions/avatarsIntroModalAc/avatarsIntroModalAc";
+
 
 const { checkAuth } = auth;
 
 export default function Home({ userDetails }) {
+
   // Hooks and vars
-  // console.log(userDetails)
   let noOfChar = maxCharAllowedOnPostComment;
   const [categoryShow, setCategoryShow] = useState(false);
   const [adSlots, setAdSlots] = useState([]);
@@ -136,7 +143,39 @@ export default function Home({ userDetails }) {
     }
   }, [privacyModal.accepted]);
 
+  // Prevents modals from being open in sharewithlove modal, and comments got modal
+  useEffect(() => {
+    // only if verify email modal is closed by user then show avatars modal
+    let timeout,
+      isVerifyEmailModalShown = verifyEmailReducer.verified,
+      privacyAccepted_ = getLocalStorageKey("privacyAccepted") === "1",
+      isAvatarSelected = isAvatarSelectedCurr().status
+
+    if ((isVerifyEmailModalShown
+      && !isAvatarSelected
+      && avatarsIntroModalReducer?.visible === false
+      && avatarsIntroModalReducer?.isShown === false) || (checkAuth() === false && avatarsIntroModalReducer?.isShown === false && privacyAccepted_)) {
+      timeout = setTimeout(() => {
+        openAvatarModal();
+      }, 10000);
+    }
+    return () => {
+      clearTimeout(timeout)
+    }
+  }, [commentsModalReducer, shareWithLoveReducer, verifyEmailReducer.verified, privacyModal.accepted])
+
+
   // Functions
+
+  // Avatar intro modal
+  function openAvatarModal() {
+    let commentsModalVisibility = commentsModalReducer.visible,
+      shareWithLoveModalVisibility = shareWithLoveReducer.visible,
+      appreciationModalVisibiltiy = appreciationModal?.visible
+    if (commentsModalVisibility === false && appreciationModalVisibiltiy === false && shareWithLoveModalVisibility === false) {
+      dispatch(toggleAvatarIntroModal({ visible: true, isShown: true }))
+    }
+  }
 
   // Opens the select box
   const openSelect = () => {
@@ -488,9 +527,8 @@ export default function Home({ userDetails }) {
                 <div className="wrapperBtnsImages">
                   {/* Upload images cont */}
                   <div
-                    className={`cstmUploadFileCont feedPage ${
-                      base64Src.length > 0 ? "feedMb15" : ""
-                    }`}
+                    className={`cstmUploadFileCont feedPage ${base64Src.length > 0 ? "feedMb15" : ""
+                      }`}
                   >
                     <div className="uploadImgFeedCont">
                       <label
@@ -573,9 +611,8 @@ export default function Home({ userDetails }) {
               {/* error view in mobile */}
               <div className="w-100 errorFieldsCPost p-0 text-center d-block d-md-none">
                 <div
-                  className={`responseCont mt-0 ${
-                    errorOrSuccess ? "text-success" : "text-danger"
-                  }`}
+                  className={`responseCont mt-0 ${errorOrSuccess ? "text-success" : "text-danger"
+                    }`}
                   id="responseCont"
                 ></div>
               </div>
@@ -654,9 +691,8 @@ export default function Home({ userDetails }) {
           {/* Error view in Web */}
           <div className="d-none d-md-block w-100 errorFieldsCPost p-0">
             <div
-              className={`responseCont mt-0 ${
-                errorOrSuccess ? "text-success" : "text-danger"
-              }`}
+              className={`responseCont mt-0 ${errorOrSuccess ? "text-success" : "text-danger"
+                }`}
               id="responseCont"
             ></div>
           </div>
@@ -720,21 +756,32 @@ export default function Home({ userDetails }) {
       {/* PRIVACY MODAL */}
       {isWindowPresent()
         ? document.querySelector("#description") &&
-          document.querySelector("#description").value !== "" &&
-          postAlertReducer.visible === true && (
-            <>
-              <PostAlertModal
-                data={{
-                  feed: {
-                    selectedCat,
-                    description: document.querySelector("#description").value,
-                  },
-                }}
-                postConfession={postConfession}
-              />
-            </>
-          )
+        document.querySelector("#description").value !== "" &&
+        postAlertReducer.visible === true && (
+          <>
+            <PostAlertModal
+              data={{
+                feed: {
+                  selectedCat,
+                  description: document.querySelector("#description").value,
+                },
+              }}
+              postConfession={postConfession}
+            />
+          </>
+        )
         : null}
+
+      {/* Report post modal */}
+      {reportPostModalReducer.visible && <ReportPostModal />}
+
+      {/* Features modal */}
+      <Features visible={featuresState.visibile} closeModal={closeFeatures}
+      />
+
+      {/* Avatar intro modal */}
+      <AvatarsIntroModal />
+
     </>
   );
 }

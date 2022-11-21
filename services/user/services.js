@@ -48,12 +48,12 @@ const getCategoriesService = async ({ dispatch = () => { } }) => {
 const getConfessionsService = async ({
     act = "all",
     page = 1,
-    append = false, 
+    append = false,
     dispatch
 }) => {
 
     // Vars
-    var token = getKeyProfileLoc("token", true) ?? "";
+    var token = getKeyProfileLoc("token") ?? "";
 
     dispatch(setConfessions({ status: apiStatus.LOADING, message: "" }))
 

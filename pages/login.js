@@ -15,12 +15,14 @@ import { useSession, signIn } from "next-auth/react";
 import { envConfig } from "../utils/envConfig";
 import { authOptions } from "./api/auth/[...nextauth]";
 
-const Login = (props) => {
-  const router = useRouter();
+const Login = () => {
 
-  const { checkAuth, setAuth } = auth;
+  // Hooks and vars
+  const router = useRouter();
+  const { data: session } = useSession()
+  const { setAuth } = auth;
   let mess = {
-    get: () => {},
+    get: () => { },
   };
   mess = mess?.get("message");
   const dispatch = useDispatch();
@@ -35,7 +37,6 @@ const Login = (props) => {
   }, [mess]);
 
   let history = router.push;
-  const [authenticated, setAuthenticated] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorOrSuccess, setErrorOrSuccess] = useState(true);
@@ -51,8 +52,16 @@ const Login = (props) => {
   });
 
   useEffect(() => {
-    setAuthenticated(checkAuth());
-  }, []);
+    if (session) {
+      setAuth(1)
+      const user = session.user;
+      localStorage.setItem(
+        "userDetails",
+        JSON.stringify(user)
+      );
+      history("/login")
+    }
+  }, [session])
 
   const acceptPrivacy = () => {
     setPrivacyModal({ ...privacyModal, accepted: true, visible: false });
@@ -72,23 +81,13 @@ const Login = (props) => {
 
   // END OF PRIVACY MODAL
 
-  useEffect(() => {
-    if (authenticated === 1) {
-      //   history("/");
-    }
-  }, [authenticated]);
-
   //GETS THE DATA FROM THE GOOGLE LOGIN API,
   //AND CHECKS WHETHER THE USER IS REGISTERED OR NOT
   const responseGoogle = async (data) => {
+
     let loginResponseCont = document.getElementById("loginResponseCont");
     let profileData = data.profileObj;
-
-    // console.log({ profileData });
-
-    if (!data.profileObj) {
-      return false;
-    }
+    if (!data.profileObj) return false;
 
     if (profileData.googleId && profileData.googleId !== "") {
       setIsLoading(true);
@@ -98,57 +97,41 @@ const Login = (props) => {
         source: 2,
       };
 
-      let obj = {
-        data: socialLoginData,
-        token: "",
-        method: "post",
-        url: "sociallogin",
-      };
       try {
-        const res = await http(obj);
-        if (res.data.status === true) {
-          if (res.data.is_registered === 1) {
-            //USER IS REGISTERED, LOGINS THE USER
-            let userDetails = res.data.body;
-            let freshUserDetails = {
-              ...userDetails,
-              profile: {
-                ...userDetails.profile,
-                ...{ comments: userDetails.comments },
-              },
-            };
-            localStorage.setItem(
-              "userDetails",
-              JSON.stringify(freshUserDetails)
-            );
-            // localStorage.setItem("userDetails", JSON.stringify(res.data.body));
-            setAuth(1);
-            setErrorOrSuccess(true);
-            setAuthenticated(1);
-            loginResponseCont.innerHTML = "";
-            localStorage.removeItem("adminDetails");
-            localStorage.removeItem("adminAuthenticated");
-            localStorage.setItem("privacyAccepted", 1);
-            return;
-          }
-        } else if (res.data.status === false) {
-          //USER IS NOT REGISTERD
-          setErrorOrSuccess((prevState) => !prevState === false && !prevState);
-          if (res.data.is_registered === 0) {
-            //USER IS NOT REGISTERD, REGISTERS THE USER
-            registerUserWithSocial(profileData);
-          } else if (res.data.message !== "") {
-            loginResponseCont.innerText = res.data.message;
-          } else {
-            console.log(res);
-          }
+        const res = await signIn("credentials", {
+          ...socialLoginData,
+          redirect: false,
+          login: true,
+          token: "",
+          method: "post",
+          url: "sociallogin",
+        });
+
+        if (res?.error) {
+          let error = res.error
+          error = JSON.parse(error)
+          if (error?.is_registered === 0) registerUserWithSocial(profileData)
+          loginResponseCont.innerHTML = ""
+          setErrorOrSuccess(false);
           return setIsLoading(false);
         }
-        setIsLoading(false);
-      } catch (err) {
-        console.log(err);
-        setIsLoading(false);
+
+        setAuth(1);
+        setErrorOrSuccess(true);
+        loginResponseCont.innerHTML = "";
+        localStorage.removeItem("adminDetails");
+        localStorage.removeItem("adminAuthenticated");
+        localStorage.setItem("privacyAccepted", 1);
+        setIsLoading(false)
+
       }
+      catch (err) {
+        setIsLoading(false)
+        setErrorOrSuccess(false);
+        loginResponseCont.innerHTML = "something went wrong"
+        console.log(err?.message)
+      }
+
     } else {
       console.log(data);
     }
@@ -180,56 +163,39 @@ const Login = (props) => {
         source: 3,
       };
 
-      let obj = {
-        data: socialLoginData,
-        token: "",
-        method: "post",
-        url: "sociallogin",
-      };
       try {
-        const res = await fetchData(obj);
-        if (res.data.status === true) {
-          if (res.data.is_registered === 1) {
-            //USER IS REGISTERED, LOGINS THE USER
-            let userDetails = res.data.body;
-            let freshUserDetails = {
-              ...userDetails,
-              profile: {
-                ...userDetails.profile,
-                ...{ comments: userDetails.comments },
-              },
-            };
-            localStorage.setItem(
-              "userDetails",
-              JSON.stringify(freshUserDetails)
-            );
-            setAuth(1);
-            setErrorOrSuccess(true);
-            setIsLoading(false);
-            setAuthenticated(1);
-            loginResponseCont.innerHTML = "";
-            localStorage.removeItem("adminDetails");
-            localStorage.removeItem("adminAuthenticated");
-            localStorage.setItem("privacyAccepted", 1);
-            return;
-          }
-        } else if (res.data.status === false) {
-          setErrorOrSuccess((prevState) => !prevState === false && !prevState);
-          if (res.data.is_registered === 0) {
-            //USER IS NOT REGISTERD, REGISTERS THE USER
-            if (res.data.is_registered === 0) {
-              registerUserWithSocialFb(profileData);
-            }
-          } else if (res.data.message !== "") {
-            loginResponseCont.innerText = res.data.message;
-          } else {
-            console.log(res);
-          }
+        const res = await signIn("credentials", {
+          ...socialLoginData,
+          redirect: false,
+          login: true,
+          token: "",
+          method: "post",
+          url: "sociallogin",
+        });
+
+        if (res?.error) {
+          let error = res.error
+          error = JSON.parse(error)
+          if (error?.is_registered === 0) registerUserWithSocialFb(profileData)
+          loginResponseCont.innerHTML = ""
+          setErrorOrSuccess(false);
           return setIsLoading(false);
         }
-      } catch (err) {
-        console.log(err);
-        setIsLoading(false);
+
+        setAuth(1);
+        setErrorOrSuccess(true);
+        loginResponseCont.innerHTML = "";
+        localStorage.removeItem("adminDetails");
+        localStorage.removeItem("adminAuthenticated");
+        localStorage.setItem("privacyAccepted", 1);
+        setIsLoading(false)
+
+      }
+      catch (err) {
+        setIsLoading(false)
+        setErrorOrSuccess(false);
+        loginResponseCont.innerHTML = "something went wrong"
+        console.log(err?.message)
       }
     } else {
       console.log(response);
@@ -242,7 +208,7 @@ const Login = (props) => {
     setSourceId(profileData.source_id);
     setSource(3);
     setPassword("");
-    register(true);
+    register();
   };
 
   const register = async () => {
@@ -259,50 +225,34 @@ const Login = (props) => {
         source_id: sourceId,
       };
 
-      let obj = {
-        data: registerFromData,
-        token: "",
-        method: "post",
-        url: "register",
-      };
-
       try {
-        const res = await fetchData(obj);
-        if (res.data.status === true) {
-          setAuthenticated(true);
-          setErrorOrSuccess(true);
-          let userDetails = res.data.body;
-          let freshUserDetails = {
-            ...userDetails,
-            profile: {
-              ...userDetails.profile,
-              ...{ comments: userDetails.comments },
-            },
-          };
-          localStorage.setItem("userDetails", JSON.stringify(freshUserDetails));
-          signIn("credentials");
+        const res = await signIn("credentials", {
+          ...registerFromData,
+          redirect: false,
+          login: false,
+          token: "",
+          method: "post",
+          url: "register",
+        });
 
-          //   const res = await signIn("credentials", {
-          //     ...userCredentials,
-          //     redirect: false,
-          //   });
-
-          //   setAuth(1);
-          localStorage.removeItem("adminDetails");
-          localStorage.removeItem("adminAuthenticated");
-          //   history("/home");
-        } else {
+        if (res?.error) {
+          loginResponseCont.innerHTML = res?.error;
           setErrorOrSuccess(false);
+          return setIsLoading(false);
         }
-        setIsLoading(false);
-        loginResponseCont.innerText = res.data.message;
+
+        localStorage.setItem("privacyAccepted", 1);
+        localStorage.removeItem("adminDetails");
+        localStorage.removeItem("adminAuthenticated")
+        setIsLoading(false)
+
       } catch (err) {
-        console.log(err?.message);
-        setIsLoading(false);
+        console.log({ err: err?.message });
+        setIsLoading(false)
         setErrorOrSuccess(false);
-        loginResponseCont.innerText =
-          "Server Error, Please try again after some time...";
+        loginResponseCont.innerHTML = "something went wrong"
       }
+
     } else {
       setPrivacyModal({ ...privacyModal, visible: true });
     }
@@ -338,14 +288,8 @@ const Login = (props) => {
         source: "1",
       };
 
-      let obj = {
-        data: registerFromData,
-        token: "",
-        method: "post",
-        url: "login",
-      };
       try {
-        await signIn("credentials", {
+        const res = await signIn("credentials", {
           ...registerFromData,
           redirect: false,
           login: true,
@@ -354,39 +298,20 @@ const Login = (props) => {
           url: "login",
         });
 
-        return false;
-        const res = await http(obj);
-        if (res.data.status === true) {
-          let userDetails = res.data.body;
-          let freshUserDetails = {
-            ...userDetails,
-            profile: JSON.stringify({
-              ...userDetails.profile,
-              ...{ comments: userDetails.comments },
-            }),
-          };
-
-          localStorage.setItem("userDetails", JSON.stringify(freshUserDetails));
-          setAuth(1);
-          setIsLoading(false);
-          setErrorOrSuccess(true);
-          setAuthenticated(1);
-          loginResponseCont.innerHTML = "";
-          localStorage.removeItem("adminDetails");
-          localStorage.removeItem("adminAuthenticated");
-          localStorage.setItem("privacyAccepted", 1);
-        } else {
+        if (res?.error) {
+          loginResponseCont.innerHTML = res?.error;
           setErrorOrSuccess(false);
-          setAuthenticated(false);
-          loginResponseCont.innerHTML = res.data.message;
-          setIsLoading(false);
+          return setIsLoading(false);
         }
+
+        localStorage.setItem("privacyAccepted", 1);
+        localStorage.removeItem("adminDetails");
+        localStorage.removeItem("adminAuthenticated")
+        setIsLoading(false)
+
       } catch (err) {
-        console.log(err?.message);
-        setErrorOrSuccess(false);
-        setIsLoading(false);
-        loginResponseCont.innerHTML =
-          "Server Error, Please try again after some time...";
+        console.log({ err: err?.message });
+        setIsLoading(false)
       }
     }
   }
@@ -535,9 +460,8 @@ const Login = (props) => {
         </button>
 
         <div
-          className={`responseCont ${
-            errorOrSuccess ? "text-success" : "text-danger"
-          }`}
+          className={`responseCont ${errorOrSuccess ? "text-success" : "text-danger"
+            }`}
           id="loginResponseCont"
         ></div>
 
@@ -607,7 +531,7 @@ const Login = (props) => {
 
       {/* PRIVACY MODAL */}
       <PrivacyModal
-        openFeatures={() => {}}
+        openFeatures={() => { }}
         privacyModal={privacyModal}
         acceptPrivacy={acceptPrivacy}
         handlePrivacyModal={handlePrivacyModal}

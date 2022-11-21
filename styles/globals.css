@@ -20,6 +20,14 @@
   display: none !important;
 }
 
+.not_auth_page {
+  background-color: #fff !important;
+}
+
+.not_contains_sidead {
+  margin-left: 380px;
+}
+
 .bounceOff {
   position: fixed;
   overflow: hidden;
@@ -4000,9 +4008,12 @@ span.facebookMobIcon {
   position: relative;
 }
 
+.not_auth_page .rightColumn {
+  margin-left: 380px;
+}
+
 .rightColumn {
   width: calc(100% - 380px);
-  /* margin-left: 380px; */
   border-radius: 0px;
   background-color: var(--whiteColor);
   /* width: 100%; */
@@ -5223,6 +5234,11 @@ i.viewPrevPostIn:hover+.ljkdjfkl {
 .featuresModal .control-dots .dot {
   background-color: var(--primaryColor) !important;
   box-shadow: none;
+}
+
+.featuresModal .imgWrapper {
+  position: relative;
+  height: 100px;
 }
 
 .featuresModal .carousel.carousel-slider {
@@ -8121,6 +8137,10 @@ button.modalFootBtns.btn a:hover {
     color: white;
     font-weight: 500;
     background: var(--orangeColor);
+  }
+
+  .not_auth_page .rightColumn {
+    margin-left: 0px;
   }
 }
 

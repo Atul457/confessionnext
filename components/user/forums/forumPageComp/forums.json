@@ -1,0 +1,67 @@
+[
+        {
+            "id": 1,
+            "name": "The Official Fighting Game Thread - v1",
+            "description": "The Think From Another World The Think From Another World The Think From Another World  From Another World The Think From Another World The Think From Another World The Think From Another World  From Another World",
+            "categoryId": 1,
+            "created_at": "2022-09-15 11:37:48",
+            "no_of_comments": 6,
+            "viewcount": 10,
+            "pinned": 0,
+            "forum_type": 0,
+            "tags": [0, 1],
+            "is_joined": 0
+        },
+        {
+            "id": 2,
+            "name": "The Official Fighting Game Thread - v2",
+            "description": "The Think From Another World The Think From Another World The Think From Another World  From Another World The Think From Another World The Think From Another World The Think From Another World  From Another World",
+            "categoryId": 2,
+            "created_at": "2022-09-15 11:45:15",
+            "no_of_comments": 5,
+            "viewcount": 10,
+            "pinned": 0,
+            "forum_type": 1,
+            "tags": [2, 3, 1],
+            "is_joined": 1
+        },
+        {
+            "id": 3,
+            "name": "True or false, most people lie most of the time.",
+            "description": "The Think From Another World The Think From Another World The Think From Another World  From Another World The Think From Another World The Think From Another World The Think From Another World  From Another World",
+            "categoryId": 3,
+            "created_at": "2022-09-15 11:37:48",
+            "no_of_comments": 5,
+            "viewcount": 10,
+            "pinned": 1,
+            "forum_type": 2,
+            "tags": [1],
+            "is_joined": 1
+        },
+        {
+            "id": 4,
+            "name": "The Official Fighting Game Thread",
+            "description": "The Think From Another World The Think From Another World The Think From Another World  From Another World The Think From Another World The Think From Another World The Think From Another World  From Another World",
+            "categoryId": 4,
+            "created_at": "2022-09-15 10:22:12",
+            "no_of_comments": 4,
+            "viewcount": 10,
+            "pinned": 1,
+            "forum_type": 1,
+            "tags": [3, 4],
+            "is_joined": 0
+        },
+        {
+            "id": 5,
+            "name": "The Official Fighting Game Thread",
+            "description": "The Think From Another World The Think From Another World The Think From Another World  From Another World The Think From Another World The Think From Another World The Think From Another World  From Another World",
+            "categoryId": 5,
+            "created_at": "2022-09-15 10:06:49",
+            "no_of_comments": 5,
+            "viewcount": 10,
+            "pinned": 0,
+            "forum_type": 2,
+            "tags": [],
+            "is_joined": 1
+        }
+    ]

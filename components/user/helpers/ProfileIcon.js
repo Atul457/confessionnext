@@ -21,17 +21,13 @@ export const ProfileIcon = ({
 
         if (isNotFriend === 1) {
             return <>
-                <Image
-                    width={20}
-                    height={20}
+                <img
                     src="/images/canBeRequested.svg"
                     type="button"
                     alt="canBeRequested"
                     onClick={openFrReqModalFn_Post}
                     className='registeredUserIndicator' />
-                <Image
-                    width={20}
-                    height={20}
+                <img
                     src={profileImg !== '' ? profileImg : userIcon}
                     className="userAccIcon generated"
                     onClick={openFrReqModalFn_Post}
@@ -42,18 +38,14 @@ export const ProfileIcon = ({
 
         if (isNotFriend === 2) {
             return <>
-                <Image
-                    width={20}
-                    height={20}
-                    src={alFriends}
+                <img
+                    src="/images/alFriends.svg"
                     onClick={openFrReqModalFn_Post}
                     type="button"
                     alt="alreadyFriendsIcon"
                     className='registeredUserIndicator' />
-                <Image
-                    width={20}
-                    height={20}
-                    src={profileImg !== '' ? profileImg : userIcon}
+                <img
+                    src={profileImg !== '' ? profileImg : "/images/userAcc.svg"}
                     onClick={openFrReqModalFn_Post}
                     className="userAccIcon"
                     alt="userAccIcon"
@@ -63,16 +55,12 @@ export const ProfileIcon = ({
 
         if (isNotFriend === 3) {
             return <>
-                <Image
-                    width={20}
-                    height={20}
+                <img
                     src="/images/alRequested.svg"
                     type="button"
                     alt="alreadyFriendsIcon"
                     className='registeredUserIndicator' />
-                <Image
-                    width={20}
-                    height={20}
+                <img
                     src={profileImg !== '' ? profileImg : userIcon}
                     className="userAccIcon"
                     alt="userAccIcon"
@@ -80,9 +68,7 @@ export const ProfileIcon = ({
             </>
         }
 
-        return <Image
-            width={20}
-            height={20}
+        return <img
             src={profileImage}
             className="userAccIcon"
             alt="userAccIcon" />

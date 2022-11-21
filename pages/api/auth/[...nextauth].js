@@ -1,13 +1,5 @@
 import nextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import GoogleProvider from "next-auth/providers/google";
-import { resHandler } from "../../../utils/api";
-import { http } from "../../../utils/http";
-
-const googleProviderProps = {
-  clientId: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-};
 
 export const authOptions = {
   providers: [
@@ -24,40 +16,58 @@ export const authOptions = {
           placeholder: "Password",
         },
       },
-      async authorize(credentials, req) {
+      async authorize(credentials) {
+
         let formData = {};
 
-        if (credentials?.login === "true") {
+        if (credentials?.login == "true") {
+          // Google login
+          if (credentials?.source === "2") {
+            formData = {
+              source_id: credentials?.source_id,
+              source: credentials?.source
+            }
+          }
+          else {
+            // Normal login
+            formData = {
+              email: credentials?.email,
+              password: credentials?.password,
+              source: credentials?.source
+            };
+          }
+        } else {
+          // Register
           formData = {
-            email: credentials?.email,
-            password: credentials?.password,
+            source_id: credentials?.source_id,
             source: credentials?.source,
-          };
+            display_name: credentials?.display_name,
+            email: credentials?.email,
+            password: credentials?.password
+          }
         }
 
-        let obj = {
-          data: formData,
-          token: "",
-          method: credentials?.method,
-          url: credentials?.url,
-        };
-
-        let res = await http(obj);
-        res = resHandler(res);
-
-        if (!res?.status) throw new Error(res?.message);
-        const user = res.body.profile;
-        return {
-          id: user.user_id,
-          ...user,
-          token: res?.body?.token,
-          comments: res?.body?.comments,
-        };
+        const res =
+          await fetch(`https://cloudart.com.au:3235/api/${credentials?.url
+            }`, {
+            method: credentials?.method ?? "get",
+            body: JSON.stringify(formData),
+            headers: {
+              "Content-Type": "application/json",
+              token: "",
+            },
+          });
+        const userDetails = (await res.json());
+        if (!userDetails?.status) {
+          if (credentials?.source == "2" || credentials?.source == "3") {
+            throw new Error(JSON.stringify(userDetails))
+          } else
+            throw new Error(userDetails?.message ?? "something went wrong");
+        }
+        const user = userDetails.body.profile;
+        return { id: user.user_id, ...user, token: userDetails?.body?.token ?? "", comments: userDetails?.body?.token ?? 0 };
       },
-    }),
-    // GoogleProvider({
-    //   ...googleProviderProps,
-    // }),
+    })
   ],
   pages: {
     signIn: "/login",
@@ -70,8 +80,9 @@ export const authOptions = {
       if (!token) return token;
       return { ...session, user: token };
     },
-    signIn: async ({ user, profile, account }) => {
-      return true;
+    signIn: async ({ user }) => {
+      if (user?.id) return true
+      return false
     },
   },
 };

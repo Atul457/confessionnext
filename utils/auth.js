@@ -24,7 +24,7 @@ const checkAuth = () => {
 const setAuth = (data) => {
   if (isWindowPresent()) {
     const dataG = data;
-    if (dataG === 1) {
+    if (dataG == 1) {
       localStorage.setItem("authenticated", "1");
     } else {
       localStorage.setItem("authenticated", "0");
@@ -101,20 +101,18 @@ const updateKeyProfileLoc = (key, value, isToken = false) => {
     if (isToken) userDetails = { ...userDetails, token: value };
     userDetails = {
       ...userDetails,
-      profile: { ...userDetails.profile, [key]: value },
+      [key]: value
     };
     localStorage.setItem("userDetails", JSON.stringify(userDetails));
   }
 };
 
 const getKeyProfileLoc = (key, isAdmin = false) => {
-  if (isWindowPresent()) {
+  if (isWindowPresent() && (adminAuthCheck() || checkAuth())) {
     let userData = "";
     userData = localStorage.getItem(isAdmin ? "adminDetails" : "userDetails");
     userData = JSON.parse(userData);
-    console.log(userData, "userData");
-    console.log("key", key);
-    if (isAdmin ? adminAuthCheck() : checkAuth()) userData = userData[key];
+    if (userData && (key in userData)) userData = userData[key];
     return userData;
   }
   return false;

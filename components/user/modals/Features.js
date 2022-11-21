@@ -26,19 +26,19 @@ const Features = (props) => {
                         showArrows={false}>
                         <div className="carousel_item_feature">
                             <div className="imgWrapper">
-                                <Image width={20} height={20} src="/images/carousel3.svg" className="carouselImage" />
+                                <Image src="/images/carousel3.svg" className="carouselImage" fill={true}/>
                             </div>
                             <div>Sign up or Login to get notified when people respond to your post</div>
                         </div>
                         <div className="carousel_item_feature">
                             <div className="imgWrapper">
-                                <Image width={20} height={20} src="/images/carousel2.svg" className="carouselImage" />
+                                <Image fill={true} src="/images/carousel2.svg" className="carouselImage" />
                             </div>
                             <div>Sign up or Login to connect with friends and chat anonymously!</div>
                         </div>
                         <div className="carousel_item_feature">
                             <div className="imgWrapper">
-                                <Image width={20} height={20} src="/images/carousel1.svg" className="carouselImage" />
+                                <Image fill={true} src="/images/carousel1.svg" className="carouselImage" />
                             </div>
                             <div>Sign up or Login to get notified when exciting community features and updates are available</div>
                         </div>

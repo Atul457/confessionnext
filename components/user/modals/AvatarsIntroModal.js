@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { useNavigate } from 'react-router-dom';
-import auth from '../../behindScenes/Auth/AuthCheck';
-import userIcon from "../../../images/userAcc.svg";
-import avatarGroup from "../../../images/avatarGroup.png";
 import { useDispatch, useSelector } from 'react-redux';
 import { toggleAvatarIntroModal } from '../../../redux/actions/avatarsIntroModalAc/avatarsIntroModalAc';
+import { useRouter } from 'next/router';
+import auth from '../../../utils/auth';
 
 
 export default function AvatarsIntroModal() {
 
     const avatarIntReducer = useSelector(store => store.avatarsIntroModalReducer);
+    const { checkAuth } = auth
     const [showImages, setShowImages] = useState(false)
     const dispatch = useDispatch();
+    const router = useRouter()
 
-    const history = useNavigate();
+    const history = router.push;
 
     const closeModalFn = () => {
         dispatch(toggleAvatarIntroModal({
@@ -26,7 +26,7 @@ export default function AvatarsIntroModal() {
 
     const navigateUser = () => {
         closeModalFn()
-        if (auth())
+        if (checkAuth())
             return history("/profile")
         history("/login")
     }
@@ -43,10 +43,10 @@ export default function AvatarsIntroModal() {
                 <Modal.Body className="privacyBody eVerifyModal">
 
                     <div className={`avtarNdefaultImgCont ${showImages ? '' : 'hiddenAvatar'}`}>
-                        <img src={userIcon} alt="" className='avatarMImages' />
+                        <img src="/images/userAcc.svg" alt="userAccountIcon" className='avatarMImages' />
                         <i className="fa fa-long-arrow-right" aria-hidden="true"></i>
 
-                        <img src={avatarGroup} onLoad={() => {
+                        <img src="/images/avatarGroup.png" onLoad={() => {
                             setShowImages(true)
                         }} className="avatarsGroup" />
                     </div>
@@ -59,7 +59,7 @@ export default function AvatarsIntroModal() {
                 </Modal.Body>
                 <Modal.Footer className="pt-0 justify-content-center">
                     <button className="modalFootBtns btn" variant="primary" onClick={navigateUser}>
-                        {auth() ? "Go to profile" : "Login"}
+                        {checkAuth() ? "Go to profile" : "Login"}
                     </button>
                 </Modal.Footer>
             </Modal>

@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useState, useEffect, useRef } from "react";
@@ -11,14 +11,25 @@ import {
 } from "../../../redux/actions/notificationAC";
 import { searchAcFn } from "../../../redux/actions/searchAc/searchAc";
 import auth from "../../../utils/auth";
+import { signOut } from "next-auth/react";
+import { togglemenu } from "../../../redux/actions/share";
+import { http } from "../../../utils/http";
+import { EVerifyModal } from "../../../redux/actions/everify";
+import VerifyEmailModal from "../modals/VerifyEmailModal";
+import _ from "lodash";
 
-const { getKeyProfileLoc, checkAuth } = auth;
+const { getKeyProfileLoc, setAuth } = auth;
 
 const UserIcon = () => {
+
+  // Hooks and vars
+  const { data: session } = useSession();
   const [requestsIndicator, setRequestIndicator] = useState(0);
+  const [showEModal, setShowEModal] = useState(false);
   const store = useSelector((store) => store);
+  const ShareReducer = store.ShareReducer;
   const SearchReducer = store.SearchReducer;
-  const [authenticated, setAuthenticated] = useState(false);
+  const verifyEState = store.VerifyEmail;
   const searchBoxRef = useRef(null);
   const image = getKeyProfileLoc("image");
   const name = getKeyProfileLoc("name");
@@ -31,27 +42,106 @@ const UserIcon = () => {
   const [showProfileOption, setShowProfileOption] = useState(false);
   const [newCommentsCount, setNewCommentsCount] = useState(0);
 
+
   useEffect(() => {
     setRequestIndicator(
       localStorage.getItem("requestsCount")
         ? parseInt(localStorage.getItem("requestsCount"))
         : 0
     );
-
-    setProfile(() => {
-      if (checkAuth()) {
-        let profile = localStorage.getItem("userDetails");
-        profile = JSON.parse(profile);
-        profile = profile.profile;
-        return profile;
-      }
-      return {};
-    });
-
-    setAuthenticated(checkAuth());
   }, []);
 
+  useEffect(() => {
+    if (ShareReducer.selectedPost?.value) {
+      document.addEventListener("click", catchEvent2);
+    }
+    return () => {
+      document.removeEventListener("click", catchEvent2);
+    }
+  }, [ShareReducer.selectedPost?.value])
+
+  useEffect(() => {
+    let interval;
+    if (session) {
+      interval = setInterval(() => { getUnreadCommentsCount(notificationReducer) }, 3000)
+    }
+    return () => {
+      if (session) clearInterval(interval)
+    }
+  }, [notificationReducer.data, notificationReducer.messagesCount, verifyEState])
+
+  useEffect(() => {
+    getNotiStatus();
+  }, [notificationReducer.data])
+
+  useEffect(() => {
+    const listener = (e) => {
+      const toIgnore = ["seach_boxinput", "headerUserAccIcon", "search_box"]
+      const elementClass = e.target.classList
+      let ignorableItem = false;
+      toIgnore.forEach(curr => {
+        if (elementClass.contains(curr)) ignorableItem = true
+      })
+      if (!ignorableItem) {
+        dispatch(searchAcFn({ visible: false }))
+      }
+    }
+    if (SearchReducer.visible) {
+      document.addEventListener("click", listener)
+    }
+    return () => {
+      document.removeEventListener("click", listener)
+    }
+  }, [SearchReducer.visible])
+
+  useEffect(() => {
+    if (showProfileOption) {
+      document.addEventListener("click", catchEvent);
+    }
+    return () => {
+      document.removeEventListener("click", catchEvent);
+    }
+  }, [showProfileOption])
+
+  useEffect(() => {
+    if (notificationReducer.isVisible === true) {
+      document.addEventListener("click", catchEventNoti);
+    }
+
+    return () => {
+      document.removeEventListener("click", catchEventNoti);
+    }
+  }, [notificationReducer.isVisible])
+
+
   // Functions
+
+  // Handles sharekit
+  function catchEvent2(e) {
+    var classes = e.target.classList;
+    if (!classes.contains("shareReqCont") && !classes.contains("shareReqRows") && !classes.contains("shareKitImgIcon") && !classes.contains("sharekitdots") && !classes.contains("dontHide")) {
+      dispatch(togglemenu({
+        id: null, value: false
+      }))
+    }
+  }
+
+  // Handles profile popup
+  function catchEvent(e) {
+    var classes = e.target.classList;
+    if (!classes.contains("takeAction") && !classes.contains("userAccIcon")) {
+      setShowProfileOption(false);
+    }
+  }
+
+  // Handles notification
+  function catchEventNoti(e) {
+    var classes = e.target.classList;
+    let result = !classes.contains("takeActionNoti") && !classes.contains("noti") && !classes.contains("takeActionOptions") && !classes.contains("notificationIcon");
+    if (result) {
+      dispatch(closeNotiPopup());
+    }
+  }
 
   const navigateToSearch = (e) => {
     e.preventDefault();
@@ -186,8 +276,6 @@ const UserIcon = () => {
       );
     }
 
-    // console.log(first)
-
     let link = "";
     let typeOfForum = 2;
 
@@ -216,9 +304,8 @@ const UserIcon = () => {
             {index > 0 && <hr className="m-0" />}
             <div
               type="button"
-              className={`takeActionOptions takeActionOptionsOnHov textDecNone py-2 ${
-                curr.is_unread === 1 ? "unread" : ""
-              }`}
+              className={`takeActionOptions takeActionOptionsOnHov textDecNone py-2 ${curr.is_unread === 1 ? "unread" : ""
+                }`}
             >
               {isForum ? (
                 <i
@@ -264,10 +351,84 @@ const UserIcon = () => {
     }
   }
 
+  //GETS THE TOTAL NO OF NEW COMMENTS
+  async function getUnreadCommentsCount() {
+    let obj = {
+      data: {},
+      token: getKeyProfileLoc("token") ?? "",
+      method: "get",
+      url: "newcommentscount"
+    }
+
+    try {
+      const res = http(obj)
+      res.then((res) => {
+
+        if (res.data.status === true) {
+          let count = parseInt(res.data.friendrequests);
+          let count_ = parseInt(res.data.messages);
+          setNewCommentsCount(res.data.comments);
+
+          if (res.data.messages !== notificationReducer.messagesCount) {
+            dispatch(updateMessagesCount(res.data.messages))
+          }
+
+          setRequestIndicator(count);
+          localStorage.setItem("requestsCount", count);
+          localStorage.setItem("mssgCount", count_);
+
+          // IF NOTIFICATION DATA IS NOT UPDATED THE ONLY UPDATE IT
+          if (!_.isEqual(res.data.commentscenter, notificationReducer.data)) {
+            dispatch(updateNotiPopState({ data: res.data.commentscenter }))
+          }
+
+          // EMAIL VERIFICATION LOGIC
+          var email_verified = res.data.email_verified;   // 0 NOT VERIFIED , 1 VERIFIED
+
+          let currPath;
+
+          // if (params.postId) {
+          //   currPath = `confession/${params.postId}`;
+          // }
+
+          // if (email_verified !== "" && email_verified === 0 && pathname !== currPath) {
+          //   if (verifyEState.verified === false) {
+          //     setShowEModal(true);
+          //   }
+
+          if (email_verified !== "" && email_verified === 0) {
+            if (verifyEState.verified === false) {
+              setShowEModal(true);
+            }
+          } else if (email_verified === 1 && verifyEState.verified === false) {
+            dispatch(EVerifyModal({ verified: true }))
+          }
+
+        }
+      })
+    } catch (err) {
+      console.log(err?.messages);
+    }
+
+  }
+
+  // Logs the user out
+  const logout = async () => {
+    await signOut({ redirect: false })
+    setAuth(0);
+    localStorage.clear()
+    router.push("/login")
+  }
+
   return (
     <>
-      {authenticated ? (
+      {session ? (
         <>
+
+          {/* Email verification modal */}
+          {verifyEState && verifyEState.verified === false && <VerifyEmailModal showEModal={showEModal} />}
+          {/* Email verification modal */}
+
           {/* Search icon */}
           <div className="authProfileIcon noti search_box_cont">
             <div
@@ -275,16 +436,12 @@ const UserIcon = () => {
               onClick={toggleSearchBox}
               pulsate="07-07-22,pulsatingIcon mobile"
             >
-              <Image
-                width={20}
-                height={20}
+              <img
                 src="/images/searchIconActive.svg"
                 alt="searchIconActive"
                 className="headerUserAccIcon mobile_view"
               />
-              <Image
-                width={20}
-                height={20}
+              <img
                 src={
                   !SearchReducer.visible
                     ? "/images/searchIcon.svg"
@@ -316,17 +473,13 @@ const UserIcon = () => {
               onClick={toggleNotificationCont}
               pulsate="07-07-22,pulsatingIcon mobile"
             >
-              <Image
-                width={20}
-                height={20}
+              <img
                 src="/images/bell.svg"
                 alt="bellIcon"
                 className="notificationIcon headerUserAccIcon"
               />
 
-              <Image
-                width={20}
-                height={20}
+              <img
                 src="/images/orangebell.svg"
                 alt="bellActive"
                 className="notificationIcon headerUserAccIcon mobIcon"
@@ -346,18 +499,14 @@ const UserIcon = () => {
 
           <div className="authProfileIcon" onClick={HandleShowHide}>
             <span className="requestsIndicatorNuserIconCont" type="button">
-              <Image
-                width={20}
-                height={20}
-                src={image === "" ? "/images/userAcc.svg" : image}
+              <img
+                src={!session?.user?.image || image === "" ? "/images/userAcc.svg" : image}
                 alt="profileImage"
                 className="userAccIcon headerUserAccIcon"
               />
 
-              <Image
-                width={20}
-                height={20}
-                src={image === "" ? "/images/mobileProfileIcon.svg" : image}
+              <img
+                src={!image || image === "" ? "/images/mobileProfileIcon.svg" : image}
                 alt="profileIcon"
                 className="userAccIcon headerUserAccIcon mobIcon"
               />
@@ -367,9 +516,7 @@ const UserIcon = () => {
               )}
 
               {getKeyProfileLoc("email_verified") === 1 ? (
-                <Image
-                  width={20}
-                  height={20}
+                <img
                   src="/images/verifiedIcon.svg"
                   title="Verified user"
                   alt="verified_user_icon"
@@ -386,19 +533,15 @@ const UserIcon = () => {
                     className="profileImgWithEmail takeActionOptions d-flex align-items-center mt-2 textDecNone"
                   >
                     <span className="profileHeaderImage">
-                      <Image
-                        width={20}
-                        height={20}
+                      <img
                         src={
-                          image === "" ? "/images/mobileProfileIcon.svg" : image
+                          !session?.user?.image || (image && image === "") ? "/images/mobileProfileIcon.svg" : image
                         }
                         alt="profileIcon"
                       />
 
                       {getKeyProfileLoc("email_verified") === 1 ? (
-                        <Image
-                          width={20}
-                          height={20}
+                        <img
                           src="/images/verifiedIcon.svg"
                           title="Verified user"
                           alt="verified_user_icon"
@@ -421,9 +564,7 @@ const UserIcon = () => {
                     type="button"
                     className="takeActionOptions takeActionOptionsOnHov textDecNone py-2"
                   >
-                    <Image
-                      width={20}
-                      height={20}
+                    <img
                       src="/images/profileIcon.svg"
                       alt="profileIcon"
                       className="profilePopUpIcons"
@@ -444,9 +585,7 @@ const UserIcon = () => {
                   onClick={openSocialLinksModal}
                   className="takeActionOptions takeActionOptionsOnHov textDecNone py-2"
                 >
-                  <Image
-                    width={20}
-                    height={20}
+                  <img
                     src="/images/follow_usIcon.svg"
                     alt="socialLinksIcon"
                     className="profilePopUpIcons"
@@ -463,9 +602,7 @@ const UserIcon = () => {
                         type="button"
                         className="takeActionOptions takeActionOptionsOnHov textDecNone py-2"
                       >
-                        <Image
-                          width={20}
-                          height={20}
+                        <img
                           src="/images/friendRequests.svg"
                           alt="friendRequestsIcon"
                           className="profilePopUpIcons friendReqIcon diff"
@@ -495,9 +632,7 @@ const UserIcon = () => {
                       onClick={openUpdatePassModal}
                       className="takeActionOptions  userProfileHeading takeActionOptionsOnHov userProfileHeading textDecNone py-2"
                     >
-                      <Image
-                        width={20}
-                        height={20}
+                      <img
                         src="/images/profileResetPass.svg"
                         alt="resetPasswordIcon"
                         className="profilePopUpIcons"
@@ -513,9 +648,7 @@ const UserIcon = () => {
                   className="takeActionOptions userProfileHeading py-2 takeActionOptionsOnHov textDecNone mb-0"
                   onClick={() => logout()}
                 >
-                  <Image
-                    width={20}
-                    height={20}
+                  <img
                     src="/images/logoutIcon.svg"
                     alt="logoutIcon"
                     className="profilePopUpIcons"
@@ -530,16 +663,12 @@ const UserIcon = () => {
         <Link href="/login" className="linkToLogin">
           <div>
             <span className="requestsIndicatorNuserIconCont">
-              <Image
-                width={20}
-                height={20}
+              <img
                 src="/images/userAcc.svg"
                 alt="userIcon"
                 className="userAccIcon headerUserAccIcon"
               />
-              <Image
-                width={20}
-                height={20}
+              <img
                 src="/images/mobileProfileIcon.svg"
                 alt="profileIcon"
                 className="userAccIcon headerUserAccIcon mobIcon"

@@ -1,17 +1,20 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { apiStatus } from '../../../helpers/status';
-import { fetchData } from "../../../commonApi"
 import { resetReportPostModal, toggleReportPostModal } from '../../../redux/actions/reportPostModal';
 import { reOpenCModal, updateCModalState } from '../../../redux/actions/commentsModal';
+import { apiStatus } from '../../../utils/api';
+import { http } from '../../../utils/http';
+import { updateConfession } from '../../../redux/actions/confession/confessionAc';
+import auth from '../../../utils/auth';
 
 
-const ReportPostModal = ({ updatedConfessions = () => { },  }) => {
+const ReportPostModal = () => {
 
     // Hooks
     const dispatch = useDispatch()
     const { reportPostModalReducer } = useSelector(state => state)
+    const { getKeyProfileLoc } = auth
 
     // Functions
 
@@ -41,17 +44,16 @@ const ReportPostModal = ({ updatedConfessions = () => { },  }) => {
     // Update confession
     const updateConfessionData = dataToUpdate => {
         let { postIndex } = reportPostModalReducer.data
-        updatedConfessions(postIndex, dataToUpdate)
+        dispatch(updateConfession({ index: postIndex, data: dataToUpdate }))
     }
 
     // Report post
     const reportPost = async () => {
         const { confessionId } = reportPostModalReducer.data
-
-        let userData = localStorage.getItem("userDetails") ?? { token: "" };
+        const token = getKeyProfileLoc("token") ?? ""
         let obj = {
             data: {},
-            token: JSON.parse(userData).token,
+            token: !token ? "" : token,
             method: "get",
             url: `reportconfession/${confessionId}`
         }
@@ -60,7 +62,7 @@ const ReportPostModal = ({ updatedConfessions = () => { },  }) => {
                 status: apiStatus.LOADING,
                 message: ""
             }))
-            const res = await fetchData(obj)
+            const res = await http(obj)
             if (res.data.status === true) {
                 closeModal(true)
             } else {
@@ -78,6 +80,8 @@ const ReportPostModal = ({ updatedConfessions = () => { },  }) => {
             console.log(err.message)
         }
     }
+
+    // console.log({ reportPostModalReducer, apiStatus })
 
 
     return (

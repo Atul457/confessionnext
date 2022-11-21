@@ -42,7 +42,7 @@ const Post = (props) => {
   const [lightBox, setLightBox] = useState(false);
   const router = useRouter();
   const history = router.push;
-  const dispatch = post?.dispatch ?? (() => {});
+  const dispatch = post?.dispatch ?? (() => { });
   const ShareReducer = store?.ShareReducer;
   const [requiredError, setRequiredError] = useState("");
   const [comment, setComment] = useState("");
@@ -53,9 +53,9 @@ const Post = (props) => {
   const isCoverTypePost = post?.category_id === 0;
   const postBg = isCoverTypePost
     ? {
-        backgroundImage: `url('${post?.cover_image}')`,
-        name: "post",
-      }
+      backgroundImage: `url('${post?.cover_image}')`,
+      name: "post",
+    }
     : {};
   const isAnyUnreadComment = post?.unread_comments && post?.unread_comments > 0;
 
@@ -194,21 +194,26 @@ const Post = (props) => {
     });
   };
 
+  // if (post?.index === 0) {
+  //   console.log(post)
+  // }
+
   // Open the modal to report the post
   const openReportPostModal = () => {
     dispatch(
       toggleReportPostModal({
         visible: true,
-        isReported: props.isReported,
+        isReported: post?.isReported,
         data: {
-          confessionId: props.confession_id,
-          postIndex: props.index,
+          confessionId: post?.confession_id,
+          postIndex: post?.index
         },
       })
     );
   };
 
   const doComment = async () => {
+
     let confession_id = post?.confession_id;
     setRequiredError("");
     preventDoubleClick(true);
@@ -221,13 +226,6 @@ const Post = (props) => {
     }
     let _comment = comment;
     setComment("");
-    let userData = localStorage.getItem("userDetails");
-    if (userData === "" || userData === null) {
-      setAuth(0);
-      history("/login");
-    }
-
-    userData = userDetails?.token ?? "";
 
     let arr = {
       confession_id,
@@ -237,7 +235,7 @@ const Post = (props) => {
 
     let obj = {
       data: arr,
-      token: userData,
+      token: getKeyProfileLoc("token") ?? "",
       method: "post",
       url: "postcomment",
     };
@@ -251,16 +249,16 @@ const Post = (props) => {
       const res = await http(obj);
       if (res.data.status === true) {
         setComment("");
-        // updateKeyProfileLoc(
-        //   "comments",
-        //   parseInt(getKeyProfileLoc("comments") ?? 0) + 1
-        // );
+        updateKeyProfileLoc(
+          "comments",
+          parseInt(getKeyProfileLoc("comments") ?? 0) + 1
+        );
       } else setRequiredError(res.data.message);
     } catch (error) {
-      console.log(error);
-      console.log("Some error occured");
+      console.log(error?.message);
     }
     preventDoubleClick(false);
+
   };
 
   return (
@@ -280,9 +278,8 @@ const Post = (props) => {
 
       <span
         type="button"
-        className={`sharekitdots withBg ${
-          sharekit === false ? "justify-content-end" : ""
-        } ${!post.deletable ? "resetRight" : ""}`}
+        className={`sharekitdots withBg ${sharekit === false ? "justify-content-end" : ""
+          } ${!post.deletable ? "resetRight" : ""}`}
         onClick={() =>
           _toggleShareReqPopUp(
             post.confession_id,
@@ -365,23 +362,23 @@ const Post = (props) => {
       <div className="postContHeader">
         {
           lightBox &&
-            post?.image &&
-            (post?.image).length !== 0 &&
-            ((post?.image).length > 1 ? (
-              <Lightbox
-                images={post?.image}
-                onClose={() => {
-                  handleLightBoxFn(false);
-                }}
-              /> //Multiple images
-            ) : (
-              <Lightbox
-                image={post?.image}
-                onClose={() => {
-                  handleLightBoxFn(false);
-                }}
-              />
-            )) //Single image
+          post?.image &&
+          (post?.image).length !== 0 &&
+          ((post?.image).length > 1 ? (
+            <Lightbox
+              images={post?.image}
+              onClose={() => {
+                handleLightBoxFn(false);
+              }}
+            /> //Multiple images
+          ) : (
+            <Lightbox
+              image={post?.image}
+              onClose={() => {
+                handleLightBoxFn(false);
+              }}
+            />
+          )) //Single image
         }
 
         <span className="leftContofPostCont">
@@ -415,20 +412,18 @@ const Post = (props) => {
             {dateConverter(post?.created_at)}
           </span>
 
-          {/* {console.log(post)} */}
         </span>
       </div>
       <div
-        className={`postBody ${isCoverTypePost ? "coverTypePost" : ""} ${
-          isAnyUnreadComment ? "addMargin" : ""
-        }`}
+        className={`postBody ${isCoverTypePost ? "coverTypePost" : ""} ${isAnyUnreadComment ? "addMargin" : ""
+          }`}
         style={postBg}
       >
         <Link className="links text-dark" href={`/confession/${post?.slug}`}>
           <div className="postedPost mb-2">
             <pre className="preToNormal post">{post.description}</pre>
             {post.description.split("").length >= noOfWords[0] ||
-            post.description.split("\n").length > 5 ? (
+              post.description.split("\n").length > 5 ? (
               <>
                 {post.description.split("").length >= noOfWords[0] &&
                   post.description.split("\n").length < 5 && (
@@ -531,9 +526,8 @@ const Post = (props) => {
         )}
 
         <div
-          className={`iconsCont ${
-            authenticated === false ? "mainDesignOnWrap" : ""
-          }`}
+          className={`iconsCont ${authenticated === false ? "mainDesignOnWrap" : ""
+            }`}
         >
           <Link className="links text-dark" href={`/confession/${post?.slug}`}>
             <div
@@ -560,8 +554,6 @@ const Post = (props) => {
               <span className="count">{post?.no_of_comments ?? 0}</span>
             </div>
           </Link>
-
-          {/* {console.log(post.is_liked)} */}
 
           {post.hasOwnProperty("is_liked") ? (
             <div className="iconsMainCont">

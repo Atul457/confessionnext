@@ -1,37 +1,89 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { toggleShareWithLoveModal } from "../../../redux/actions/shareWithLoveAc/shareWithLoveAc";
 import AppLogo from "../../common/AppLogo";
+import { HeartComponent, ShareWithLoveModal, AppreciationModal } from "../modals/Sharepostwithlove";
 import HeadMenu from "./HeadMenus";
 import UserIcon from "./UserIcon";
-import { signOut } from "next-auth/react";
+
 
 const Header = (props) => {
+
   // Logs the user out
-  const logout = async () => {
-    await signOut({ redirect: false });
-  };
+  // const logout = async () => {
+  //   await signOut({ redirect: false });
+  // };
+
+  // Hooks and vars
+  const dispatch = useDispatch()
+  const heartCompRef = useRef(null)
+
+  // Handles scroll to top button
+  useEffect(() => {
+    const scroll = () => {
+      let secondPostElem = document.querySelector("html")
+      if (heartCompRef?.current) {
+        if (secondPostElem?.scrollTop > 600) heartCompRef?.current?.classList?.remove("hideHeartComp")
+        else heartCompRef?.current?.classList?.add("hideHeartComp")
+      }
+    }
+
+    document.addEventListener("scroll", scroll);
+    return () => {
+      window.removeEventListener("scroll", scroll);
+    }
+  }, [props])
+
+  // Functions
+
+  // Open share with love modal
+  const openSharewithLoveModal = () => {
+    dispatch(toggleShareWithLoveModal({
+      visible: true
+    }))
+  }
 
   return (
-    <header className="mainHead col-12 posFixedForHeader">
-      <button onClick={logout}>logout</button>
-      <div className="insideHeader">
-        <div className="headerLeftCol pl-0">
-          <span to="/home" className="homeHeaderLink">
-            <AppLogo />
-          </span>
-        </div>
+    <>
+      <header className="mainHead col-12 posFixedForHeader">
+        <div className="insideHeader">
+          <div className="headerLeftCol pl-0">
+            <span to="/home" className="homeHeaderLink">
+              <AppLogo />
+            </span>
+          </div>
 
-        <div className="viewProfileIcon pr-md-0 pr-lg-4">
-          <div className="row align-items-center justify-content-end m-0 navigationIcons">
-            <HeadMenu />
-            <UserIcon />
+          <div className="viewProfileIcon pr-md-0 pr-lg-4">
+            <div className="row align-items-center justify-content-end m-0 navigationIcons">
+              <HeadMenu />
+              <UserIcon />
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className={`roundCorners ${props.hideRound ? "d-none" : ""}`}>
-        __
+        <div className={`roundCorners ${props.hideRound ? "d-none" : ""}`}>
+          __
+        </div>
+
+        {/* Modals */}
+
+        {/* Share post with love modal */}
+        <ShareWithLoveModal />
+
+        {/* Appriciation Modal */}
+        <AppreciationModal />
+
+      </header>
+
+      {/* Share post with love floating icon */}
+      <div
+        pulsate='28-10-22,pulsatingIcon mobile'
+        className={`heartCompCont hideHeartComp cursor_pointer`}
+        onClick={openSharewithLoveModal}
+        ref={heartCompRef}>
+        <HeartComponent />
       </div>
-    </header>
+    </>
   );
 };
 
