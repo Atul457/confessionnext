@@ -72,7 +72,7 @@ const HeadMenus = (props) => {
                   src={
                     currentUrl === "chat"
                       ? "/images/inboxIconActive.svg"
-                      : "./images/inboxIcon.svg"
+                      : "/images/inboxIcon.svg"
                   }
                   alt="inboxIcon"
                 />

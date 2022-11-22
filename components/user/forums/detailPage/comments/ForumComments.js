@@ -1,38 +1,41 @@
 import React, { useEffect, useState } from 'react'
 
-// Helpers
-import { fetchData } from '../../../../commonApi'
-import { resHandler } from '../../../../helpers/helpers'
-import { forumHandlers } from '../../../../redux/actions/forumsAc/forumsAc'
-import { apiStatus } from '../../../../helpers/status'
 import InfiniteScroll from "react-infinite-scroll-component"
-import { useNavigate } from 'react-router-dom'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 
 // Redux
 import { useDispatch, useSelector } from 'react-redux'
+import { forumHandlers } from '../../../../../redux/actions/forumsAc/forumsAc'
 
 // Component imports
 import ForumComment from './ForumComment'
-import AdSense_ from '../../../../user/pageElements/components/AdSense'
+import { AdSense_, WhatsNewAds } from '../../../ads/AdMob'
 
 // Helpers
-import auth from '../../../../user/behindScenes/Auth/AuthCheck'
-import { getKeyProfileLoc } from '../../../../helpers/profileHelper'
+import { http } from '../../../../../utils/http'
 import {
   goUp,
   subComIniVal,
   showSubCommentsFn
 } from './ForumCommProvider'
-import { WhatsNewAds } from '../../../../user/pageElements/components/AdMob'
-import { envConfig } from '../../../../configs/envConfig'
+import auth from '../../../../../utils/auth'
+import { envConfig } from '../../../../../utils/envConfig'
+import { apiStatus, resHandler } from '../../../../../utils/api'
+
+const { getKeyProfileLoc } = auth
+
+
 
 const ForumComments = props => {
 
   // Hooks and vars
+  const { data: session } = useSession()
+  const router = useRouter()
   const { forum_id, isAllowedToComment, usersToTag } = props,
     [goDownArrow, setGoDownArrow] = useState(false),
     dispatch = useDispatch(),
-    navigate = useNavigate(),
+    navigate = router.push,
     { comments: commentsRed, postComment } = useSelector(state => state.forumsReducer.detailPage),
     {
       status,
@@ -51,7 +54,7 @@ const ForumComments = props => {
     toSearch: usersToTag?.strToSearch ?? "",
     isAllowedToComment,
     postComment,
-    auth,
+    session,
     forum_id,
     navigate,
     dispatch,
@@ -84,7 +87,7 @@ const ForumComments = props => {
   // Get comments on forum
   const getComments = async (page = 1, append = false) => {
     let obj = {
-      token: getKeyProfileLoc("token", true) ?? "",
+      token: getKeyProfileLoc("token") ?? "",
       data: {
         forum_id,
         root_id: "",
@@ -94,7 +97,7 @@ const ForumComments = props => {
       url: `getforumcomments`
     }
     try {
-      let res = await fetchData(obj)
+      let res = await http(obj)
       res = resHandler(res)
 
       let { comments: commentsInRes = [] } = res?.body
@@ -152,10 +155,10 @@ const ForumComments = props => {
             </div>
 
             {/* Ad, is shown after last comment */}
-            <div className="w-100 mt-2 mb-3">
+            {/* <div className="w-100 mt-2 mb-3">
               {envConfig?.isProdMode ? <AdSense_ /> :
                 <WhatsNewAds mainContId={"dr99"} />}
-            </div>
+            </div> */}
             {/* Ad, is shown after last comment */}
 
           </>

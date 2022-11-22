@@ -1,45 +1,37 @@
 import React, { useState, useEffect } from 'react';
-import auth from '../../behindScenes/Auth/AuthCheck';
-import { Link } from 'react-router-dom';
-import { fetchData } from '../../../commonApi';
 import Lightbox from "react-awesome-lightbox";
-import userIcon from '../../../images/userAcc.png';
-import commentCountIcon from '../../../images/commentCountIcon.svg';
-import forwardIcon from '../../../images/forwardIcon.svg';
 import InfiniteScroll from "react-infinite-scroll-component";
-import Comments from '../../pageElements/components/Comments';
-import useShareKit from '../../utilities/useShareKit';
 import _ from 'lodash';
 import TextareaAutosize from 'react-textarea-autosize';
-import shareKitIcon from "../../../images/actionIconImg.svg";
-import DateConverter from '../../../helpers/DateConverter';
 import { useDispatch, useSelector } from 'react-redux';
 import { closeCModal, updateCModalState } from '../../../redux/actions/commentsModal';
+import { useSession } from 'next-auth/react';
+import Link from 'next/link';
+import { http } from '../../../utils/http';
+import { ProfileIcon } from '../helpers/ProfileIcon';
+import Comments from '../comments/Comments';
 import { togglemenu, toggleSharekitMenu } from '../../../redux/actions/share';
-import canBeRequested from "../../../images/canBeRequested.svg";
-import alRequested from "../../../images/alRequested.svg";
-import verifiedIcon from "../../../images/verifiedIcon.svg";
-import upvote from '../../../images/upvote.svg';
-import upvoted from '../../../images/upvoted.svg';
-import alFriends from "../../../images/alFriends.svg";
-import useShareRequestPopUp from '../../utilities/useShareRequestPopUp';
+import useShareRequestPopUp from '../../../utils/hooks/useShareRequestPopUp';
 import { openCFRModal } from '../../../redux/actions/friendReqModal';
-import { getToken } from '../../../helpers/getToken';
+import auth from '../../../utils/auth';
+import Badge from '../../common/Badge';
+import { apiStatus } from '../../../utils/api';
 import { toggleReportPostModal } from '../../../redux/actions/reportPostModal';
-import { getKeyProfileLoc, updateKeyProfileLoc } from '../../../helpers/profileHelper';
-import { apiStatus } from '../../../helpers/status';
-import Badge from '../../../common/components/badges/Badge';
-import { envConfig } from '../../../configs/envConfig';
-import AdSense_ from '../components/AdSense';
-import { WhatsNewAds } from '../components/AdMob';
+import useShareKit from '../../../utils/hooks/useShareKit';
+import { dateConverter } from '../../../utils/helpers';
+import { envConfig } from '../../../utils/envConfig';
+import { AdSense_, WhatsNewAds } from '../ads/AdMob';
+
+const { getToken, getKeyProfileLoc, updateKeyProfileLoc } = auth
 
 
-export default function ConfessionDetailPage({ categories, updatePost, ...rest }) {
+export default function ConfessionDetailPage({ categories, updatePost, serverSideData, ...rest }) {
 
     let maxChar = 2000;
+    const { data: session } = useSession()
     const dispatch = useDispatch();
     const { comDetailPage: { props: state }, comDetailPage } = rest;
-    const [userDetails] = useState(auth() ? JSON.parse(localStorage.getItem("userDetails")) : '');
+    const [userDetails] = useState(session ? JSON.parse(localStorage.getItem("userDetails")) : '');
     const [confessionData, setConfessionData] = useState(false);
     const [shareReqPopUp, toggleShareReqPopUp, ShareRequestPopUp, closeShareReqPopUp] = useShareRequestPopUp();
     const [sharekit, toggleSharekit, ShareKit, hideShareKit] = useShareKit();
@@ -100,7 +92,7 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
         }
 
         try {
-            const response = await fetchData(obj)
+            const response = await http(obj)
             if (response.data.status === true) {
 
                 setComment("");
@@ -149,8 +141,8 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
                 setRequiredError(response.data.message);
             }
         }
-        catch {
-            console.log('some error occured');
+        catch (err) {
+            console.log(err?.message)
         }
     }
 
@@ -181,7 +173,7 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
         let pageNo = page;
 
         let token;
-        if (auth()) {
+        if (session) {
             token = localStorage.getItem("userDetails");
             token = JSON.parse(token);
             token = token.token;
@@ -201,7 +193,7 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
             url: "getcomments"
         }
         try {
-            const res = await fetchData(obj)
+            const res = await http(obj)
             if (res.data.status === true) {
                 if (append === true) {
                     let newConf = [...commentsArr, ...res.data.body.comments];
@@ -290,82 +282,6 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
         dispatch(updateCModalState({ no_of_comments: parseInt(state.no_of_comments) - count }))
     }
 
-    const ProfileIcon = (profileImg, isNotFriend) => {
-
-        // isNotFriend :
-        // 0 : SHOW NOTHING
-        // 1 : SHOW REQUEST
-        // 2: SHOW CANCEL 
-        // 3: ALREADY FRIEND
-
-        let profileImage, profileBPlate;
-
-        profileImage = profileImg !== '' ? profileImg : userIcon;
-
-        const getHtml = () => {
-
-            if (isNotFriend === 1) {
-                return <>
-                    <img
-                        src={canBeRequested}
-                        type="button"
-                        alt=""
-                        onClick={openFrReqModalFn_Post}
-                        className='registeredUserIndicator' />
-                    <img
-                        src={profileImg !== '' ? profileImg : userIcon}
-                        className="userAccIcon generated"
-                        onClick={openFrReqModalFn_Post}
-                        alt=""
-                    />
-                </>
-            }
-
-            if (isNotFriend === 2) {
-                return <>
-                    <img
-                        src={alFriends}
-                        onClick={openFrReqModalFn_Post}
-                        type="button"
-                        alt=""
-                        className='registeredUserIndicator' />
-                    <img
-                        src={profileImg !== '' ? profileImg : userIcon}
-                        onClick={openFrReqModalFn_Post}
-                        className="userAccIcon"
-                        alt=""
-                    />
-                </>
-            }
-
-            if (isNotFriend === 3) {
-                return <>
-                    <img
-                        src={alRequested}
-                        type="button"
-                        alt=""
-                        className='registeredUserIndicator' />
-                    <img
-                        src={profileImg !== '' ? profileImg : userIcon}
-                        className="userAccIcon"
-                        alt=""
-                    />
-                </>
-            }
-
-            return <img src={profileImage} className="userAccIcon" alt="" />
-        }
-
-        profileBPlate = getHtml();
-        if (comDetailPage?.data?.email_verified === 1)
-            profileBPlate = (
-                <>
-                    {profileBPlate}
-                    <img src={verifiedIcon} title="Verified user" className="verified_user_icon" alt="verified_user_icon" />
-                </>)
-        return profileBPlate;
-    }
-
 
     const _toggleShareReqPopUp = (id, value) => {
 
@@ -413,6 +329,7 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
 
     const openFrReqModalFn_Post = () => {
         dispatch(openCFRModal({
+            index: false,
             cancelReq: state.isNotFriend === 2 ? true : false,
             userId: state.user_id
         }))
@@ -425,7 +342,7 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
         is_liked = isLiked ? 1 : 2;
         ip_address = localStorage.getItem("ip")
         check_ip = ip_address.split(".").length
-        if (auth()) {
+        if (session) {
             token = localStorage.getItem("userDetails");
             token = JSON.parse(token).token;
         }
@@ -447,7 +364,7 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
                 // dispatch(updateCModalState(data))
 
                 updatePost(data);
-                await fetchData(obj)
+                await http(obj)
 
             } catch (error) {
                 console.log(error);
@@ -485,273 +402,249 @@ export default function ConfessionDetailPage({ categories, updatePost, ...rest }
     return (
         <>
             <div className="container-fluid postWrapperCommentsModal confession_detail_page">
-                {comDetailPage.status === apiStatus.FULFILLED
-                    ?
-                    <div className="row commentsNlightboxWrapper">
-                        {lightBox && (
-                            confessionData.image && ((confessionData.image).length !== 0 && ((confessionData.image).length > 1
-                                ?
-                                (<Lightbox images={confessionData.image} onClose={() => { setLightBox(false) }} />)     //MULTIPLE IMAGES
-                                :
-                                (<Lightbox image={confessionData.image} onClose={() => { setLightBox(false) }} />)))    //SINGLE IMAGE
-                        )}
-                        <div className="w-100">
+                <div className="row commentsNlightboxWrapper">
+                    {lightBox && (
+                        serverSideData.image && ((serverSideData.image).length !== 0 && ((serverSideData.image).length > 1
+                            ?
+                            (<Lightbox images={serverSideData.image} onClose={() => { setLightBox(false) }} />)     //MULTIPLE IMAGES
+                            :
+                            (<Lightbox image={serverSideData.image} onClose={() => { setLightBox(false) }} />)))    //SINGLE IMAGE
+                    )}
+                    <div className="w-100">
+                        <section className="sharekitWrapper">
 
-                            {/* MIDDLECONTAINER */}
+                            {(session && state.isReported !== 2) && <span className="reportPost" onClick={openReportPostModal}>
+                                <i className="fa fa-exclamation-circle reportComIcon" aria-hidden="true"></i>
+                            </span>}
 
-                            {isWaitingRes
-                                ?
-                                <div className="spinner-border pColor spinnerSizeFeed" role="status">
-                                    <span className="sr-only">Loading...</span>
-                                </div>
-                                :
-                                (isServerErr
-                                    ?
-                                    (<div className="alert alert-danger" role="alert">
-                                        Server Error.. Please try again
-                                    </div>)
-                                    :
-                                    (
-                                        <section className="sharekitWrapper">
+                            <span
+                                type="button"
+                                className={`sharekitdots resetRightModal ${sharekit === false ? "justify-content-end" : ""}`}
+                                onClick={() => _toggleShareReqPopUp(state.postId, ShareReducer.selectedPost?.id === state.postId ? !ShareReducer.selectedPost?.value : true)}>
+                                {ShareReducer &&
+                                    ShareReducer.selectedPost?.id === state.postId &&
+                                    ShareReducer.sharekitShow &&
+                                    <ShareKit
+                                        postData={{
+                                            confession_id: state.slug,
+                                            description: state.postedComment,
+                                        }}
+                                        closeShareReqPopUp={closeShareReqPopUp} />}
+                                <img src="/images/actionIconImg.svg" alt='shareKit' className="shareKitImgIcon" />
+                            </span>
 
-                                            {(auth() && state.isReported !== 2) && <span className="reportPost" onClick={openReportPostModal}>
-                                                <i className="fa fa-exclamation-circle reportComIcon" aria-hidden="true"></i>
-                                            </span>}
+                            {ShareReducer &&
+                                ShareReducer.selectedPost?.id === state.postId &&
+                                ShareReducer.selectedPost?.value === true &&
+                                <ShareRequestPopUp
+                                    toggleSharekit={
+                                        () => _toggleSharekit(state.postId, !ShareReducer.sharekitShow?.value)
+                                    }
+                                    isNotFriend={state.isNotFriend}
+                                    openFrReqModalFn={openFrReqModalFn_Post}
+                                    closeShareMenu={closeShareMenu}
+                                />}
 
-                                            <span
-                                                type="button"
-                                                className={`sharekitdots resetRightModal ${sharekit === false ? "justify-content-end" : ""}`}
-                                                onClick={() => _toggleShareReqPopUp(state.postId, ShareReducer.selectedPost?.id === state.postId ? !ShareReducer.selectedPost?.value : true)}>
-                                                {ShareReducer &&
-                                                    ShareReducer.selectedPost?.id === state.postId &&
-                                                    ShareReducer.sharekitShow &&
-                                                    <ShareKit
-                                                        postData={{
-                                                            confession_id: state.slug,
-                                                            description: state.postedComment,
-                                                        }}
-                                                        closeShareReqPopUp={closeShareReqPopUp} />}
-                                                <img src={shareKitIcon} className="shareKitImgIcon" />
+                            {isValidPost ? <div className="postCont modalPostCont">
+                                {sharekit &&
+                                    <div className="shareKitSpace"></div>}
+                                <div className="postContHeader justify-content-start">
+                                    <span className="userImage userImageFeed">
+                                        <ProfileIcon profileImg={state.profile_image} isNotFriend={state.isNotFriend} />
+                                    </span>
+
+                                    {serverSideData.post_as_anonymous === 1
+                                        ? <span className="userName postUserName">
+                                            {serverSideData.created_by}
+                                        </span> :
+                                        <Link className={`textDecNone postUserName`}
+                                            href={serverSideData.post_as_anonymous === 0 &&
+                                                (session ? (userDetails.profile.user_id === serverSideData.user_id ? `/profile` : `/userProfile?user=${serverSideData.user_id}`) : `/userProfile?user=${serverSideData.user_id}`)
+                                            }>
+                                            <span className="userName removeElipses">
+                                                {serverSideData.post_as_anonymous === 1 ? "Anonymous ." : serverSideData.created_by}
                                             </span>
+                                        </Link>}
 
-                                            {ShareReducer &&
-                                                ShareReducer.selectedPost?.id === state.postId &&
-                                                ShareReducer.selectedPost?.value === true &&
-                                                <ShareRequestPopUp
-                                                    toggleSharekit={
-                                                        () => _toggleSharekit(state.postId, !ShareReducer.sharekitShow?.value)
-                                                    }
-                                                    isNotFriend={state.isNotFriend}
-                                                    openFrReqModalFn={openFrReqModalFn_Post}
-                                                    closeShareMenu={closeShareMenu}
-                                                />}
+                                    <Badge points={comDetailPage?.data?.points} />
 
-                                            {isValidPost ? <div className="postCont modalPostCont">
-                                                {sharekit &&
-                                                    <div className="shareKitSpace"></div>}
-                                                <div className="postContHeader justify-content-start">
-                                                    <span className="userImage userImageFeed">
-                                                        {ProfileIcon(state.profile_image, state.isNotFriend)}
-                                                    </span>
+                                    {!isCoverTypePost && <span className="catCommentBtnCont">
+                                        <div className="categoryOfUser">{(serverSideData.category_name).charAt(0) + (serverSideData.category_name).slice(1).toLowerCase()}</div>
+                                    </span>}
 
-                                                    {confessionData.post_as_anonymous === 1
-                                                        ? <span className="userName postUserName">
-                                                            {confessionData.created_by}
-                                                        </span> :
-                                                        <Link className={`textDecNone postUserName`}
-                                                            to={confessionData.post_as_anonymous === 0 &&
-                                                                (auth() ? (userDetails.profile.user_id === confessionData.user_id ? `/profile` : `/userProfile?user=${confessionData.user_id}`) : `/userProfile?user=${confessionData.user_id}`)
-                                                            }>
-                                                            <span className="userName removeElipses">
-                                                                {confessionData.post_as_anonymous === 1 ? "Anonymous ." : confessionData.created_by}
-                                                            </span>
-                                                        </Link>}
-
-                                                    <Badge points={comDetailPage?.data?.points} />
-
-                                                    {!isCoverTypePost && <span className="catCommentBtnCont">
-                                                        <div className="categoryOfUser">{(confessionData.category_name).charAt(0) + (confessionData.category_name).slice(1).toLowerCase()}</div>
-                                                    </span>}
-
-                                                    <span className="postCreatedTime">
-                                                        {DateConverter(confessionData.created_at ?? state.created_at)}
-                                                    </span>
-                                                </div>
-                                                <div
-                                                    className={`postBody ${isCoverTypePost ? 'coverTypePost' : ''}`}
-                                                    style={postBg}>
-                                                    <div className="postedPost mb-2">
-                                                        <pre className="preToNormal">
-                                                            {confessionData.description}
-                                                        </pre>
-                                                    </div>
-                                                </div>
+                                    <span className="postCreatedTime">
+                                        {dateConverter(serverSideData.created_at ?? state.created_at)}
+                                    </span>
+                                </div>
+                                <div
+                                    className={`postBody ${isCoverTypePost ? 'coverTypePost' : ''}`}
+                                    style={postBg}>
+                                    <div className="postedPost mb-2">
+                                        <pre className="preToNormal">
+                                            {serverSideData?.description}
+                                        </pre>
+                                    </div>
+                                </div>
 
 
-                                                {(confessionData.image !== null && (confessionData.image).length > 0)
-                                                    &&
-                                                    (
-                                                        <div className="form-group imgPreviewCont">
-                                                            <div className="imgContForPreviewImg fetched" type="button" onClick={() => { setLightBox(true) }} >
-                                                                {(confessionData.image).map((src, index) => {
-                                                                    return (<span key={`${src}${index}`} className='uploadeImgWrapper fetched'>
-                                                                        <img src={src} alt="" className="previewImg" />
-                                                                    </span>)
+                                {(serverSideData.image !== null && (serverSideData.image).length > 0)
+                                    &&
+                                    (
+                                        <div className="form-group imgPreviewCont">
+                                            <div className="imgContForPreviewImg fetched" type="button" onClick={() => { setLightBox(true) }} >
+                                                {(serverSideData.image).map((src, index) => {
+                                                    return (<span key={`${src}${index}`} className='uploadeImgWrapper fetched'>
+                                                        <img src={src} alt="" className="previewImg" />
+                                                    </span>)
 
-                                                                })}
-                                                            </div>
-                                                        </div>
-                                                    )
-
-                                                }
-
-                                                {auth() === true &&
-                                                    <div className="container-fluid inputWithForwardCont">
-                                                        <div className="inputToAddComment textAreaToComment mb-1 my-md-0">
-                                                            <TextareaAutosize type="text" maxLength={maxChar} row='1' value={comment} onKeyDown={(e) => { checkKeyPressed(e) }} onChange={(e) => { setComment(e.target.value) }} className="form-control"></TextareaAutosize>
-
-                                                        </div>
-                                                        <div className="arrowToAddComment" type="button" id="commentsModalDoComment" onClick={() => { doComment() }}>
-                                                            <img src={forwardIcon} alt="" className="forwardIconContImg" />
-                                                        </div>
-                                                    </div>
-                                                }
-                                                <span className="d-block text-left errorCont text-danger mb-2 moveUp">{requiredError}</span>
-
-
-                                                <div className="postFoot commmentsGotModal">
-
-                                                    {auth() === false &&
-                                                        <span className="feedPageLoginBtnCont postLoginBtnCont">
-                                                            <Link to="/login">
-                                                                <div className="categoryOfUser enhancedStyle" type="button">
-                                                                    Login to comment
-                                                                </div>
-                                                            </Link>
-                                                        </span>}
-
-                                                    <div className={`iconsCont ${auth() === false ? 'mainDesignOnWrap' : ''}`}>
-                                                        <div className="upvote_downvote_icons_cont  ml-0" type="button">
-                                                            <img src={commentCountIcon} alt="" />
-                                                            <span className="count">
-                                                                {state.no_of_comments}
-                                                            </span>
-                                                        </div>
-
-
-                                                        {(state.hasOwnProperty("is_liked")
-                                                            ?
-                                                            <div className='iconsMainCont'>
-                                                                <div className={`upvote_downvote_icons_cont buttonType`}>
-                                                                    {state.is_liked === 1 ?
-                                                                        <img src={upvoted} alt="" onClick={() => upvoteOrDownvote(false)} /> :
-                                                                        <img src={upvote} alt="" onClick={() => upvoteOrDownvote(true)} />}
-                                                                    <span className='count'>{state.like}</span>
-                                                                </div>
-                                                            </div>
-                                                            :
-                                                            <div className='iconsMainCont'>
-                                                                <div className={`upvote_downvote_icons_cont`}>
-                                                                    <img src={upvote} alt="" />
-                                                                    <span className='count'>{state.like}</span>
-                                                                </div>
-                                                            </div>)}
-
-                                                    </div>
-                                                </div>
+                                                })}
                                             </div>
-                                                :
-                                                <div className="alert alert-danger" role="alert">
-                                                    The post doesn't exists
-                                                </div>}
-
-                                            {isValidPost && <div className="postsMainCont" id="postsMainCont">
-                                                {commentsArr.length > 0
-                                                    ?
-                                                    <InfiniteScroll
-                                                        onScroll={handleScrollTo}
-                                                        className="commentsModalIscroll"
-                                                        endMessage={
-                                                            commentsData.loading ?
-                                                                <div className="w-100 text-center ">
-                                                                    <div className="spinner-border pColor mt-4" role="status">
-                                                                        <span className="sr-only">Loading...</span>
-                                                                    </div>
-                                                                </div> :
-                                                                (<>
-                                                                    <div className="endListMessage mt-2 pb-0 w-100 text-center">
-                                                                        End of Comments
-                                                                    </div>
-                                                                </>)
-                                                        }
-                                                        dataLength={commentsArr.length}
-                                                        next={fetchMoreComments}
-                                                        hasMore={commentsArr.length < commentsCount}
-                                                        loader={
-                                                            <div className="w-100 text-center">
-                                                                <div className="spinner-border pColor mt-4" role="status">
-                                                                    <span className="sr-only">Loading...</span>
-                                                                </div>
-                                                            </div>
-                                                        }
-                                                    >
-                                                        {commentsArr.map((post, index) => {
-                                                            const comment = post
-                                                            return <Comments
-                                                                mutateCommentsFn={updateSingleCommentData}
-                                                                isReported={post.isReported}
-                                                                isLastIndex={commentsArr.length === index + 1}
-                                                                updateSingleCommentData
-                                                                ={updateSingleCommentData}
-                                                                updatePost={updatePost}
-                                                                comment={comment}
-                                                                index={index}
-                                                                updateComments={updateComments}
-                                                                postId={postId}
-                                                                updateComment={updateComment}
-                                                                created_at={post.created_at}
-                                                                commentId={post.comment_id}
-                                                                countChild={post.countChild}
-                                                                is_editable={post.is_editable}
-                                                                curid={(post.user_id === '' || post.user_id === 0) ? false : post.user_id}
-                                                                key={"Arr" + index + postId + "dp"}
-                                                                imgUrl={post.profile_image}
-                                                                userName={post.comment_by}
-                                                                postedComment={post.comment} />
-
-                                                        })}
-                                                    </InfiniteScroll>
-                                                    : (
-                                                        commentsData.loading ? <div className="w-100 text-center">
-                                                            <div className="spinner-border pColor mt-4" role="status">
-                                                                <span className="sr-only">Loading...</span>
-                                                            </div>
-                                                        </div> :
-                                                            <div className="endListMessage m-0 pb-1 w-100 text-center">
-                                                                End of Comments
-                                                            </div>
-                                                    )}
-
-                                            </div>}
-
-                                            {/* Ad, is shown after last comment */}
-                                            <div className="w-100 mt-2 mb-3">
-                                                {envConfig?.isProdMode ? <AdSense_ /> :
-                                                    <WhatsNewAds mainContId={"confession_detail_page_lsc_add"} />}
-                                            </div>
-                                            {/* Ad, is shown after last comment */}
-
-                                        </section>
+                                        </div>
                                     )
-                                )}
 
-                            {/* MIDDLECONTAINER */}
+                                }
 
-                        </div>
-                        <i className={`fa fa-arrow-circle-o-up commentsModalGoUpArrow ${goDownArrow === true ? "d-block" : "d-none"}`} aria-hidden="true" type="button" onClick={goUp}></i>
-                    </div> : null
-                }
+                                {session &&
+                                    <div className="container-fluid inputWithForwardCont">
+                                        <div className="inputToAddComment textAreaToComment mb-1 my-md-0">
+                                            <TextareaAutosize type="text" maxLength={maxChar} row='1' value={comment} onKeyDown={(e) => { checkKeyPressed(e) }} onChange={(e) => { setComment(e.target.value) }} className="form-control"></TextareaAutosize>
 
+                                        </div>
+                                        <div className="arrowToAddComment" type="button" id="commentsModalDoComment" onClick={() => { doComment() }}>
+                                            <img src="/images/forwardIcon.svg" alt="forwardIcon" className="forwardIconContImg" />
+                                        </div>
+                                    </div>
+                                }
+                                <span className="d-block text-left errorCont text-danger mb-2 moveUp">{requiredError}</span>
+
+
+                                <div className="postFoot commmentsGotModal">
+
+                                    {!session &&
+                                        <span className="feedPageLoginBtnCont postLoginBtnCont">
+                                            <Link href="/login">
+                                                <div className="categoryOfUser enhancedStyle" type="button">
+                                                    Login to comment
+                                                </div>
+                                            </Link>
+                                        </span>}
+
+                                    <div className={`iconsCont ${!session ? 'mainDesignOnWrap' : ''}`}>
+                                        <div className="upvote_downvote_icons_cont  ml-0" type="button">
+                                            <img src="/images/commentCountIcon.svg" alt="commentCountIcon" />
+                                            <span className="count">
+                                                {state.no_of_comments}
+                                            </span>
+                                        </div>
+
+
+                                        {(state.hasOwnProperty("is_liked")
+                                            ?
+                                            <div className='iconsMainCont'>
+                                                <div className={`upvote_downvote_icons_cont buttonType`}>
+                                                    {state.is_liked === 1 ?
+                                                        <img src="/images/upvoted.svg" alt="upvoted" onClick={() => upvoteOrDownvote(false)} /> :
+                                                        <img src="/images/upvote.svg" alt="upvote" onClick={() => upvoteOrDownvote(true)} />}
+                                                    <span className='count'>{state.like}</span>
+                                                </div>
+                                            </div>
+                                            :
+                                            <div className='iconsMainCont'>
+                                                <div className={`upvote_downvote_icons_cont`}>
+                                                    <img src="/images/upvote.svg" alt="upvote" />
+                                                    <span className='count'>{state.like}</span>
+                                                </div>
+                                            </div>)}
+
+                                    </div>
+                                </div>
+                            </div>
+                                :
+                                <div className="alert alert-danger" role="alert">
+                                    The post doesn't exists
+                                </div>}
+
+                            {isValidPost && <div className="postsMainCont" id="postsMainCont">
+                                {commentsArr.length > 0
+                                    ?
+                                    <InfiniteScroll
+                                        onScroll={handleScrollTo}
+                                        className="commentsModalIscroll"
+                                        endMessage={
+                                            commentsData.loading ?
+                                                <div className="w-100 text-center ">
+                                                    <div className="spinner-border pColor mt-4" role="status">
+                                                        <span className="sr-only">Loading...</span>
+                                                    </div>
+                                                </div> :
+                                                (<>
+                                                    <div className="endListMessage mt-2 pb-0 w-100 text-center">
+                                                        End of Comments
+                                                    </div>
+                                                </>)
+                                        }
+                                        dataLength={commentsArr.length}
+                                        next={fetchMoreComments}
+                                        hasMore={commentsArr.length < commentsCount}
+                                        loader={
+                                            <div className="w-100 text-center">
+                                                <div className="spinner-border pColor mt-4" role="status">
+                                                    <span className="sr-only">Loading...</span>
+                                                </div>
+                                            </div>
+                                        }
+                                    >
+                                        {commentsArr.map((post, index) => {
+                                            const comment = post
+                                            return <Comments
+                                                session={session}
+                                                mutateCommentsFn={updateSingleCommentData}
+                                                isReported={post.isReported}
+                                                isLastIndex={commentsArr.length === index + 1}
+                                                updateSingleCommentData
+                                                ={updateSingleCommentData}
+                                                updatePost={updatePost}
+                                                comment={comment}
+                                                index={index}
+                                                updateComments={updateComments}
+                                                postId={postId}
+                                                updateComment={updateComment}
+                                                created_at={post.created_at}
+                                                commentId={post.comment_id}
+                                                countChild={post.countChild}
+                                                is_editable={post.is_editable}
+                                                curid={(post.user_id === '' || post.user_id === 0) ? false : post.user_id}
+                                                key={"Arr" + index + postId + "dp"}
+                                                imgUrl={post.profile_image}
+                                                userName={post.comment_by}
+                                                postedComment={post.comment} />
+
+                                        })}
+                                    </InfiniteScroll>
+                                    : (
+                                        commentsData.loading ? <div className="w-100 text-center">
+                                            <div className="spinner-border pColor mt-4" role="status">
+                                                <span className="sr-only">Loading...</span>
+                                            </div>
+                                        </div> :
+                                            <div className="endListMessage m-0 pb-1 w-100 text-center">
+                                                End of Comments
+                                            </div>
+                                    )}
+
+                            </div>}
+
+                            {/* Ad, is shown after last comment */}
+                            <div className="w-100 mt-2 mb-3">
+                                {envConfig?.isProdMode ? <AdSense_ /> :
+                                    <WhatsNewAds mainContId={"confession_detail_page_lsc_add"} />}
+                            </div>
+                            {/* Ad, is shown after last comment */}
+
+                        </section>
+                    </div>
+                    <i className={`fa fa-arrow-circle-o-up commentsModalGoUpArrow ${goDownArrow === true ? "d-block" : "d-none"}`} aria-hidden="true" type="button" onClick={goUp}></i>
+                </div>
             </div>
         </>
     )

@@ -1,29 +1,32 @@
 import React, { useEffect } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 // Custom components
 import ForumFooter from '../forum/ForumFooter';
 import ForumHeader from '../forum/ForumHeader';
 import CommentBox from './CommentBox';
 
+import { useSession } from 'next-auth/react';
+
 // Redux
-import { forumHandlers, postComment, usersToTagAcFn } from '../../../redux/actions/forumsAc/forumsAc';
+import { forumHandlers, postComment, usersToTagAcFn } from '../../../../redux/actions/forumsAc/forumsAc';
 
 // Helpers
 import { doCommentService, getUsersToTagService } from '../services/forumServices';
-import { apiStatus } from '../../../helpers/status';
-import { scrollToTop } from '../../../helpers/helpers';
-import auth from '../../../user/behindScenes/Auth/AuthCheck';
+import { apiStatus } from '../../../../utils/api';
+import { scrollToTop } from '../../../../utils/dom';
 
 // Modals
 import NfswAlertModal from '../../modals/NfswAlertModal';
-import { toggleNfswModal } from '../../../redux/actions/modals/ModalsAc';
-import { isAllowedToComment } from './comments/ForumCommProvider';
+import { isAllowedToComment } from '../../../../utils/helpers';
+import { toggleNfswModal } from '../../../../redux/actions/modals/ModalsAc';
 
 
 const SingleForum = props => {
 
     // Hooks and vars
+    const { data: session } = useSession()
     const {
         currForum,
         forumTypes,
@@ -31,15 +34,15 @@ const SingleForum = props => {
         nfsw_modal,
         shareBox,
         dispatch,
+        serverSideData,
         forum_index,
         usersToTag,
         postCommentReducer,
         comments: { count: commentsCount, page = 1 }
     } = props
-    const location = useLocation()
-
-    // cameFromSearch
-    const navigate = useNavigate()
+    const router = useRouter()
+    const location = router.pathname
+    const navigate = router.push
     const { is_nsw } = currForum
     const isAllowedToCommentvar = isAllowedToComment(currForum)
 
@@ -53,47 +56,51 @@ const SingleForum = props => {
         showPin = false,
         isActionBoxVisible = actionBox?.forum_id === forum_id
     const forumHeaderProps = {
-        category_name: currForum?.category_name,
-        created_at: currForum?.created_at,
-        name: currForum?.title,
-        forum_id: currForum?.forum_id,
+        category_name: serverSideData?.category_name,
+        created_at: serverSideData?.created_at,
+        name: serverSideData?.title,
+        forum_id: serverSideData?.forum_id,
         is_requested: currForum?.is_requested,
         isReported: currForum?.isReported,
         forum_index,
-        type: currForum?.type,
+        type: serverSideData?.type,
         dispatch,
         currForum,
+        serverSideData,
         actionBox,
         shareBox,
         isActionBoxVisible,
         is_for_post: false,
-        is_calledfrom_detailPage: true
+        is_calledfrom_detailPage: true,
+        session
     }
 
     const forumFooterProps = {
         currForum,
         no_of_comments: currForum?.no_of_comments,
-        viewcount: currForum?.viewcount ?? 0,
+        viewcount: serverSideData?.viewcount ?? 0,
         forum_type,
         is_calledfrom_detailPage: true,
         isPinned,
+        serverSideData,
+        session,
         showPin,
-        forum_tags: currForum?.tags,
-        forum_id: currForum?.forum_id,
+        forum_tags: serverSideData?.tags,
+        forum_id: serverSideData?.forum_id,
         forum_index,
         dispatch
     }
 
     useEffect(() => {
         dispatch(forumHandlers.handleForums({ shareBox: {}, actionBox: {} }))
-        if (is_nsw && auth()) {
+        if (is_nsw && session) {
             dispatch(toggleNfswModal({
                 forum_index,
                 forum_id: currForum?.forum_id,
                 isVisible: true, forum_link: `/forums/${currForum?.slug}`
             }))
         }
-        scrollToTop()
+        scrollToTop({})
     }, [])
 
 
@@ -137,6 +144,7 @@ const SingleForum = props => {
     }
 
     const commentBoxProps = {
+        session,
         isCalledByParent: true,
         postCommentReducer,
         usedById: forum_id,
@@ -161,7 +169,7 @@ const SingleForum = props => {
         <>
             <div className='w-100 mb-3'>
                 <Link
-                    to={`/${location?.state?.cameFromSearch ? "search" : "forums"}`}
+                    href={`/${location?.state?.cameFromSearch ? "search" : "forums"}`}
                     onClick={resetTagList}
                     className='backtoHome'>
                     <span className='mr-2'>

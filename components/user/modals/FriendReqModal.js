@@ -1,25 +1,36 @@
+import { useSession } from 'next-auth/react';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchData } from '../../../commonApi';
-import requestModalImg from '../../../images/requestModalImg.png';
 import { reOpenCModal, updateCModal } from '../../../redux/actions/commentsModal';
+import { updateConfession } from '../../../redux/actions/confession/confessionAc';
 import { changeCancelled, changeRequested, closeFRModal } from '../../../redux/actions/friendReqModal';
-import auth from '../../behindScenes/Auth/AuthCheck';
+import { http } from '../../../utils/http';
 
-
-export const FriendReqModal = ({ userId, closeFrReqModalFn, toggleLoadingFn, _updateCanBeRequested, cancelReq, chaneCancelled }) => {
+export const FriendReqModal = ({ userId, closeFrReqModalFn, toggleLoadingFn, cancelReq, chaneCancelled }) => {
 
     const friendReqState = useSelector(state => state.friendReqModalReducer)
+    const { data: session } = useSession()
     const commentsModalReducer = useSelector(state => state.commentsModalReducer)
     const dispatch = useDispatch();
 
+
+    const _updateCanBeRequested = (userId, action) => {
+        dispatch(updateConfession({
+            index: friendReqState?.data?.index,
+            data: {
+                isNotFriend: action,
+            },
+            userId,
+            multiple: true
+        }))
+    }
 
     const sendFriendRequest = async (is_cancelled = 0) => {
 
         let token;
 
-        if (auth()) {
+        if (session) {
             token = JSON.parse(localStorage.getItem("userDetails"));
             token = token.token;
         }
@@ -41,7 +52,7 @@ export const FriendReqModal = ({ userId, closeFrReqModalFn, toggleLoadingFn, _up
         // console.log(obj);
 
         try {
-            const res = await fetchData(obj)
+            const res = await http(obj)
             if (res.data.status === true) {
                 is_cancelled === 0 ? dispatch(changeRequested()) : dispatch(changeCancelled());
             } else {
@@ -70,7 +81,7 @@ export const FriendReqModal = ({ userId, closeFrReqModalFn, toggleLoadingFn, _up
 
     const closeModal = () => {
         dispatch(closeFRModal({
-            
+
         }))
         reOpenCommentsModal();
     }
@@ -105,7 +116,7 @@ export const FriendReqModal = ({ userId, closeFrReqModalFn, toggleLoadingFn, _up
                     <Modal.Body className="privacyBody friendReqModalBody">
                         <div className="reqModalImgCont">
                             <div className="head">
-                                <img src={requestModalImg} alt="" />
+                                <img src="/images/requestModalImg.png" alt="requestModalImg" />
                             </div>
                             <div className="body">
                                 {friendReqState.requested === true ?
@@ -161,7 +172,7 @@ export const FriendReqModal = ({ userId, closeFrReqModalFn, toggleLoadingFn, _up
                     <Modal.Body className="privacyBody friendReqModalBody">
                         <div className="reqModalImgCont">
                             <div className="head">
-                                <img src={requestModalImg} alt="" />
+                                <img src="/images/requestModalImg.png" alt="requestModalImg" />
                             </div>
                             <div className="body">
                                 {friendReqState.cancelled === true ?

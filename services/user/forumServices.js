@@ -1,12 +1,12 @@
 // Helpers
 import { deleteForumAcFn, deleteForumCommSubcomAcFn, deleteForum_AcFn, forumHandlers, handleSingleForumCommAcFn, mutateForumFn, usersToTagAcFn } from "../../redux/actions/forumsAc/forumsAc"
 import { searchAcFn } from "../../redux/actions/searchAc/searchAc"
-import { apiStatus } from "../../utils/api"
+import { apiStatus, resHandler } from "../../utils/api"
 import auth from "../../utils/auth"
 import { areAtLastPage, showSubCommentsFn, subComIniVal } from "../../utils/helpers"
 import { http } from "../../utils/http"
 
-const { isUserLoggedIn, getKeyProfileLoc, setAuth } = auth
+const { getKeyProfileLoc } = auth
 
 // Sends comment
 const doCommentService = async ({
@@ -69,7 +69,7 @@ const doCommentService = async ({
 
     obj = {
         data,
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "post",
         url: "postforumcomment"
     }
@@ -169,7 +169,7 @@ const likeDislikeService = async ({
     if (check_ip === 4) {
         let obj = {
             data: { is_liked, ip_address },
-            token: getKeyProfileLoc("token", true) ?? "",
+            token: getKeyProfileLoc("token") ?? "",
             method: "post",
             url: `likedislikeforumcommet/${forum_id}/${commentId}`
         }
@@ -220,7 +220,7 @@ const pinForumService = async ({
     }))
 
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "get",
         url: `setfavforum/${forum_id}/${isPinned ? 0 : 1}`
     }
@@ -273,7 +273,7 @@ const deleteForumCommService = async ({
     }
 
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "get",
         url: `deletforumecomment/${forum_id}/${commentId}`
     }
@@ -303,7 +303,7 @@ const getUsersToTagService = async ({
     }
 
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "post",
         url: `gettaguser/${forum_id}`,
         data
@@ -334,7 +334,7 @@ const deleteForumService = async ({
 }) => {
     let obj
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "get",
         url: `deletforum/${forum_id}`,
     }
@@ -389,7 +389,7 @@ const getForumsNConfessions = async ({ SearchReducer, selectedCategory }) => {
         }
 
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "post",
         url: `search`,
         data
@@ -420,7 +420,7 @@ const getTagsService = async ({
 }) => {
     let obj = {
         data: {},
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "get",
         url: "gettags"
     }
@@ -431,6 +431,7 @@ const getTagsService = async ({
         const tags = res.tags?.map(curr => ({ value: curr, label: curr }))
         dispatch(forumHandlers.handleForumsTagsAcFn({ data: tags, status: apiStatus.FULFILLED }))
     } catch (error) {
+        console.log(error?.message)
         dispatch(searchAcFn({
             message: error?.message ?? "Something went wrong",
             status: apiStatus.REJECTED

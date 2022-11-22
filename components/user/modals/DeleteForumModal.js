@@ -1,4 +1,3 @@
-import Button from '@restart/ui/esm/Button';
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
@@ -47,15 +46,15 @@ export default function DeleteForumModal() {
                     Do you really want to delete the forum ?
                 </Modal.Body>
                 <Modal.Footer className="pt-0 justify-content-center">
-                    <Button className="modalFootBtns btn" variant="primary" onClick={closeModal}>
+                    <button className="modalFootBtns btn" variant="primary" onClick={closeModal}>
                         No
-                    </Button>
-                    <Button className="modalFootBtns btn" variant="primary" onClick={deleteForum}>
+                    </button>
+                    <button className="modalFootBtns btn" variant="primary" onClick={deleteForum}>
                         {isLoading ?
                             <div className="spinner-border text-white" role="status">
                                 <span className="sr-only">Loading...</span>
                             </div> : "Yes"}
-                    </Button>
+                    </button>
                 </Modal.Footer>
             </Modal>
         </>

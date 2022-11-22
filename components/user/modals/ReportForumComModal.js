@@ -1,11 +1,13 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { apiStatus } from '../../../helpers/status';
-import { fetchData } from "../../../commonApi"
 import { handleSingleForumCommAcFn, reportForumCommAcFn } from '../../../redux/actions/forumsAc/forumsAc';
-import { getKeyProfileLoc } from '../../../helpers/profileHelper';
-import { reportedFormStatus } from '../../../components/forums/detailPage/comments/ForumCommProvider';
+import { apiStatus } from '../../../utils/api';
+import { http } from '../../../utils/http';
+import { reportedFormStatus } from '../forums/detailPage/comments/ForumCommProvider';
+import auth from '../../../utils/auth';
+
+const { getKeyProfileLoc} = auth
 
 
 const ReportForumComModal = () => {
@@ -56,7 +58,7 @@ const ReportForumComModal = () => {
 
         let obj = {
             data: {},
-            token: getKeyProfileLoc("token", true) ?? "",
+            token: getKeyProfileLoc("token") ?? "",
             method: "get",
             url: `reportforumcomment/${forum_id}/${comment_id}`
         }
@@ -66,7 +68,7 @@ const ReportForumComModal = () => {
                 status: apiStatus.LOADING,
                 message: ""
             }))
-            const res = await fetchData(obj)
+            const res = await http(obj)
             if (res.data.status === true) {
                 doReport()
             } else {

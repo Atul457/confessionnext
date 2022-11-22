@@ -1,41 +1,32 @@
 import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
 import parse from 'html-react-parser';
+import Link from 'next/link';
 
 // Helpers
-import DateConverter from '../../../../helpers/DateConverter'
-
-// Image imports
-import userIcon from "../../../../images/userAcc.svg"
-import editCommentIcon from "../../../../images/editCommentIcon.svg"
-import commentReplyIcon from "../../../../images/creplyIcon.svg"
-import upvoted from '../../../../images/upvoted.svg';
-import verifiedIcon from '../../../../images/verifiedIcon.svg';
-import upvote from '../../../../images/upvote.svg';
+import { dateConverter, profileLinkToVisit } from '../../../../../utils/helpers';
+import { reportedFormStatus } from './ForumCommProvider';
+import auth from '../../../../../utils/auth';
+import { http } from '../../../../../utils/http';
+import { apiStatus } from '../../../../../utils/api';
 
 // Component imports
 import ForumSubComments from './ForumSubComments'
-import Badge from '../../../../common/components/badges/Badge';
+import Badge from '../../../../common/Badge';
 
 // HelperComp function
-import { getKeyProfileLoc } from '../../../../helpers/profileHelper'
-import { fetchData } from '../../../../commonApi'
-import { apiStatus } from '../../../../helpers/status'
 import { deleteForumCommService, doCommentService, getUsersToTagService, likeDislikeService } from '../../services/forumServices'
 import CommentBox from '../CommentBox'
-import { reportedFormStatus } from './ForumCommProvider'
-import { profileLinkToVisit } from '../../../../helpers/helpers';
+import { forumHandlers, postComment, reportForumCommAcFn, usersToTagAcFn } from '../../../../../redux/actions/forumsAc/forumsAc';
 
 // Redux
-import { forumHandlers, postComment, reportForumCommAcFn, usersToTagAcFn } from '../../../../redux/actions/forumsAc/forumsAc'
 
+const { getKeyProfileLoc } = auth
 
 const ForumComment = (props) => {
 
   // Hooks and vars
   const {
     comment: currComment,
-    auth,
     loggedInUserId,
     toSearch,
     usersToTag,
@@ -49,7 +40,8 @@ const ForumComment = (props) => {
     commentBox: { commentId: activeComBoxId },
     updateBox: { commentId: activeUpdateComBoxId },
     updateBox,
-    commentBox
+    commentBox,
+    session
   } = props
   let {
     comment_by,
@@ -69,8 +61,8 @@ const ForumComment = (props) => {
   const subComments = currComment?.subComments
 
   const { handleCommentAcFn, handleCommentsAcFn } = forumHandlers,
-    isCommentBoxVisible = auth() && activeComBoxId === commentId,
-    isUpdateComBoxVisible = auth() && activeUpdateComBoxId === commentId,
+    isCommentBoxVisible = session && activeComBoxId === commentId,
+    isUpdateComBoxVisible = session && activeUpdateComBoxId === commentId,
     isMyComment = loggedInUserId === user_id
 
   const doCommentVars = {
@@ -119,7 +111,7 @@ const ForumComment = (props) => {
   // Fetch subcomments on the comment
   async function fetchSubComs({ page = 1, append = false, fetchOnLoad = false }) {
 
-    let token = getKeyProfileLoc("token", true) ?? "",
+    let token = getKeyProfileLoc("token") ?? "",
       data = {},
       obj = {}
 
@@ -137,7 +129,7 @@ const ForumComment = (props) => {
     }
 
     try {
-      const res = await fetchData(obj)
+      const res = await http(obj)
       if (res.data.status === true) {
         return dispatch(handleCommentAcFn({
           subComments: {
@@ -278,7 +270,7 @@ const ForumComment = (props) => {
   }
 
 
-  profile_image = profile_image === "" ? userIcon : profile_image
+  profile_image = profile_image === "" ? "/images/userAcc.svg" : profile_image
 
   if (subComments?.status === apiStatus.LOADING)
     return (
@@ -299,16 +291,16 @@ const ForumComment = (props) => {
       <div className={`postCont forum_comment abc${commentId}`}>
 
         {/* Edit/Delete comment */}
-        {(auth() && currComment?.is_editable === 1) ?
+        {(session && currComment?.is_editable === 1) ?
           <div className='edit_delete_com_forum'>
             <i className="fa fa-trash deleteCommentIcon" type="button" aria-hidden="true" onClick={deleteCommentFunc}></i>
-            {!isUpdateComBoxVisible ? <img src={editCommentIcon} className='editCommentIcon' onClick={openUpdateComBox} /> : null}
+            {!isUpdateComBoxVisible ? <img src={"/images/editCommentIcon.svg"} className='editCommentIcon' onClick={openUpdateComBox} /> : null}
           </div>
           : null}
         {/* Edit/Delete comment */}
 
         {/* Report comment */}
-        {(auth() && isReported !== 2) ? <span className="reportPost" onClick={openReportCommentModal}>
+        {(session && isReported !== 2) ? <span className="reportPost" onClick={openReportCommentModal}>
           <i className="fa fa-exclamation-circle reportComIcon" aria-hidden="true"></i>
         </span> : null}
         {/* } */}
@@ -318,12 +310,12 @@ const ForumComment = (props) => {
           <span className="commentsGotProfileImg">
             <img src={profile_image} alt="user_profile_image" />
             {currComment?.email_verified === 1 ?
-              <img src={verifiedIcon} title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
+              <img src="/images/verifiedIcon.svg" title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
           </span>
-          
+
           {currComment?.userslug && currComment?.userslug !== "" ?
             <Link className={`forum_com_p_link`}
-              to={profileLinkToVisit(currComment)}>
+              href={profileLinkToVisit(currComment)}>
               <span className="userName">
                 {comment_by}
               </span>
@@ -337,7 +329,7 @@ const ForumComment = (props) => {
           <Badge points={currComment?.points} classlist="ml-2" />
 
           <span className="postCreatedTime">
-            {created_at ? DateConverter(created_at) : null}
+            {created_at ? dateConverter(created_at) : null}
           </span>
         </div>
 
@@ -354,6 +346,7 @@ const ForumComment = (props) => {
 
             {/* Update box */}
             {isUpdateComBoxVisible ? <CommentBox
+              session={session}
               toSearch={toSearch}
               dispatch={dispatch}
               usedById={commentId}
@@ -368,7 +361,7 @@ const ForumComment = (props) => {
               <div className="replyCont">
                 <span className="reply_btn">
                   <div onClick={toggleReplyBtn}>
-                    <img src={commentReplyIcon} alt="" className='replyIcon' />
+                    <img src="/images/creplyIcon.svg" alt="replyIcon" className='replyIcon' />
                     <span className='pl-2'>Reply</span>
                   </div>
 
@@ -378,8 +371,8 @@ const ForumComment = (props) => {
                     <div className='iconsMainCont'>
                       <div className={`upvote_downvote_icons_cont buttonType`}>
                         {is_liked === 1 ?
-                          <img src={upvoted} alt="" onClick={() => upvoteOrDownvote(false)} /> :
-                          <img src={upvote} alt="" onClick={() => upvoteOrDownvote(true)} />}
+                          <img src="/images/upvoted.svg" alt="upvoted" onClick={() => upvoteOrDownvote(false)} /> :
+                          <img src="/images/upvote.svg" alt="upvote" onClick={() => upvoteOrDownvote(true)} />}
                         <span className='count'>{currComment?.like}</span>
                       </div>
                     </div>
@@ -392,6 +385,7 @@ const ForumComment = (props) => {
                 {isCommentBoxVisible ?
                   <>
                     <CommentBox
+                      session={session}
                       toSearch={toSearch}
                       dispatch={dispatch}
                       usersToTag={usersToTag}
@@ -414,6 +408,7 @@ const ForumComment = (props) => {
         isAllowedToComment={isAllowedToComment}
         commentIndex={commentIndex}
         forum_id={forum_id}
+        session={session}
         toSearch={toSearch}
         updateBox={updateBox}
         doCommentVars={doCommentVars}

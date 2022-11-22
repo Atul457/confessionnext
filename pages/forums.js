@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import RightSideComp from '../components/user/forums/RightSideComp'
+import { forumHandlers } from '../redux/actions/forumsAc/forumsAc'
+
 
 const Forums = () => {
 
@@ -38,5 +40,8 @@ const Forums = () => {
 export default Forums
 
 Forums.additionalProps = {
-    containsSideAd: true
+    containsSideAd: true,
+    meta: {
+        title: "Forums"
+    }
 }

@@ -1,19 +1,16 @@
 import React, { useEffect, useRef } from 'react'
 
-// Third party
-// import TextareaAutosize from 'react-textarea-autosize';
-
-// Image imports
-import forwardIcon from '../../../images/forwardIcon.svg'
-
 // HelperComps
-import { ShowResComponent } from '../../HelperComponents';
+import { ShowResComponent } from '../../../../utils/ShowResComponent';
 
 // Helpers
-import { apiStatus } from '../../../helpers/status';
-import auth from '../../../user/behindScenes/Auth/AuthCheck';
-import { usersToTagAcFn } from '../../../redux/actions/forumsAc/forumsAc';
-import { getKeyProfileLoc } from '../../../helpers/profileHelper';
+import auth from '../../../../utils/auth';
+import { apiStatus } from '../../../../utils/api';
+
+// Redux
+import { usersToTagAcFn } from '../../../../redux/actions/forumsAc/forumsAc';
+
+const { getKeyProfileLoc } = auth
 
 
 const CommentBox = props => {
@@ -23,6 +20,7 @@ const CommentBox = props => {
         doComment,
         postCommentReducer: { message = "", status, usedById: messageId },
         usedById,
+        session,
         isCalledByParent = false,
         toSearch,
         isForUpdateCom = false,
@@ -103,7 +101,7 @@ const CommentBox = props => {
 
     return (
         <>
-            {auth &&
+            {session &&
                 (
                     <>
                         <div className="container-fluid inputWithForwardCont">
@@ -128,7 +126,7 @@ const CommentBox = props => {
                                     </div> : null}
                             </div>
                             <div className="arrowToAddComment" id="userPostCommentIcon" type="button" onClick={sendComment}>
-                                <img src={forwardIcon} alt="" className="forwardIconContImg" />
+                                <img src="/images/forwardIcon.svg" alt="forwardIcon" className="forwardIconContImg" />
                             </div>
                         </div>
                         {showMessage && message && message !== "" &&

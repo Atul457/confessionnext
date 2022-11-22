@@ -554,6 +554,9 @@ Login.additionalProps = {
       "Click the image to POST anonymously. LOGIN to respond to comments, add friends and do so much more!",
     bottomLogo: "/images/loginLogo.svg",
   },
+  meta: {
+    title: "Login"
+  }
 };
 
 export async function getServerSideProps(context) {

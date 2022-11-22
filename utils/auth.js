@@ -38,7 +38,7 @@ const getToken = () => {
 };
 
 const getAdminToken = () => {
-  return getKeyProfileLoc("token", true);
+  return getKeyProfileLoc("token");
 };
 
 const adminAuthCheck = () => {

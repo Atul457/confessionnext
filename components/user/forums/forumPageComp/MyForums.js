@@ -17,6 +17,7 @@ import DeleteForumModal from '../../modals/DeleteForumModal'
 import { http } from '../../../../utils/http'
 import { scrollDetails, scrollToTop } from '../../../../utils/dom'
 import auth from '../../../../utils/auth'
+import { useSession } from 'next-auth/react'
 // import { WhatsNewAds } from '../../../user/pageElements/components/AdMob'
 
 const { getKeyProfileLoc } = auth
@@ -29,6 +30,7 @@ const MyForums = () => {
     forumTypes,
     modals
   } = useSelector(state => state.forumsReducer)
+  const { data: session } = useSession()
   const { requestToJoinModal, reportForumModal, deleteForumModal } = modals
   const cameback = scrollDetails.getScrollDetails()?.pageName === "myforums"
   const dispatch = useDispatch()
@@ -51,7 +53,7 @@ const MyForums = () => {
   useEffect(() => {
     if (cameback === false || forums.length === 0) {
       getForums(1, false)
-      scrollToTop()
+      scrollToTop({})
     }
   }, [])
 
@@ -60,16 +62,17 @@ const MyForums = () => {
   // Get Forums
   const getForums = async (page = 1, append = false) => {
     let obj = {
-      token: getKeyProfileLoc("token", true) ?? "",
+      token: getKeyProfileLoc("token") ?? "",
       method: "get",
       url: `getmyforums/${page}`
     }
     try {
-      let res = await fetchData(obj)
+      let res = await http(obj)
       res = resHandler(res)
       const forums_from_api = res?.forums ?? []
 
       dispatch(handleForums({
+        data: append ? [...forums, ...forums_from_api] : forums_from_api,
         status: apiStatus.FULFILLED,
         count: res?.count,
         hasMore: forums_from_api.length ? true : false,
@@ -96,6 +99,7 @@ const MyForums = () => {
       forums.map((currForum, cfIndex) => {
         return (<div key={`forumNo${cfIndex}`}>
           <Forum
+            session={session}
             isMyForumPage={true}
             dispatch={dispatch}
             forum_index={cfIndex}

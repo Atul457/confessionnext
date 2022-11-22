@@ -124,7 +124,7 @@ export default function VerifyEmailModal(props) {
                     <>
                         <Modal.Body className="privacyBody eVerifyModal">
 
-                            <img src={everifyLogo} alt="" className='regions img' />
+                            <img src="/images/everifyLogo.png" alt="everifyLogo" className='regions img' />
 
                             {/* VERBIAGE */}
                             <div className='regions'>

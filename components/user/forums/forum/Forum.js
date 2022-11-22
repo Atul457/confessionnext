@@ -13,14 +13,12 @@ import ForumHeader from './ForumHeader';
 import WithLinkComp from '../../../../utils/WithLinkComp';
 
 // Helpers
-// import auth from '../../../user/behindScenes/Auth/AuthCheck';
 import { forum_types, myForum, requestedStatus } from '../detailPage/comments/ForumCommProvider';
 
 
 const Forum = (props) => {
 
     // Hooks and vars
-    const { data: session } = useSession();
     const {
         currForum,
         forumTypes,
@@ -30,7 +28,8 @@ const Forum = (props) => {
         pageName = "",
         rememberScrollPos = false,
         isMyForumPage = false,
-        forum_index
+        forum_index,
+        session
     } = props
 
     const { forum_id, is_pinned } = currForum
@@ -128,7 +127,7 @@ const Forum = (props) => {
     const getBody = () => {
 
         const private_and_joined = isPrivateForum && joined
-        const returnLink = isMyForum || (!ausession && !isNfswTypeContent) || (!isPrivateForum && !isNfswTypeContent)
+        const returnLink = isMyForum || (!session && !isNfswTypeContent) || (!isPrivateForum && !isNfswTypeContent)
             || (private_and_joined && !isNfswTypeContent) || pageName === "myforums"
         const forum_slug = !returnLink ? "#" : (`/forums/${currForum?.slug}`)
         let Html = ""

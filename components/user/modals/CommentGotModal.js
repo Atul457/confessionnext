@@ -364,6 +364,7 @@ export default function CommentGotModal({ categories, ...rest }) {
 
     const openFrReqModalFn_Post = () => {
         dispatch(openCFRModal({
+            index: state.index,
             cancelReq: state.isNotFriend === 2 ? true : false,
             userId: state.user_id
         }))
@@ -521,7 +522,9 @@ export default function CommentGotModal({ categories, ...rest }) {
                                                                 <div className="shareKitSpace"></div>}
                                                             <div className="postContHeader justify-content-start">
                                                                 <span className="userImage userImageFeed">
-                                                                    <ProfileIcon profileImg={state.profile_image} isNotFriend={state.isNotFriend} />
+                                                                    <ProfileIcon
+                                                                        openFrReqModalFn_Post={openFrReqModalFn_Post}
+                                                                        profileImg={state.profile_image} isNotFriend={state.isNotFriend} />
                                                                     {/* {ProfileIcon(state.profile_image, state.isNotFriend)} */}
                                                                 </span>
 

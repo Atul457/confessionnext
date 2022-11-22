@@ -1,18 +1,11 @@
 
 import React, { useRef, useState, useEffect } from 'react';
-// import auth from '../../behindScenes/Auth/AuthCheck';
 import TextareaAutosize from 'react-textarea-autosize';
-// import dateConverter from '../../../helpers/dateConverter'SubComments
-// import SubComments from './SubComments';
 import { useDispatch, useSelector } from 'react-redux';
 import { setCommentField, setUpdateFieldCModal, updateCModalState } from '../../../redux/actions/commentsModal';
-// import { getToken } from '../../../helpers/getToken';
 import _ from 'lodash';
 import { toggleReportComModal } from "../../../redux/actions/reportcommentModal"
 import { closeCModal } from "../../../redux/actions/commentsModal"
-// import { getKeyProfileLoc, updateKeyProfileLoc } from '../../../helpers/profileHelper';
-// import Badge from '../../../common/components/badges/Badge';
-// import { profileLinkToVisit } from '../../../helpers/helpers';
 import Link from 'next/link';
 import { http } from '../../../utils/http';
 import auth from '../../../utils/auth';
@@ -26,8 +19,8 @@ import useFeaturesModal from '../../../utils/hooks/useFeaturesModal';
 export default function Comments(props) {
 
     let SLOMT = 3; // SHOW LATEST ON COMMENTS MORE THAN
-    const { authCheck, getToken, getKeyProfileLoc, updateKeyProfileLoc } = auth
-    const [userDetails] = useState(authCheck() ? JSON.parse(localStorage.getItem("userDetails")) : '');
+    const { checkAuth, getToken, getKeyProfileLoc, updateKeyProfileLoc } = auth
+    const [userDetails] = useState(props?.session ? JSON.parse(localStorage.getItem("userDetails")) : '');
     const [editedComment, setEditedComment] = useState("");
     const [requiredError, setRequiredError] = useState({ updateError: '', replyError: '' });
     const editCommentField = useRef(null);
@@ -266,7 +259,7 @@ export default function Comments(props) {
 
         setSubComments({ ...subComments, loading: true });
 
-        if (auth()) {
+        if (props?.session) {
             token = localStorage.getItem("userDetails");
             token = JSON.parse(token);
             token = token.token;
@@ -399,15 +392,15 @@ export default function Comments(props) {
                 <div className="commentsContHeader">
                     <div className="postContHeader">
                         <span className="commentsGotProfileImg">
-                            <img src={props.imgUrl === "" ? userIcon : props.imgUrl} alt="" />
+                            <img src={props.imgUrl === "" ? "/images/userAcc.svg" : props.imgUrl} alt="" />
                             {comment?.email_verified === 1 ?
-                                <img src={verifiedIcon} title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
+                                <img src="/images/verifiedIcon.svg" title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
                         </span>
 
                         {props.curid !== false ?
 
                             (<Link className={`textDecNon comment cutDown`}
-                                to={profileLinkToVisit(comment)}>
+                                href={profileLinkToVisit(comment)}>
                                 <span className="userName">
                                     {props.userName}
                                 </span>
@@ -431,13 +424,13 @@ export default function Comments(props) {
                         {props.is_editable === 1 ?
                             <>
                                 <i className="fa fa-trash deleteCommentIcon" type="button" aria-hidden="true" onClick={deleteCommentFunc}></i>
-                                {commentsModalReducer.updateField.comment_id !== props.commentId ? <img src={editCommentIcon} className='editCommentIcon' onClick={setComment} /> : ''}
-                                {(auth() && props.isReported !== 2) ? <i
+                                {commentsModalReducer.updateField.comment_id !== props.commentId ? <img src="/images/editCommentIcon.svg" className='editCommentIcon' onClick={setComment} /> : ''}
+                                {(props?.session && props.isReported !== 2) ? <i
                                     className="fa fa-exclamation-circle reportComIcon"
                                     aria-hidden="true"
                                     onClick={openReportCommModal}></i> : null}
                             </> :
-                            (auth() && props.isReported !== 2) ? <i
+                            (props?.session && props.isReported !== 2) ? <i
                                 className="fa fa-exclamation-circle reportComIcon"
                                 aria-hidden="true"
                                 onClick={openReportCommModal}></i> : null
@@ -466,7 +459,7 @@ export default function Comments(props) {
                                             </TextareaAutosize>
                                         </div>
                                         <div className="arrowToAddComment" type="button">
-                                            <img src={forwardIcon} className="forwardIconContImg" onClick={updateComment} />
+                                            <img src="/images/forwardIcon.svg" alt='sendMessageIcon' className="forwardIconContImg" onClick={updateComment} />
                                         </div>
                                     </div>
                                     {requiredError.updateError !== '' ? <span className="d-block errorCont text-danger mb-2 moveUp">{requiredError.updateError}</span> : ''}
@@ -474,10 +467,10 @@ export default function Comments(props) {
                             }
                         </pre>
 
-                        {auth() &&
+                        {props?.session &&
                             <div className="replyCont">
                                 <span onClick={() => handleCommentBox()}>
-                                    <img src={commentReplyIcon} alt="" className='replyIcon' />
+                                    <img src="/images/creplyIcon.svg" alt="replyIcon" className='replyIcon' />
                                     <span className='pl-2'>Reply</span>
                                 </span>
 
@@ -498,7 +491,7 @@ export default function Comments(props) {
                                                 type="button"
                                                 onClick={() => handleSubComment()}
                                             >
-                                                <img src={forwardIcon} alt="" className="forwardIconContImg" />
+                                                <img src="/images/forwardIcon.svg" alt="sendMessageIcon" className="forwardIconContImg" />
                                             </div>
                                         </div>
                                         {requiredError.replyError !== "" ? <span className="d-block errorCont text-danger mb-2 mt-2 moveUp">{requiredError.replyError}</span> : null}
@@ -518,9 +511,9 @@ export default function Comments(props) {
                 <div className="postCont overWritePostWithComment subcommentCont upperView" onClick={openSubComments}>
                     <div className="postContHeader commentsContHeader">
                         <span className="commentsGotProfileImg">
-                            <img src={props.imgUrl === "" ? userIcon : props.imgUrl} alt="" />
+                            <img src={props.imgUrl === "" ? "/images/userAcc.svg" : props.imgUrl} alt="user account icon" />
                             {comment?.email_verified === 1 ?
-                                <img src={verifiedIcon} title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
+                                <img src="/images/verifiedIcon.svg" title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
                         </span>
                         <span className="userName">
                             Dummy name
@@ -545,6 +538,7 @@ export default function Comments(props) {
                         <div className="subcommentsMainCont">
                             {subComments.data.map((subcomment, index) => {
                                 return <SubComments
+                                    session={props?.session}
                                     isReported={subcomment.isReported}
                                     isLastIndex={subComments.data.length === index + 1}
                                     deleteSubComment={deleteSubComment}

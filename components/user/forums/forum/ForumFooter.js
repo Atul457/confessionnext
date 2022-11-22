@@ -18,8 +18,10 @@ const ForumFooter = (props) => {
     // Hooks and vars
     const {
         viewcount,
+        serverSideData,
         is_only_to_show = false,
         no_of_comments,
+        session,
         forum_type,
         currForum,
         pageName = "",
@@ -86,25 +88,25 @@ const ForumFooter = (props) => {
     const getBody = () => {
 
         const private_and_joined = isPrivateForum && joined
-        const returnLink = isMyForum || (!checkAuth() && !isNfswTypeContent) || (!isPrivateForum && !isNfswTypeContent)
+        const returnLink = isMyForum || (!session && !isNfswTypeContent) || (!isPrivateForum && !isNfswTypeContent)
             || (private_and_joined && !isNfswTypeContent) || (isCalledFromSearchPage && isPublicForum && !isNfswTypeContent)
         const forum_slug = returnLink ? `/forums/${currForum?.slug}` : "#"
         let Html = ""
 
         Html = (
             <>
-                {!checkAuth() && is_calledfrom_detailPage ?
+                {!session && is_calledfrom_detailPage ?
                     <span className="feedPageLoginBtnCont postLoginBtnCont">
                         <div className="categoryOfUser enhancedStyle mb-0" type="button">Login to comment</div>
                     </span>
                     : ""}
                 <pre className="preToNormal post cursor_pointer" onClick={() => {
-                    if ((!checkAuth() && isNfswTypeContent) || (isPrivateForum && joined && isNfswTypeContent)) return openNsfwModal()
-                    if (checkAuth() && (isPrivateForum && !joined) && !isCalledFromSearchPage) return openReqToJoinModal()
-                    if (checkAuth() && (isPrivateForum && !joined) && isCalledFromSearchPage) return
+                    if ((!session && isNfswTypeContent) || (isPrivateForum && joined && isNfswTypeContent)) return openNsfwModal()
+                    if (session && (isPrivateForum && !joined) && !isCalledFromSearchPage) return openReqToJoinModal()
+                    if (session && (isPrivateForum && !joined) && isCalledFromSearchPage) return
                     if (!isPrivateForum && isNfswTypeContent) return openNsfwModal()
                 }}>
-                    <div className={`iconsCont ${!checkAuth() ? 'mainDesignOnWrap' : ''}`}>
+                    <div className={`iconsCont ${!session ? 'mainDesignOnWrap' : ''}`}>
                         <div className="upvote_downvote_icons_cont underlineShareCount ml-0" type="button">
                             <img src="/images/viewsCountIcon.svg" alt="viewsCount" />
                             <span className="count">{viewcount ?? 0}</span>
@@ -123,7 +125,7 @@ const ForumFooter = (props) => {
             className='links text-dark'
             pageName={pageName}
             rememberScrollPos={rememberScrollPos}
-            link={!checkAuth() && is_calledfrom_detailPage ? "/login" : forum_slug}
+            link={!session && is_calledfrom_detailPage ? "/login" : forum_slug}
             children={Html} /> : Html
 
     }
@@ -161,7 +163,7 @@ const ForumFooter = (props) => {
                 }
             </div>
 
-            {(!is_only_to_show && checkAuth() && showPin && !isMyForumPage) ? <span className="pinnForum" onClick={pinForumFn}>
+            {(!is_only_to_show && session && showPin && !isMyForumPage) ? <span className="pinnForum" onClick={pinForumFn}>
                 <img
                     src={!isPinned ? "/images/pinIcon.svg" : "/images/pinnedIcon.svg"}
                     alt="pin_forum_icon" />

@@ -19,6 +19,7 @@ const SubComments = ({ data, subcommentId, updatePost, updatSubComments, index,
     let props = data;
     const { authCheck, getKeyProfileLoc, updateKeyProfileLoc, getToken } = auth
     const subcomment = rest?.subcomment
+    const session = rest.session
     const [editedComment, setEditedComment] = useState("");
     const [requiredError, setRequiredError] = useState({ updateError: '', replyError: '' });
     const editCommentField = useRef(null);
@@ -184,7 +185,7 @@ const SubComments = ({ data, subcommentId, updatePost, updatSubComments, index,
 
 
     return (
-        <div className={`postCont overWritePostWithComment subcommentCont ${props.id_path} ${!authCheck() ? 'notAuth' : ''}`} index={index}>
+        <div className={`postCont overWritePostWithComment subcommentCont ${props.id_path} ${!session ? 'notAuth' : ''}`} index={index}>
 
             {!isLastIndex
                 ?
@@ -197,9 +198,9 @@ const SubComments = ({ data, subcommentId, updatePost, updatSubComments, index,
             <div className="commentsContHeader">
                 <div className="postContHeader">
                     <span className="commentsGotProfileImg">
-                        <Image width={20} height={20} src={props.profile_image === "" ? "/images/userAcc.png" : props.profile_image} alt="profile_image" />
+                        <img src={props.profile_image === "" ? "/images/userAcc.png" : props.profile_image} alt="profile_image" />
                         {subcomment?.email_verified === 1 ?
-                            <Image width={20} height={20} src="/images/verifiedIcon.svg" title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
+                            <img src="/images/verifiedIcon.svg" title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
                     </span>
 
                     {props.curid !== false ?
@@ -226,13 +227,13 @@ const SubComments = ({ data, subcommentId, updatePost, updatSubComments, index,
                     {props.is_editable === 1 ?
                         <>
                             <i className="fa fa-trash deleteCommentIcon" type="button" aria-hidden="true" onClick={deleteCommentFunc}></i>
-                            {commentsModalReducer.updateField.comment_id !== props.comment_id ? <Image width={20} height={20} src="/images/editCommentIcon.svg" alt="editCommentIcon" className='editCommentIcon' onClick={setComment} /> : ''}
-                            {(authCheck() && props.isReported !== 2) ? <i
+                            {commentsModalReducer.updateField.comment_id !== props.comment_id ? <img src="/images/editCommentIcon.svg" alt="editCommentIcon" className='editCommentIcon' onClick={setComment} /> : ''}
+                            {(session && props.isReported !== 2) ? <i
                                 className="fa fa-exclamation-circle reportComIcon"
                                 aria-hidden="true"
                                 onClick={openReportCommModal}></i> : null}
                         </> :
-                        (authCheck() && props.isReported !== 2) ? <i
+                        (session && props.isReported !== 2) ? <i
                             className="fa fa-exclamation-circle reportComIcon"
                             aria-hidden="true"
                             onClick={openReportCommModal}></i> : null
@@ -263,7 +264,7 @@ const SubComments = ({ data, subcommentId, updatePost, updatSubComments, index,
                                         </TextareaAutosize>
                                     </div>
                                     <div className="arrowToAddComment" type="button">
-                                        <Image width={20} height={20} src="/images/forwardIcon.svg"
+                                        <img src="/images/forwardIcon.svg"
                                             className="forwardIconContImg"
                                             alt="forwardIconContImg"
                                             onClick={updateComment}
@@ -275,9 +276,9 @@ const SubComments = ({ data, subcommentId, updatePost, updatSubComments, index,
                         }
                     </pre>
 
-                    {authCheck() && <div className="replyCont replyContainer">
+                    {session && <div className="replyCont replyContainer">
                         <span onClick={openCommentBox}>
-                            <Image width={20} height={20} src="/images/creplyIcon.svg" alt="" className="replyIcon" />
+                            <img src="/images/creplyIcon.svg" alt="" className="replyIcon" />
                             <span className='pl-2'>Reply</span>
                         </span>
 
@@ -298,7 +299,7 @@ const SubComments = ({ data, subcommentId, updatePost, updatSubComments, index,
                                         type="button"
                                         onClick={sendSubCommentDebounced}
                                     >
-                                        <Image width={20} height={20} src="/images/forwardIcon.svg" alt="" className="forwardIconContImg" />
+                                        <img src="/images/forwardIcon.svg" alt="" className="forwardIconContImg" />
                                     </div>
                                 </div>
                             </>

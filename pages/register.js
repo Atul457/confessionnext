@@ -554,6 +554,9 @@ Login.additionalProps = {
             "Register here & Create your account to create Confessions, comment on confession, adding friends, and to do a lot more...",
         bottomLogo: "/images/registerLogo.svg",
     },
+    meta: {
+        title: "Register"
+    }
 };
 
 export async function getServerSideProps(context) {

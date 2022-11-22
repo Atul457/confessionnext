@@ -1,18 +1,19 @@
 import React, { useState } from 'react'
-import { Button, Modal } from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
-import { fetchData } from '../../commonApi'
 import * as yup from 'yup';
-import { resHandler } from '../../helpers/helpers'
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
-import { apiStatus } from '../../helpers/status'
-import { forumHandlers, mutateForumFn, reqToJoinModalAcFn } from '../../redux/actions/forumsAc/forumsAc'
-import { requestedStatus } from '../forums/detailPage/comments/ForumCommProvider'
-import { ShowResComponent } from '../HelperComponents'
-import { getKeyProfileLoc } from "../../helpers/profileHelper"
-import { useNavigate } from 'react-router-dom';
-import toastMethods from '../../helpers/components/Toaster';
+import { http } from '../../../utils/http';
+import { apiStatus, resHandler } from '../../../utils/api';
+import { forumHandlers, mutateForumFn, reqToJoinModalAcFn } from '../../../redux/actions/forumsAc/forumsAc';
+import { requestedStatus } from '../forums/detailPage/comments/ForumCommProvider';
+import { ShowResComponent } from '../../../utils/ShowResComponent';
+import auth from '../../../utils/auth';
+import { useRouter } from 'next/router';
+import toastMethods from '../../common/Toaster';
+
+const { getKeyProfileLoc } = auth
 
 const types = {
   "PASSWORD": 1,
@@ -22,11 +23,12 @@ const types = {
 const SendRequestModal = () => {
 
   // Hooks and vars
+  const router = useRouter()
   const { modals, detailPage } = useSelector(state => state.forumsReducer)
   const [pass, setPass] = useState({
     type: types.TEXT
   })
-  const navigate = useNavigate()
+  // const navigate = router.push
   const createForumSchema = yup.object().shape({
     password: yup.string().required()
   });
@@ -79,7 +81,7 @@ const SendRequestModal = () => {
   }
 
   const onSubmit = async (data) => {
-    let token = getKeyProfileLoc("token", true) ?? "";
+    let token = getKeyProfileLoc("token") ?? "";
 
     dispatch(reqToJoinModalAcFn({
       status: apiStatus.LOADING,
@@ -94,7 +96,7 @@ const SendRequestModal = () => {
     }
 
     try {
-      const res = await fetchData(obj)
+      const res = await http(obj)
       resHandler(res)
       sendRequest()
     } catch (err) {
@@ -142,7 +144,7 @@ const SendRequestModal = () => {
             </div>
 
             <ShowResComponent isError={isError} message={message} classList="w-100 text-center pb-2" />
-            <Button
+            <button
               className="reqModalFootBtns mt-3"
               variant="primary"
               type="submit"
@@ -152,7 +154,7 @@ const SendRequestModal = () => {
                   <span className="sr-only">Loading...</span>
                 </div> :
                 "Submit"}
-            </Button>
+            </button>
           </form>
         </Modal.Body>
       </Modal>

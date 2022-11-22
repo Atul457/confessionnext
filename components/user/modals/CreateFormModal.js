@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Modal } from 'react-bootstrap'
+import { button, Modal } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import * as yup from 'yup';
 import { useForm } from 'react-hook-form'
@@ -116,7 +116,7 @@ const CreateFormModal = () => {
   // Get Forums
   const getForums = async () => {
     let obj = {
-      token: getKeyProfileLoc("token", true) ?? "",
+      token: getKeyProfileLoc("token") ?? "",
       method: "get",
       url: `getmyforums/1`
     }
@@ -149,7 +149,7 @@ const CreateFormModal = () => {
       })
     }
 
-    let token = getKeyProfileLoc("token", true) ?? "";
+    let token = getKeyProfileLoc("token") ?? "";
     dispatch(createForumModalFnAc({
       status: apiStatus.LOADING,
       message: ""
@@ -337,7 +337,7 @@ const CreateFormModal = () => {
               <ShowResComponent isError={isError} message={message} classList="w-100 text-center pb-2 mt-3" />
               : null}
 
-            <Button
+            <button
               className="reqModalFootBtns"
               variant="primary"
               type="submit"
@@ -347,7 +347,7 @@ const CreateFormModal = () => {
                 <div className="spinner-border text-white" role="status">
                   <span className="sr-only">Loading...</span>
                 </div> : "Submit"}
-            </Button>
+            </button>
 
           </form>
         </Modal.Body>

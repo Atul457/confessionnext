@@ -2,13 +2,14 @@ import React, { useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import postAlertActionCreators from '../../../redux/actions/postAlert';
-import { useNavigate } from 'react-router-dom';
 import { setPostBoxState } from '../../../redux/actions/postBoxState';
+import { useRouter } from 'next/router';
 
 const PostAlertModal = ({ postConfession, data }) => {
 
     const dispatch = useDispatch();
-    const history = useNavigate();
+    const router = useRouter()
+    const history = router.push;
     const postAlertReducer = useSelector(state => state.postAlertReducer);
 
     useEffect(() => {

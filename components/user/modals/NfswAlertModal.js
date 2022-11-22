@@ -1,6 +1,7 @@
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/router'
 import React from 'react'
-import { Button, Modal } from 'react-bootstrap'
+import { Modal } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import { forumHandlers, mutateForumFn } from '../../../redux/actions/forumsAc/forumsAc'
 import { toggleNfswModal } from '../../../redux/actions/modals/ModalsAc'
@@ -16,9 +17,11 @@ const { getKeyProfileLoc } = auth
 const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
 
     // Hooks and vars
+    const { data: session } = useSession()
     const dispatch = useDispatch()
     const forum_link = nfsw_modal?.forum_link ?? "#"
     const router = useRouter()
+    const pathname = router.pathname
     const navigate = router.push
     const { status } = useSelector(state => state?.modalsReducer?.nfsw_modal)
     const isLoading = status === apiStatus?.LOADING
@@ -33,7 +36,8 @@ const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
                 dispatch(toggleNfswModal({
                     isVisible: false
                 }))
-                return (navigate("/forums"))
+                if (pathname !== "/forums") navigate("/forums")
+                return
             }
             return dispatch(toggleNfswModal({
                 isVisible: false
@@ -47,12 +51,12 @@ const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
     // Confirm nsfw content
     const confirmNfsw = async () => {
 
-        if (!auth()) return dispatch(toggleNfswModal({
+        if (!session) return dispatch(toggleNfswModal({
             isVisible: false,
             status: apiStatus.IDLE
         }))
 
-        let token = getKeyProfileLoc("token", true) ?? "", data;
+        let token = getKeyProfileLoc("token") ?? "", data;
 
         dispatch(toggleNfswModal({
             isVisible: false,
@@ -95,8 +99,9 @@ const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
 
             if (!rest?.isForumDetailPage) {
                 // Works when modal is opened on search page
-                navigate(forum_link, {
-                    state: { ...(nfsw_modal?.is_calledfrom_searchPage ? { cameFromSearch: true } : {}) }
+                navigate({
+                    pathname: forum_link,
+                    query: { ...(nfsw_modal?.is_calledfrom_searchPage ? { cameFromSearch: true } : {}) }
                 })
                 if (nfsw_modal?.rememberScrollPos) {
                     scrollDetails.setScrollDetails({ pageName: nfsw_modal?.pageName, scrollPosition: nfsw_modal?.scrollPosition })
@@ -104,7 +109,7 @@ const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
             }
 
         } catch (err) {
-            console.log({ err })
+            console.log(err?.message ?? "something went wrong")
             dispatch(toggleNfswModal({
                 status: apiStatus.REJECTED,
                 message: err.message
@@ -114,7 +119,7 @@ const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
 
     const getCloseBtn = () => {
         const closeBtnHtml = (
-            <Button
+            <button
                 className="reqModalFootBtns"
                 variant="primary"
                 onClick={() => closeModal(false)}
@@ -123,10 +128,10 @@ const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
                     <span className="sr-only">Loading...</span>
                 </div> : "Continue"}
 
-            </Button>
+            </button>
         )
 
-        return !auth() ? (
+        return !session ? (
             <WithLinkComp
                 nfsw={true}
                 rememberScrollPos={true}
@@ -165,13 +170,13 @@ const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
                 </div>
             </Modal.Body>
             <Modal.Footer className="pt-0 reqModalFooter">
-                <Button
+                <button
                     className="reqModalFootBtns cancel"
                     variant="primary"
                     onClick={() => closeModal(true)}
                 >
                     Cancel
-                </Button>
+                </button>
                 {getCloseBtn()}
             </Modal.Footer>
         </Modal>

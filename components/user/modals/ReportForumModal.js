@@ -1,19 +1,23 @@
 import React, { useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { apiStatus } from '../../../helpers/status';
-import { fetchData } from "../../../commonApi"
+import { apiStatus } from '../../../utils/api';
 import { forumHandlers, mutateForumFn, reportForumAcFn } from '../../../redux/actions/forumsAc/forumsAc';
-import { getKeyProfileLoc } from '../../../helpers/profileHelper';
-import { reportedFormStatus } from '../../../components/forums/detailPage/comments/ForumCommProvider';
-import auth from '../../behindScenes/Auth/AuthCheck';
-import { useNavigate } from 'react-router-dom';
+import { http } from '../../../utils/http';
+import { useSession } from "next-auth/react";
+import auth from '../../../utils/auth';
+import { useRouter } from 'next/router';
+import { reportedFormStatus } from '../forums/detailPage/comments/ForumCommProvider';
+
+const { getKeyProfileLoc } = auth
 
 
 const ReportForumModal = () => {
 
     // Hooks and vars
-    const navigate = useNavigate()
+    const router = useRouter()
+    const navigate = router.push
+    const { data: session } = useSession()
     const { modals, detailPage } = useSelector(state => state.forumsReducer)
     const { handleForum } = forumHandlers
     const { reportForumModal } = modals
@@ -25,7 +29,7 @@ const ReportForumModal = () => {
     const { reportPostModalReducer } = useSelector(state => state)
 
     useEffect(() => {
-        if (visible && !auth()) {
+        if (visible && !session) {
             dispatch(reportForumAcFn({ reset: true }))
             navigate("/login")
         }
@@ -57,7 +61,7 @@ const ReportForumModal = () => {
 
         let obj = {
             data: {},
-            token: getKeyProfileLoc("token", true) ?? "",
+            token: getKeyProfileLoc("token") ?? "",
             method: "get",
             url: `reportforum/${forum_id}`
         }
@@ -67,7 +71,7 @@ const ReportForumModal = () => {
                 status: apiStatus.LOADING,
                 message: ""
             }))
-            const res = await fetchData(obj)
+            const res = await http(obj)
             if (res.data.status === true) {
                 dispatch(mutateForumFn({
                     forum_index,

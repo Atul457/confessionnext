@@ -67,7 +67,7 @@ const Tabs = ({ activeTab, setActiveTab, session }) => {
     }
 
     const openCreateSForumModal = () => {
-        if (!auth) navigate("/login")
+        if (!session) navigate("/login")
         dispatch(createForumModalFnAc({
             visible: true
         }))

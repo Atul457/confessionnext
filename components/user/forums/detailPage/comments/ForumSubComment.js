@@ -1,28 +1,21 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import parse from 'html-react-parser';
+import Link from 'next/link';
 
 // Helpers
-import DateConverter from '../../../../helpers/DateConverter'
-import { deleteForumCommService, doCommentService, getUsersToTagService, likeDislikeService } from '../../services/forumServices'
-import { profileLinkToVisit } from '../../../../helpers/helpers';
+import { dateConverter, profileLinkToVisit } from '../../../../../utils/helpers';
+import { apiStatus } from '../../../../../utils/api';
 
-// Image imports
-import userIcon from "../../../../images/userAcc.svg"
-import commentReplyIcon from "../../../../images/creplyIcon.svg"
-import upvoted from "../../../../images/upvoted.svg"
-import verifiedIcon from "../../../../images/verifiedIcon.svg"
-import upvote from "../../../../images/upvote.svg"
-import editCommentIcon from "../../../../images/editCommentIcon.svg"
+// Services
+import { deleteForumCommService, doCommentService, getUsersToTagService, likeDislikeService } from '../../services/forumServices';
 
 // Redux
-import { forumHandlers, postComment, reportForumCommAcFn, usersToTagAcFn } from '../../../../redux/actions/forumsAc/forumsAc'
+import { forumHandlers, postComment, reportForumCommAcFn, usersToTagAcFn } from '../../../../../redux/actions/forumsAc/forumsAc'
 
 // Component imports
 import CommentBox from '../CommentBox'
-import { apiStatus } from '../../../../helpers/status'
-import { reportedFormStatus } from './ForumCommProvider'
-import Badge from '../../../../common/components/badges/Badge';
+import Badge from '../../../../common/Badge';
+import { reportedFormStatus } from './ForumCommProvider';
 
 
 const ForumSubComment = (props) => {
@@ -31,7 +24,7 @@ const ForumSubComment = (props) => {
     const {
         comment: currSubComment,
         usersToTag,
-        auth,
+        session,
         loggedInUserId,
         dispatch,
         toSearch,
@@ -56,8 +49,8 @@ const ForumSubComment = (props) => {
 
     const { handleCommentsAcFn } = forumHandlers,
         isMyComment = loggedInUserId === user_id,
-        isCommentBoxVisible = auth() && commentId === activeComBoxId,
-        isUpdateComBoxVisible = auth() && activeUpdateComBoxId === commentId
+        isCommentBoxVisible = session && commentId === activeComBoxId,
+        isUpdateComBoxVisible = session && activeUpdateComBoxId === commentId
 
     const {
         navigate,
@@ -204,20 +197,20 @@ const ForumSubComment = (props) => {
         })
     }
 
-    profile_image = profile_image === "" ? userIcon : profile_image
+    profile_image = profile_image === "" ? "/images/userAcc.svg" : profile_image
 
     return (
         <div className={`postCont overWritePostWithComment subcommentCont upperView ${currSubComment?.id_path ?? ""}`} index={subCommentIndex}>
 
-            {(auth && currSubComment?.is_editable === 1) ?
+            {(session && currSubComment?.is_editable === 1) ?
                 <div className='edit_delete_com_forum'>
                     <i className="fa fa-trash deleteCommentIcon" type="button" aria-hidden="true" onClick={deleteCommentFunc}></i>
-                    {!isUpdateComBoxVisible ? <img src={editCommentIcon} className='editCommentIcon' onClick={openUpdateComBox} /> : null}
+                    {!isUpdateComBoxVisible ? <img src="/images/editCommentIcon.svg" className='editCommentIcon' onClick={openUpdateComBox} alt="editCommentIcon" /> : null}
                 </div>
                 : null}
 
             {/* Report comment */}
-            {(auth() && isReported !== 2) && <span className="reportPost" onClick={openReportCommentModal}>
+            {(session && isReported !== 2) && <span className="reportPost" onClick={openReportCommentModal}>
                 <i className="fa fa-exclamation-circle reportComIcon" aria-hidden="true"></i>
             </span>}
             {/* Report comment */}
@@ -226,12 +219,12 @@ const ForumSubComment = (props) => {
                 <span className="commentsGotProfileImg">
                     <img src={profile_image} alt="user_profile_image" />
                     {currSubComment?.email_verified === 1 ?
-                        <img src={verifiedIcon} title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
+                        <img src="/images/verifiedIcon.svg" title="Verified user" alt="verified_user_icon" className='verified_user_icon' /> : null}
                 </span>
 
                 {currSubComment?.userslug && currSubComment?.userslug !== "" ?
                     <Link className={`forum_com_p_link`}
-                        to={profileLinkToVisit(currSubComment)}>
+                        href={profileLinkToVisit(currSubComment)}>
                         <span className="userName">
                             {comment_by}
                         </span>
@@ -245,7 +238,7 @@ const ForumSubComment = (props) => {
                 <Badge points={currSubComment?.points} classlist="ml-2" />
 
                 <span className="postCreatedTime">
-                    {created_at ? DateConverter(created_at) : null}
+                    {created_at ? dateConverter(created_at) : null}
                 </span>
             </div>
 
@@ -273,6 +266,7 @@ const ForumSubComment = (props) => {
                         dispatch={dispatch}
                         toSearch={toSearch}
                         usersToTag={usersToTag}
+                        session={session}
                         getUsersToTag={getUsersToTag}
                         usedById={commentId}
                         isForUpdateCom={true}
@@ -285,7 +279,7 @@ const ForumSubComment = (props) => {
                         <div className="replyCont">
                             <span className="reply_btn">
                                 <div onClick={toggleReplyBtn}>
-                                    <img src={commentReplyIcon} alt="" className='replyIcon' />
+                                    <img src="/images/creplyIcon.svg" alt="replyIcon" className='replyIcon' />
                                     <span className='pl-2'>Reply</span>
                                 </div>
 
@@ -295,8 +289,8 @@ const ForumSubComment = (props) => {
                                     <div className='iconsMainCont'>
                                         <div className={`upvote_downvote_icons_cont buttonType`}>
                                             {is_liked === 1 ?
-                                                <img src={upvoted} alt="" onClick={() => upvoteOrDownvote(false)} /> :
-                                                <img src={upvote} alt="" onClick={() => upvoteOrDownvote(true)} />}
+                                                <img src="/images/upvoted.svg" alt="upvoted" onClick={() => upvoteOrDownvote(false)} /> :
+                                                <img src="/images/upvote.svg" alt="upvote" onClick={() => upvoteOrDownvote(true)} />}
                                             <span className='count'>{like}</span>
                                         </div>
                                     </div>
@@ -307,11 +301,11 @@ const ForumSubComment = (props) => {
 
                             {isCommentBoxVisible ?
                                 <CommentBox
+                                    session={session}
                                     getUsersToTag={getUsersToTag}
                                     usersToTag={usersToTag}
                                     dispatch={dispatch}
                                     toSearch={toSearch}
-                                    auth={auth}
                                     usedById={commentId}
                                     postCommentReducer={postCommentReducer}
                                     doComment={doComment} /> :

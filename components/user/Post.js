@@ -31,8 +31,9 @@ import { toggleReportPostModal } from "../../redux/actions/reportPostModal";
 import TextareaAutosize from "react-textarea-autosize";
 import { http } from "../../utils/http";
 import { updateConfession } from "../../redux/actions/confession/confessionAc";
+import { openCFRModal } from "../../redux/actions/friendReqModal";
 
-const { isUserLoggedIn, getKeyProfileLoc, setAuth, updateKeyProfileLoc } = auth;
+const { getKeyProfileLoc, updateKeyProfileLoc, checkAuth } = auth;
 
 const Post = (props) => {
   // Hooks and vars
@@ -69,7 +70,7 @@ const Post = (props) => {
   const [sharekit, toggleSharekit, ShareKit, hideShareKit] = useShareKit();
 
   useEffect(() => {
-    setAuthenticated(isUserLoggedIn);
+    setAuthenticated(checkAuth());
   }, []);
 
   // Functions
@@ -101,7 +102,7 @@ const Post = (props) => {
   };
 
   const deletePost = () => {
-    props.deletePostModal(props.confession_id, props.index);
+    props.deletePostModal(post.confession_id, post.index);
   };
 
   const checkKeyPressed = betterCheckKeyPressed();
@@ -151,11 +152,12 @@ const Post = (props) => {
   const openFrReqModalFn_Post = () => {
     dispatch(
       openCFRModal({
-        cancelReq: props.isNotFriend === 2 ? true : false,
+        cancelReq: post.isNotFriend === 2 ? true : false,
+        index: post?.index,
         userId:
           friendReqState.requested === true || friendReqState.cancelled
             ? friendReqState.data.userId
-            : props.curid,
+            : post.user_id,
       })
     );
 
@@ -267,7 +269,7 @@ const Post = (props) => {
         ShareReducer.selectedPost?.id === post.confession_id &&
         ShareReducer.sharekitShow && <div className="shareKitSpace"></div>}
 
-      {isUserLoggedIn && post.isReported !== 2 && (
+      {checkAuth() && post.isReported !== 2 && (
         <span className="reportPost" onClick={openReportPostModal}>
           <i
             className="fa fa-exclamation-circle reportComIcon"
@@ -384,6 +386,7 @@ const Post = (props) => {
         <span className="leftContofPostCont">
           <span className="userImage userImageFeed">
             <ProfileIcon
+              openFrReqModalFn_Post={openFrReqModalFn_Post}
               profileImg={post?.profileImg}
               isNotFriend={post?.isNotFriend}
             />

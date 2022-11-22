@@ -70,7 +70,7 @@ const doCommentService = async ({
 
     obj = {
         data,
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "post",
         url: "postforumcomment"
     }
@@ -192,7 +192,7 @@ const likeDislikeService = async ({
     if (check_ip === 4) {
         let obj = {
             data: { is_liked, ip_address },
-            token: getKeyProfileLoc("token", true) ?? "",
+            token: getKeyProfileLoc("token") ?? "",
             method: "post",
             url: `likedislikeforumcommet/${forum_id}/${commentId}`
         }
@@ -243,7 +243,7 @@ const pinForumService = async ({
     }))
 
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "get",
         url: `setfavforum/${forum_id}/${isPinned ? 0 : 1}`
     }
@@ -294,7 +294,7 @@ const deleteForumCommService = async ({
     }
 
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "get",
         url: `deletforumecomment/${forum_id}/${commentId}`
     }
@@ -324,7 +324,7 @@ const getUsersToTagService = async ({
     }
 
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "post",
         url: `gettaguser/${forum_id}`,
         data
@@ -355,7 +355,7 @@ const deleteForumService = async ({
 }) => {
     let obj
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "get",
         url: `deletforum/${forum_id}`,
     }
@@ -410,7 +410,7 @@ const getForumsNConfessions = async ({ SearchReducer, selectedCategory }) => {
         }
 
     obj = {
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "post",
         url: `search`,
         data
@@ -441,7 +441,7 @@ const getTagsService = async ({
 }) => {
     let obj = {
         data: {},
-        token: getKeyProfileLoc("token", true) ?? "",
+        token: getKeyProfileLoc("token") ?? "",
         method: "get",
         url: "gettags"
     }

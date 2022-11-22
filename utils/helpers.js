@@ -5,7 +5,7 @@ import { apiStatus } from "./api";
 import axios from "axios";
 import auth from "./auth";
 
-const { isUserLoggedIn, getKeyProfileLoc } = auth
+const { isUserLoggedIn, getKeyProfileLoc, checkAuth } = auth
 
 const getIP = async () => {
   try {
@@ -19,6 +19,14 @@ const getIP = async () => {
     console.log(err?.message, "ip could not be loaded");
   }
 };
+
+// Returns profile visit link
+const profileLinkToVisit = (obj) => {
+  var isMyProfile = getKeyProfileLoc("user_id") === obj?.user_id
+  if (!obj?.userslug) return "#"
+  var linkToOtherProfile = `/userProfile/${obj?.userslug}`
+  return `${(isUserLoggedIn && isMyProfile) ? "/profile" : linkToOtherProfile}`
+}
 
 // Generates message
 const messageGenerator = (status = false, message = '', data = {}) => {
@@ -231,7 +239,7 @@ const isAllowedToComment = (currForum) => {
     (!isClosed && (isAllowedType || isApproved)) ||
     currForum?.isReported === myForum ||
     currForum?.isAllowedToComment === true;
-  return isUserLoggedIn && allowToComment;
+  return checkAuth() && allowToComment;
 };
 
 const customStyles = {
@@ -340,5 +348,6 @@ export {
   getLocalStorageKey,
   setLocalStoragekey,
   isAvatarSelectedCurr,
+  profileLinkToVisit,
   isAllowedToComment
 };

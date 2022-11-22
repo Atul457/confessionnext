@@ -1,10 +1,10 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { apiStatus } from '../../../helpers/status';
+import { apiStatus } from '../../../utils/api';
 import { reOpenCModal } from '../../../redux/actions/commentsModal';
+import { http } from '../../../utils/http';
 import { resetReportModal, toggleReportComModal } from '../../../redux/actions/reportcommentModal';
-import { fetchData } from "../../../commonApi"
 
 
 const ReportCommentModal = () => {
@@ -41,7 +41,7 @@ const ReportCommentModal = () => {
                 status: apiStatus.LOADING,
                 message: ""
             }))
-            const res = await fetchData(obj)
+            const res = await http(obj)
             if (res.data.status === true) {
                 closeModal({ mutateComments: true })
             } else {

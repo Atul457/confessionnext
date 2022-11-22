@@ -59,6 +59,22 @@ const confessionReducer = (state = initialstate, action) => {
 
         // Update a single confession
         case confAcs.UPDATE_CONFESSION: return produce(state, draft => {
+            if (action.payload.multiple) {
+                let updatedConfessionArray;
+                const confessions = current(draft.confessions.data)
+                updatedConfessionArray = confessions.map((curr) => {
+                    if (curr.user_id === action.payload.userId) {
+                        return {
+                            ...curr,
+                            ...(action.payload?.data ?? {})
+                        }
+                    } else return curr;
+                })
+
+                draft.confessions.data = updatedConfessionArray
+                return
+            }
+
             draft.confessions.data[action.payload.index] = {
                 ...draft.confessions.data[action.payload.index],
                 ...action.payload.data

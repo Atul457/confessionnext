@@ -19,7 +19,7 @@ import auth from '../../../../utils/auth'
 import { apiStatus, resHandler } from '../../../../utils/api'
 import { scrollDetails, scrollToTop } from '../../../../utils/dom'
 import { http } from '../../../../utils/http'
-
+import { useSession } from 'next-auth/react'
 
 
 const { getKeyProfileLoc } = auth
@@ -34,6 +34,7 @@ const WhatsNew = () => {
         forumTypes,
         modals
     } = useSelector(state => state.forumsReducer)
+    const { data: session } = useSession()
     const cameback = scrollDetails.getScrollDetails()?.pageName === "forums"
     const { modalsReducer: { nfsw_modal } } = useSelector(state => state)
     const { requestToJoinModal, reportForumModal } = modals
@@ -58,7 +59,7 @@ const WhatsNew = () => {
     useEffect(() => {
         if (cameback === false || forums.length === 0) {
             getForums(1, false)
-            scrollToTop()
+            scrollToTop({})
         }
     }, [activeCategory])
 
@@ -69,7 +70,7 @@ const WhatsNew = () => {
     const getForums = async (page = 1, append = false) => {
         let acCategory = activeCategory ? `${activeCategory}` : 'all'
         let obj = {
-            token: getKeyProfileLoc("token", true) ?? "",
+            token: getKeyProfileLoc("token") ?? "",
             method: "get",
             url: `getforums/${acCategory}/${page}`
         }
@@ -97,6 +98,7 @@ const WhatsNew = () => {
             forums.map((currForum, cfIndex) => {
                 return (<div key={`forumNo${cfIndex}`}>
                     <Forum
+                        session={session}
                         dispatch={dispatch}
                         forum_index={cfIndex}
                         actionBox={forumsRed.actionBox ?? {}}
@@ -106,10 +108,10 @@ const WhatsNew = () => {
                         pageName="forums"
                         currForum={currForum} />
 
-                    {((cfIndex + 1) % afterHowManyShowAdd === 0) ? <div className="mb-4">
+                    {/* {((cfIndex + 1) % afterHowManyShowAdd === 0) ? <div className="mb-4">
                         {envConfig?.isProdMode ? <AdSense_ /> :
                             <WhatsNewAds mainContId={`whatsNewPage${cfIndex}`} />}
-                    </div> : null}
+                    </div> : null} */}
 
                 </div>)
             })

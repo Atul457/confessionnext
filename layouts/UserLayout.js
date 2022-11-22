@@ -162,16 +162,20 @@ const UserLayout = ({ children, additionalProps = false }) => {
     getCategoriesService({ dispatch });
   }, []);
 
-
-
-  if (status === "loading" || session === undefined) {
-    return <h4 align="center">Loading</h4>;
-  }
+  if (additionalProps.serverSidePage !== true)
+    if (status === "loading" || session === undefined)
+      return <h4 align="center">Loading</h4>;
 
   return (
     <>
       <AuthContext.Provider value={setAuth}>
-        <Meta />
+
+        <Meta
+          {...additionalProps?.meta && {
+            ...additionalProps.meta
+          }}
+          removeDefaultMeta={additionalProps?.removeDefaultMeta} />
+
         <main className="container-fluid">
           <div
             className={`row outerContWrapper${!additionalProps?.authPage ? " not_auth_page" : ""
@@ -215,7 +219,7 @@ const UserLayout = ({ children, additionalProps = false }) => {
         </main>
 
         <Footer />
-        
+
         <FooterScripts />
 
       </AuthContext.Provider>

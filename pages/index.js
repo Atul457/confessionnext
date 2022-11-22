@@ -33,13 +33,18 @@ import { isWindowPresent } from "../utils/checkDom";
 import { extValidator, getLocalStorageKey, pulsationHelper, isAvatarSelectedCurr } from "../utils/helpers";
 import { http } from "../utils/http";
 
+// Redux
+import { changeCancelled, changeRequested, closeFRModal, toggleLoadingFn } from "../redux/actions/friendReqModal";
+import postAlertActionCreators from "../redux/actions/postAlert";
+
 // Modals
 import PrivacyModal from "../components/user/modals/PrivacyModal";
 import { scrollToTop } from "../utils/dom";
 import ReportPostModal from "../components/user/modals/ReportPostModal";
 import AvatarsIntroModal from "../components/user/modals/AvatarsIntroModal";
 import { toggleAvatarIntroModal } from "../redux/actions/avatarsIntroModalAc/avatarsIntroModalAc";
-
+import { FriendReqModal } from "../components/user/modals/FriendReqModal";
+import PostAlertModal from "../components/user/modals/PostAlertModal";
 
 const { checkAuth } = auth;
 
@@ -235,7 +240,7 @@ export default function Home({ userDetails }) {
           if (checkAuth()) {
             loggedInUserData = localStorage.getItem("userDetails");
             loggedInUserData = JSON.parse(loggedInUserData);
-            post_as_anonymous = loggedInUserData.profile.post_as_anonymous;
+            post_as_anonymous = loggedInUserData.post_as_anonymous;
             token = loggedInUserData.token;
             recapToken = "";
           } else if (recapToken === "") {
@@ -782,10 +787,26 @@ export default function Home({ userDetails }) {
       {/* Avatar intro modal */}
       <AvatarsIntroModal />
 
+      {/* Friend req modal */}
+      {
+        friendReqModalReducer.visible === true &&
+        <FriendReqModal
+          changeCancelled={changeCancelled}
+          closeFrReqModalFn={closeFRModal}
+          toggleLoadingFn={toggleLoadingFn}
+          changeRequested={changeRequested}
+        // _updateCanBeRequested={updateCanBeRequested}
+        />
+      }
+
+
     </>
   );
 }
 
 Home.additionalProps = {
   containsSideAd: true,
+  meta: {
+    title: "Home"
+  }
 };

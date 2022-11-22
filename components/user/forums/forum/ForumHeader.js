@@ -26,6 +26,7 @@ const ForumHeader = props => {
         is_only_to_show = false,
         created_at,
         currForum,
+        serverSideData,
         isMyForumPage,
         shareBox,
         pageName = "",
@@ -40,6 +41,7 @@ const ForumHeader = props => {
         is_calledfrom_detailPage = false,
         isReported,
         is_for_post = true,
+        session
     } = props
 
     const isActionBoxVisible = actionBox?.forum_id === forum_id
@@ -75,7 +77,7 @@ const ForumHeader = props => {
     const openNsfwModal = () => {
         dispatch(toggleNfswModal({
             isVisible: true,
-            forum_link: `/forums/${currForum?.slug}`,
+            forum_link: `/forums/${serverSideData?.slug}`,
             forum_id,
             rememberScrollPos,
             pageName,
@@ -91,7 +93,7 @@ const ForumHeader = props => {
             message: "",
             data: {
                 forum_id,
-                slug: currForum?.slug,
+                slug: serverSideData?.slug,
                 requested: requested,
                 is_calledfrom_detailPage,
                 forum_index
@@ -136,17 +138,17 @@ const ForumHeader = props => {
     const getBody = () => {
 
         const private_and_joined = isPrivateForum && joined
-        const returnLink = isMyForum || (!checkAuth() && !isNfswTypeContent) || (!isPrivateForum && !isNfswTypeContent)
+        const returnLink = isMyForum || (!session && !isNfswTypeContent) || (!isPrivateForum && !isNfswTypeContent)
             || (private_and_joined && !isNfswTypeContent) || (isCalledFromSearchPage && isPublicForum && !isNfswTypeContent)
-        const forum_slug = returnLink ? `/forums/${currForum?.slug}` : "#"
+        const forum_slug = returnLink ? `/forums/${serverSideData?.slug}` : "#"
         let Html = ""
 
         Html = (
             <div className="forum_header_left_sec" onClick={() => {
                 if (pageName === "myforums") return
-                if ((!checkAuth() && isNfswTypeContent) || (isPrivateForum && joined && isNfswTypeContent)) return openNsfwModal()
-                if (checkAuth() && (isPrivateForum && !joined) && !isCalledFromSearchPage) return openReqToJoinModal()
-                if (checkAuth() && (isPrivateForum && !joined) && isCalledFromSearchPage) return
+                if ((!session && isNfswTypeContent) || (isPrivateForum && joined && isNfswTypeContent)) return openNsfwModal()
+                if (session && (isPrivateForum && !joined) && !isCalledFromSearchPage) return openReqToJoinModal()
+                if (session && (isPrivateForum && !joined) && isCalledFromSearchPage) return
                 if (!isPrivateForum && isNfswTypeContent) return openNsfwModal()
             }}>
                 <div className="forum_name">
@@ -228,7 +230,7 @@ const ForumHeader = props => {
 
                                     {!isMyForumPage ?
                                         <>
-                                            {(!hideJoinDiv && checkAuth() ?
+                                            {(!hideJoinDiv && session ?
                                                 <>
                                                     <div className="shareReqRows user" type="button" onClick={openReqToJoinModal}>
                                                         <img src="/images/addFriend.svg" alt="addFriend" />
@@ -237,7 +239,7 @@ const ForumHeader = props => {
                                                     <div className='shareReqDivider'></div>
                                                 </> : null)}
 
-                                            <div onClick={openReportModal} className={`shareReqRows ${(!showShareBlock && hideJoinDiv) || (!checkAuth() && !showShareBlock) ? "pt-3" : ""} user w-100`} type="button">
+                                            <div onClick={openReportModal} className={`shareReqRows ${(!showShareBlock && hideJoinDiv) || (!session && !showShareBlock) ? "pt-3" : ""} user w-100`} type="button">
                                                 <img src="/images/reportForumIcon.svg" className="report_forum_icon" />
                                                 <span>Report</span>
                                             </div>

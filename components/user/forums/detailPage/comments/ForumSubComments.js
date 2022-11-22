@@ -3,18 +3,15 @@ import React from 'react'
 // Component imports
 import ForumSubComment from './ForumSubComment'
 
-// Image imports
-import userIcon from "../../../../images/userAcc.svg"
-
 // Helpers
-import { apiStatus } from '../../../../helpers/status'
-import auth from '../../../../user/behindScenes/Auth/AuthCheck'
-import DateConverter from '../../../../helpers/DateConverter'
-import { forumHandlers } from '../../../../redux/actions/forumsAc/forumsAc'
 import InfiniteScroll from 'react-infinite-scroll-component'
+import { apiStatus } from '../../../../../utils/api'
+import { dateConverter } from '../../../../../utils/helpers'
+import { forumHandlers } from '../../../../../redux/actions/forumsAc/forumsAc'
 
 
 const ForumSubComments = props => {
+
 
     // Hooks and vars
     const {
@@ -22,6 +19,7 @@ const ForumSubComments = props => {
         toSearch,
         forum_id,
         usersToTag,
+        session,
         dispatch,
         loggedInUserId,
         commentIndex,
@@ -33,6 +31,7 @@ const ForumSubComments = props => {
         doCommentVars,
         isAllowedToComment
     } = props
+
     const {
         status, message,
         data: subCommentsArr = [],
@@ -62,13 +61,13 @@ const ForumSubComments = props => {
             <div className={`postCont overWritePostWithComment subcommentCont upperView`} onClick={openSubComments}>
                 <div className="postContHeader commentsContHeader">
                     <span className="commentsGotProfileImg">
-                        <img src={userIcon} alt="" />
+                        <img src="/images/userAcc.svg" alt="userAcc" />
                     </span>
                     <span className="userName">
                         Dummy name
                     </span>
                     <span className="postCreatedTime">
-                        {DateConverter(parent_created_at)}
+                        {dateConverter(parent_created_at)}
                     </span>
                     <span className='subCommentsCount'>
                         {countChild} More Reply
@@ -99,7 +98,7 @@ const ForumSubComments = props => {
                             updateBox={updateBox}
                             key={`${comment.id}${index}`}
                             isAllowedToComment={isAllowedToComment}
-                            auth={auth}
+                            session={session}
                             doCommentVars={doCommentVars}
                             commentBox={commentBox ?? {}}
                             forum_id={forum_id}

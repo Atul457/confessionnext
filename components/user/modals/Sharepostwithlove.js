@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { Button, Modal } from 'react-bootstrap';
+import { button, Modal } from 'react-bootstrap';
 import TextareaAutosize from 'react-textarea-autosize';
 import { useRef, useState } from "react"
 import { toggleShareWithLoveModal, resetShareWithLoveModal } from '../../../redux/actions/shareWithLoveAc/shareWithLoveAc';
@@ -170,18 +170,18 @@ const ShareWithLoveModal = ({ getConfessions }) => {
                                 {shareWithLoveReducer.message}
                             </div>}
                         <div className="w-100 d-flex justify-content-end">
-                            <Button className="doPostBtn" variant="primary" onClick={postConfession}>
+                            <button className="doPostBtn" variant="primary" onClick={postConfession}>
                                 {shareWithLoveReducer.status === apiStatus.LOADING ? <div className="spinner-border text-white text-center" role="status">
                                     <span className="sr-only">Loading...</span>
                                 </div> : "Post"}
-                            </Button>
+                            </button>
                         </div>
                     </>)
                     :
                     <div div className="w-100 d-flex justify-content-center mt-3">
-                        <Button className="modalFootBtns btn mb-2" onClick={navigateToLogin}>
+                        <button className="modalFootBtns btn mb-2" onClick={navigateToLogin}>
                             Login
-                        </Button>
+                        </button>
                     </div>}
             </Modal.Footer>
         </Modal >
@@ -244,9 +244,9 @@ const AppreciationModal = () => {
                 </div>
             </Modal.Body>
             <Modal.Footer className="sharePWLMfooter appreciationModalFoot d-flex justify-content-center">
-                <Button className="doPostBtn mt-0" variant="primary" onClick={closeModal}>
+                <button className="doPostBtn mt-0" variant="primary" onClick={closeModal}>
                     Done
-                </Button>
+                </button>
             </Modal.Footer>
         </Modal>
     )

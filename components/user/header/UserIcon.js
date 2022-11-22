@@ -18,11 +18,11 @@ import { EVerifyModal } from "../../../redux/actions/everify";
 import VerifyEmailModal from "../modals/VerifyEmailModal";
 import _ from "lodash";
 
-const { getKeyProfileLoc, setAuth } = auth;
 
 const UserIcon = () => {
 
   // Hooks and vars
+  const { getKeyProfileLoc, setAuth } = auth;
   const { data: session } = useSession();
   const [requestsIndicator, setRequestIndicator] = useState(0);
   const [showEModal, setShowEModal] = useState(false);
@@ -414,10 +414,9 @@ const UserIcon = () => {
 
   // Logs the user out
   const logout = async () => {
-    await signOut({ redirect: false })
+    await signOut({ redirect: true, callbackUrl: "/login" })
     setAuth(0);
     localStorage.clear()
-    router.push("/login")
   }
 
   return (
