@@ -1,24 +1,44 @@
 import { isWindowPresent } from "./checkDom";
 
+// const checkAuth = () => {
+//   if (isWindowPresent()) {
+//     const localStorageR = localStorage.getItem("userDetail")?.user_id;
+
+//     if (!localStorageR) {
+//       localStorage.clear();
+//       return false;
+//     } else {
+//       return false;
+//     }
+//   }
+// };
+
+// const checkAuth = () => {
+//   if (isWindowPresent()) {
+//     const localStorageR = localStorage.getItem("authenticated");
+
+//     if (
+//       localStorageR === "" ||
+//       localStorageR === null ||
+//       localStorageR === "0"
+//     ) {
+//       localStorage.setItem("authenticated", "0");
+//       return false;
+//     } else if (localStorageR === "1") {
+//       localStorage.setItem("authenticated", "1");
+//       return true;
+//     } else {
+//       localStorage.setItem("authenticated", "0");
+//       return false;
+//     }
+//   } else return false;
+// };
+
 const checkAuth = () => {
   if (isWindowPresent()) {
-    const localStorageR = localStorage.getItem("authenticated");
-
-    if (
-      localStorageR === "" ||
-      localStorageR === null ||
-      localStorageR === "0"
-    ) {
-      localStorage.setItem("authenticated", "0");
-      return false;
-    } else if (localStorageR === "1") {
-      localStorage.setItem("authenticated", "1");
-      return true;
-    } else {
-      localStorage.setItem("authenticated", "0");
-      return false;
-    }
-  } else return false;
+    const localStorageR = localStorage.getItem("userDetails")?.user_id;
+    return localStorageR ? true : false;
+  }
 };
 
 const setAuth = (data) => {
@@ -101,7 +121,7 @@ const updateKeyProfileLoc = (key, value, isToken = false) => {
     if (isToken) userDetails = { ...userDetails, token: value };
     userDetails = {
       ...userDetails,
-      [key]: value
+      [key]: value,
     };
     localStorage.setItem("userDetails", JSON.stringify(userDetails));
   }
@@ -112,7 +132,7 @@ const getKeyProfileLoc = (key, isAdmin = false) => {
     let userData = "";
     userData = localStorage.getItem(isAdmin ? "adminDetails" : "userDetails");
     userData = JSON.parse(userData);
-    if (userData && (key in userData)) userData = userData[key];
+    if (userData && key in userData) userData = userData[key];
     return userData;
   }
   return false;

@@ -18,12 +18,21 @@ const scrollToTop = ({ isFeedPage = false }) => {
 
 const scrollDetails = {
   setScrollDetails({ scrollPosition, pageName }) {
-    localStorage.setItem("scrollDetails", JSON.stringify({ scrollPosition: scrollPosition ?? 0, pageName: pageName ?? "" }))
+    if (isWindowPresent())
+      localStorage.setItem(
+        "scrollDetails",
+        JSON.stringify({
+          scrollPosition: scrollPosition ?? 0,
+          pageName: pageName ?? "",
+        })
+      );
   },
   getScrollDetails() {
-    const scrollDetails = localStorage.getItem("scrollDetails") ?? "{}";
-    return JSON.parse(scrollDetails)
-  }
-}
+    if (isWindowPresent()) {
+      const scrollDetails = localStorage.getItem("scrollDetails") ?? "{}";
+      return JSON.parse(scrollDetails);
+    }
+  },
+};
 
 export { scrollToTop, scrollDetails };

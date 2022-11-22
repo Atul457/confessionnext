@@ -5099,6 +5099,7 @@ button.report {
 }
 
 .postsHeadingProfile {
+  width: 100%;
   display: block;
   margin: 20px 0px;
   padding: 0 20px;

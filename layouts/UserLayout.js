@@ -1,5 +1,6 @@
-import React, { createContext, useEffect, cloneElement } from "react";
+import React, { createContext, useEffect, useRef, cloneElement } from "react";
 import { useDispatch } from "react-redux";
+import { useRouter } from "next/router";
 
 // Common Imports
 import Footer from "../components/user/footer/Footer";
@@ -9,7 +10,9 @@ import { FooterScripts } from "../components/user/Scripts";
 import Sidebar from "../components/user/sidebar/Sidebar";
 
 // Third party
+import { signOut } from "next-auth/react";
 import TagManager from "react-gtm-module";
+import LoadingBar from "react-top-loading-bar";
 import { unstable_getServerSession } from "next-auth";
 import { useSession } from "next-auth/react";
 // import ReactPixel from 'react-facebook-pixel';
@@ -37,8 +40,6 @@ import LgSidebar from "../components/common/LgSidebar";
 import { authOptions } from "../pages/api/auth/[...nextauth]";
 import { next_auth_status } from "../utils/provider";
 import { resHandler } from "../utils/api";
-import { signOut } from "next-auth/react";
-
 
 // Google tag manager
 if (isWindowPresent()) {
@@ -66,16 +67,18 @@ const { checkAuth, setAuth } = auth;
 
 export const AuthContext = createContext(checkAuth());
 
-const UserLayout = ({ children, additionalProps = false }) => {
-  if (isWindowPresent()) {
-    window.dataLayer.push({
-      event: "pageview",
-    });
-  }
+if (isWindowPresent()) {
+  window.dataLayer.push({
+    event: "pageview",
+  });
+}
 
+const UserLayout = ({ children, additionalProps = false }) => {
   // Hooks and vars
+  const router = useRouter();
+  const loaderRef = useRef(null);
   const { data: session, status } = useSession();
-  const logout = isWindowPresent() ? localStorage.getItem("logout") : "0"
+  const logout = isWindowPresent() ? localStorage.getItem("logout") : "0";
   const userDetails = session?.user;
   const updatedChildren = cloneElement(children, {
     userDetails: userDetails,
@@ -86,12 +89,11 @@ const UserLayout = ({ children, additionalProps = false }) => {
   useEffect(() => {
     if (session && status === next_auth_status.authenticated) {
       const getProfileData = async () => {
-
         // Means that may have been inactivated or deleted form db
-        const logout = localStorage.getItem("logout")
+        const logout = localStorage.getItem("logout");
         if (session && logout === "1") {
-          localStorage.clear()
-          return await signOut({ redirect: false })
+          localStorage.clear();
+          return await signOut({ redirect: false });
         }
 
         let obj = {
@@ -110,27 +112,21 @@ const UserLayout = ({ children, additionalProps = false }) => {
               id: user.user_id,
               ...user,
               token: session?.user?.token,
-              comments: res?.comments
+              comments: res?.comments,
             };
-            localStorage.setItem(
-              "userDetails",
-              JSON.stringify(userDet)
-            );
+            localStorage.setItem("userDetails", JSON.stringify(userDet));
           } else {
-            console.log(res)
+            console.log(res);
           }
         } catch (err) {
           console.log(err?.message);
         }
-      }
+      };
       getProfileData();
-    }
-    else if (status === next_auth_status.unauthenticated) {
+    } else if (status === next_auth_status.unauthenticated) {
       handleUserDetails({ remove: true });
     }
-
   }, [session, status, logout]);
-
 
   // Retrieves the categories from the backend, and if authenticated fetches the userDetails also
   useEffect(() => {
@@ -153,7 +149,7 @@ const UserLayout = ({ children, additionalProps = false }) => {
       }
     };
 
-    loadScriptByURL("recaptcha-key", envConfig.recaptchaKey, function () { });
+    loadScriptByURL("recaptcha-key", envConfig.recaptchaKey, function () {});
 
     // End of load recaptcha v3
     let { handleForumsTypesAcFn } = forumHandlers;
@@ -162,24 +158,40 @@ const UserLayout = ({ children, additionalProps = false }) => {
     getCategoriesService({ dispatch });
   }, []);
 
-  if (additionalProps.serverSidePage !== true)
-    if (status === "loading" || session === undefined)
-      return <h4 align="center">Loading</h4>;
+  useEffect(() => {
+    const handleStart = () => {
+      loaderRef.current.continuousStart()
+    };
+    const handleStop = () => {
+      loaderRef.current.complete()
+    };
+
+    router.events.on("routeChangeStart", handleStart);
+    router.events.on("routeChangeComplete", handleStop);
+    router.events.on("routeChangeError", handleStop);
+
+    return () => {
+      router.events.off("routeChangeStart", handleStart);
+      router.events.off("routeChangeComplete", handleStop);
+      router.events.off("routeChangeError", handleStop);
+    };
+  }, [router]);
 
   return (
     <>
       <AuthContext.Provider value={setAuth}>
-
         <Meta
-          {...additionalProps?.meta && {
-            ...additionalProps.meta
-          }}
-          removeDefaultMeta={additionalProps?.removeDefaultMeta} />
+          {...(additionalProps?.meta && {
+            ...additionalProps.meta,
+          })}
+          removeDefaultMeta={additionalProps?.removeDefaultMeta}
+        />
 
         <main className="container-fluid">
           <div
-            className={`row outerContWrapper${!additionalProps?.authPage ? " not_auth_page" : ""
-              }`}
+            className={`row outerContWrapper${
+              !additionalProps?.authPage ? " not_auth_page" : ""
+            }`}
           >
             {additionalProps?.authPage ? null : (
               <Header userDetails={userDetails} />
@@ -192,8 +204,13 @@ const UserLayout = ({ children, additionalProps = false }) => {
             )}
 
             <div
-              className={`rightColumn${additionalProps?.containsSideAd ? " side_ads_page" : ""
-                }${additionalProps?.authPage ? " auth_page" : ""}${additionalProps?.containsSideAd && additionalProps?.authPage ? " not_contains_sidead" : ""}`}
+              className={`rightColumn${
+                additionalProps?.containsSideAd ? " side_ads_page" : ""
+              }${additionalProps?.authPage ? " auth_page" : ""}${
+                additionalProps?.containsSideAd && additionalProps?.authPage
+                  ? " not_contains_sidead"
+                  : ""
+              }`}
             >
               <div className="rightMainFormCont rightMainFormContFeed p-0">
                 {additionalProps?.authPage ? null : (
@@ -219,9 +236,9 @@ const UserLayout = ({ children, additionalProps = false }) => {
         </main>
 
         <Footer />
+        <LoadingBar color="#FC997C" ref={loaderRef} />
 
         <FooterScripts />
-
       </AuthContext.Provider>
     </>
   );

@@ -18,9 +18,7 @@ import { EVerifyModal } from "../../../redux/actions/everify";
 import VerifyEmailModal from "../modals/VerifyEmailModal";
 import _ from "lodash";
 
-
 const UserIcon = () => {
-
   // Hooks and vars
   const { getKeyProfileLoc, setAuth } = auth;
   const { data: session } = useSession();
@@ -42,7 +40,6 @@ const UserIcon = () => {
   const [showProfileOption, setShowProfileOption] = useState(false);
   const [newCommentsCount, setNewCommentsCount] = useState(0);
 
-
   useEffect(() => {
     setRequestIndicator(
       localStorage.getItem("requestsCount")
@@ -57,42 +54,48 @@ const UserIcon = () => {
     }
     return () => {
       document.removeEventListener("click", catchEvent2);
-    }
-  }, [ShareReducer.selectedPost?.value])
+    };
+  }, [ShareReducer.selectedPost?.value]);
 
   useEffect(() => {
     let interval;
     if (session) {
-      interval = setInterval(() => { getUnreadCommentsCount(notificationReducer) }, 3000)
+      interval = setInterval(() => {
+        getUnreadCommentsCount(notificationReducer);
+      }, 3000);
     }
     return () => {
-      if (session) clearInterval(interval)
-    }
-  }, [notificationReducer.data, notificationReducer.messagesCount, verifyEState])
+      if (session) clearInterval(interval);
+    };
+  }, [
+    notificationReducer.data,
+    notificationReducer.messagesCount,
+    verifyEState,
+  ]);
 
   useEffect(() => {
     getNotiStatus();
-  }, [notificationReducer.data])
+  }, [notificationReducer.data]);
 
   useEffect(() => {
     const listener = (e) => {
-      const toIgnore = ["seach_boxinput", "headerUserAccIcon", "search_box"]
-      const elementClass = e.target.classList
+      const toIgnore = ["seach_boxinput", "headerUserAccIcon", "search_box"];
+      const elementClass = e.target.classList;
       let ignorableItem = false;
-      toIgnore.forEach(curr => {
-        if (elementClass.contains(curr)) ignorableItem = true
-      })
+      toIgnore.forEach((curr) => {
+        if (elementClass.contains(curr)) ignorableItem = true;
+      });
       if (!ignorableItem) {
-        dispatch(searchAcFn({ visible: false }))
+        dispatch(searchAcFn({ visible: false }));
       }
-    }
+    };
     if (SearchReducer.visible) {
-      document.addEventListener("click", listener)
+      document.addEventListener("click", listener);
     }
     return () => {
-      document.removeEventListener("click", listener)
-    }
-  }, [SearchReducer.visible])
+      document.removeEventListener("click", listener);
+    };
+  }, [SearchReducer.visible]);
 
   useEffect(() => {
     if (showProfileOption) {
@@ -100,8 +103,8 @@ const UserIcon = () => {
     }
     return () => {
       document.removeEventListener("click", catchEvent);
-    }
-  }, [showProfileOption])
+    };
+  }, [showProfileOption]);
 
   useEffect(() => {
     if (notificationReducer.isVisible === true) {
@@ -110,19 +113,27 @@ const UserIcon = () => {
 
     return () => {
       document.removeEventListener("click", catchEventNoti);
-    }
-  }, [notificationReducer.isVisible])
-
+    };
+  }, [notificationReducer.isVisible]);
 
   // Functions
 
   // Handles sharekit
   function catchEvent2(e) {
     var classes = e.target.classList;
-    if (!classes.contains("shareReqCont") && !classes.contains("shareReqRows") && !classes.contains("shareKitImgIcon") && !classes.contains("sharekitdots") && !classes.contains("dontHide")) {
-      dispatch(togglemenu({
-        id: null, value: false
-      }))
+    if (
+      !classes.contains("shareReqCont") &&
+      !classes.contains("shareReqRows") &&
+      !classes.contains("shareKitImgIcon") &&
+      !classes.contains("sharekitdots") &&
+      !classes.contains("dontHide")
+    ) {
+      dispatch(
+        togglemenu({
+          id: null,
+          value: false,
+        })
+      );
     }
   }
 
@@ -137,7 +148,11 @@ const UserIcon = () => {
   // Handles notification
   function catchEventNoti(e) {
     var classes = e.target.classList;
-    let result = !classes.contains("takeActionNoti") && !classes.contains("noti") && !classes.contains("takeActionOptions") && !classes.contains("notificationIcon");
+    let result =
+      !classes.contains("takeActionNoti") &&
+      !classes.contains("noti") &&
+      !classes.contains("takeActionOptions") &&
+      !classes.contains("notificationIcon");
     if (result) {
       dispatch(closeNotiPopup());
     }
@@ -304,8 +319,9 @@ const UserIcon = () => {
             {index > 0 && <hr className="m-0" />}
             <div
               type="button"
-              className={`takeActionOptions takeActionOptionsOnHov textDecNone py-2 ${curr.is_unread === 1 ? "unread" : ""
-                }`}
+              className={`takeActionOptions takeActionOptionsOnHov textDecNone py-2 ${
+                curr.is_unread === 1 ? "unread" : ""
+              }`}
             >
               {isForum ? (
                 <i
@@ -357,20 +373,19 @@ const UserIcon = () => {
       data: {},
       token: getKeyProfileLoc("token") ?? "",
       method: "get",
-      url: "newcommentscount"
-    }
+      url: "newcommentscount",
+    };
 
     try {
-      const res = http(obj)
+      const res = http(obj);
       res.then((res) => {
-
         if (res.data.status === true) {
           let count = parseInt(res.data.friendrequests);
           let count_ = parseInt(res.data.messages);
           setNewCommentsCount(res.data.comments);
 
           if (res.data.messages !== notificationReducer.messagesCount) {
-            dispatch(updateMessagesCount(res.data.messages))
+            dispatch(updateMessagesCount(res.data.messages));
           }
 
           setRequestIndicator(count);
@@ -379,11 +394,11 @@ const UserIcon = () => {
 
           // IF NOTIFICATION DATA IS NOT UPDATED THE ONLY UPDATE IT
           if (!_.isEqual(res.data.commentscenter, notificationReducer.data)) {
-            dispatch(updateNotiPopState({ data: res.data.commentscenter }))
+            dispatch(updateNotiPopState({ data: res.data.commentscenter }));
           }
 
           // EMAIL VERIFICATION LOGIC
-          var email_verified = res.data.email_verified;   // 0 NOT VERIFIED , 1 VERIFIED
+          var email_verified = res.data.email_verified; // 0 NOT VERIFIED , 1 VERIFIED
 
           let currPath;
 
@@ -401,31 +416,30 @@ const UserIcon = () => {
               setShowEModal(true);
             }
           } else if (email_verified === 1 && verifyEState.verified === false) {
-            dispatch(EVerifyModal({ verified: true }))
+            dispatch(EVerifyModal({ verified: true }));
           }
-
         }
-      })
+      });
     } catch (err) {
       console.log(err?.messages);
     }
-
   }
 
   // Logs the user out
   const logout = async () => {
-    await signOut({ redirect: true, callbackUrl: "/login" })
+    await signOut({ redirect: true, callbackUrl: "/login" });
     setAuth(0);
-    localStorage.clear()
-  }
+    localStorage.clear();
+  };
 
   return (
     <>
       {session ? (
         <>
-
           {/* Email verification modal */}
-          {verifyEState && verifyEState.verified === false && <VerifyEmailModal showEModal={showEModal} />}
+          {verifyEState && verifyEState.verified === false && (
+            <VerifyEmailModal showEModal={showEModal} />
+          )}
           {/* Email verification modal */}
 
           {/* Search icon */}
@@ -498,14 +512,23 @@ const UserIcon = () => {
 
           <div className="authProfileIcon" onClick={HandleShowHide}>
             <span className="requestsIndicatorNuserIconCont" type="button">
+              {/* console.log(first) */}
               <img
-                src={!session?.user?.image || image === "" ? "/images/userAcc.svg" : image}
+                src={
+                  (!session?.user?.image && !image) || image === ""
+                    ? "/images/userAcc.svg"
+                    : image
+                }
                 alt="profileImage"
                 className="userAccIcon headerUserAccIcon"
               />
 
               <img
-                src={!image || image === "" ? "/images/mobileProfileIcon.svg" : image}
+                src={
+                  !image || image === ""
+                    ? "/images/mobileProfileIcon.svg"
+                    : image
+                }
                 alt="profileIcon"
                 className="userAccIcon headerUserAccIcon mobIcon"
               />
@@ -534,7 +557,9 @@ const UserIcon = () => {
                     <span className="profileHeaderImage">
                       <img
                         src={
-                          !session?.user?.image || (image && image === "") ? "/images/mobileProfileIcon.svg" : image
+                          !session?.user?.image || (image && image === "")
+                            ? "/images/mobileProfileIcon.svg"
+                            : image
                         }
                         alt="profileIcon"
                       />

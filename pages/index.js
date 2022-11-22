@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 // Third party
@@ -30,31 +30,37 @@ import { setConfessions } from "../redux/actions/confession/confessionAc";
 import useCommentsModal from "../utils/hooks/useCommentsModal";
 import useFeaturesModal from "../utils/hooks/useFeaturesModal";
 import { isWindowPresent } from "../utils/checkDom";
-import { extValidator, getLocalStorageKey, pulsationHelper, isAvatarSelectedCurr } from "../utils/helpers";
+import {
+  extValidator,
+  getLocalStorageKey,
+  pulsationHelper,
+  isAvatarSelectedCurr,
+} from "../utils/helpers";
 import { http } from "../utils/http";
 
 // Redux
-import { changeCancelled, changeRequested, closeFRModal, toggleLoadingFn } from "../redux/actions/friendReqModal";
+import {
+  changeCancelled,
+  changeRequested,
+  closeFRModal,
+  toggleLoadingFn,
+} from "../redux/actions/friendReqModal";
 import postAlertActionCreators from "../redux/actions/postAlert";
 
 // Modals
 import PrivacyModal from "../components/user/modals/PrivacyModal";
+import PostAlertModal from "../components/user/modals/PostAlertModal";
 import { scrollToTop } from "../utils/dom";
 import ReportPostModal from "../components/user/modals/ReportPostModal";
 import AvatarsIntroModal from "../components/user/modals/AvatarsIntroModal";
 import { toggleAvatarIntroModal } from "../redux/actions/avatarsIntroModalAc/avatarsIntroModalAc";
 import { FriendReqModal } from "../components/user/modals/FriendReqModal";
-import PostAlertModal from "../components/user/modals/PostAlertModal";
 
 const { checkAuth } = auth;
 
 export default function Home({ userDetails }) {
-
   // Hooks and vars
   let noOfChar = maxCharAllowedOnPostComment;
-  const [categoryShow, setCategoryShow] = useState(false);
-  const [adSlots, setAdSlots] = useState([]);
-  const [selectedFile, setSelectedFile] = useState("");
   const [submittable, setSubmittable] = useState(true);
   const [base64Src, setBase64Src] = useState([]);
   const [imgPathArr, setImgPathArr] = useState([]);
@@ -62,13 +68,11 @@ export default function Home({ userDetails }) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorOrSuccess, setErrorOrSuccess] = useState(true);
 
-  const heartCompRef = useRef(null);
-
   const dispatch = useDispatch();
   const store = useSelector((store) => store);
   const confessionRed = store?.confessionReducer.confessions;
   const confessions = confessionRed?.data;
-  const reportModalReducer = store.reportComModalReducer;
+  // const reportModalReducer = store.reportComModalReducer;
   const postBoxStateReducer = store.postBoxStateReducer.feed;
   const reportPostModalReducer = store.reportPostModalReducer;
   const [selectedCat, setSelectedCat] = useState(
@@ -154,21 +158,30 @@ export default function Home({ userDetails }) {
     let timeout,
       isVerifyEmailModalShown = verifyEmailReducer.verified,
       privacyAccepted_ = getLocalStorageKey("privacyAccepted") === "1",
-      isAvatarSelected = isAvatarSelectedCurr().status
+      isAvatarSelected = isAvatarSelectedCurr().status;
 
-    if ((isVerifyEmailModalShown
-      && !isAvatarSelected
-      && avatarsIntroModalReducer?.visible === false
-      && avatarsIntroModalReducer?.isShown === false) || (checkAuth() === false && avatarsIntroModalReducer?.isShown === false && privacyAccepted_)) {
+    if (
+      (isVerifyEmailModalShown &&
+        !isAvatarSelected &&
+        avatarsIntroModalReducer?.visible === false &&
+        avatarsIntroModalReducer?.isShown === false) ||
+      (checkAuth() === false &&
+        avatarsIntroModalReducer?.isShown === false &&
+        privacyAccepted_)
+    ) {
       timeout = setTimeout(() => {
         openAvatarModal();
       }, 10000);
     }
     return () => {
-      clearTimeout(timeout)
-    }
-  }, [commentsModalReducer, shareWithLoveReducer, verifyEmailReducer.verified, privacyModal.accepted])
-
+      clearTimeout(timeout);
+    };
+  }, [
+    commentsModalReducer,
+    shareWithLoveReducer,
+    verifyEmailReducer.verified,
+    privacyModal.accepted,
+  ]);
 
   // Functions
 
@@ -176,9 +189,13 @@ export default function Home({ userDetails }) {
   function openAvatarModal() {
     let commentsModalVisibility = commentsModalReducer.visible,
       shareWithLoveModalVisibility = shareWithLoveReducer.visible,
-      appreciationModalVisibiltiy = appreciationModal?.visible
-    if (commentsModalVisibility === false && appreciationModalVisibiltiy === false && shareWithLoveModalVisibility === false) {
-      dispatch(toggleAvatarIntroModal({ visible: true, isShown: true }))
+      appreciationModalVisibiltiy = appreciationModal?.visible;
+    if (
+      commentsModalVisibility === false &&
+      appreciationModalVisibiltiy === false &&
+      shareWithLoveModalVisibility === false
+    ) {
+      dispatch(toggleAvatarIntroModal({ visible: true, isShown: true }));
     }
   }
 
@@ -414,7 +431,6 @@ export default function Home({ userDetails }) {
           singleResCont.innerText = "[Max FileSize: 2000KB], No file selected";
         });
         setIsImgLoading(false);
-        setSelectedFile("");
         setErrorOrSuccess(false);
         setSubmittable(true);
         return false;
@@ -434,7 +450,6 @@ export default function Home({ userDetails }) {
 
         // log to console
         // logs wL2dvYWwgbW9yZ...
-        setSelectedFile(base64String);
         let data = {
           image: base64String,
           folder: "post-images",
@@ -532,8 +547,9 @@ export default function Home({ userDetails }) {
                 <div className="wrapperBtnsImages">
                   {/* Upload images cont */}
                   <div
-                    className={`cstmUploadFileCont feedPage ${base64Src.length > 0 ? "feedMb15" : ""
-                      }`}
+                    className={`cstmUploadFileCont feedPage ${
+                      base64Src.length > 0 ? "feedMb15" : ""
+                    }`}
                   >
                     <div className="uploadImgFeedCont">
                       <label
@@ -616,8 +632,9 @@ export default function Home({ userDetails }) {
               {/* error view in mobile */}
               <div className="w-100 errorFieldsCPost p-0 text-center d-block d-md-none">
                 <div
-                  className={`responseCont mt-0 ${errorOrSuccess ? "text-success" : "text-danger"
-                    }`}
+                  className={`responseCont mt-0 ${
+                    errorOrSuccess ? "text-success" : "text-danger"
+                  }`}
                   id="responseCont"
                 ></div>
               </div>
@@ -696,8 +713,9 @@ export default function Home({ userDetails }) {
           {/* Error view in Web */}
           <div className="d-none d-md-block w-100 errorFieldsCPost p-0">
             <div
-              className={`responseCont mt-0 ${errorOrSuccess ? "text-success" : "text-danger"
-                }`}
+              className={`responseCont mt-0 ${
+                errorOrSuccess ? "text-success" : "text-danger"
+              }`}
               id="responseCont"
             ></div>
           </div>
@@ -761,45 +779,41 @@ export default function Home({ userDetails }) {
       {/* PRIVACY MODAL */}
       {isWindowPresent()
         ? document.querySelector("#description") &&
-        document.querySelector("#description").value !== "" &&
-        postAlertReducer.visible === true && (
-          <>
-            <PostAlertModal
-              data={{
-                feed: {
-                  selectedCat,
-                  description: document.querySelector("#description").value,
-                },
-              }}
-              postConfession={postConfession}
-            />
-          </>
-        )
+          document.querySelector("#description").value !== "" &&
+          postAlertReducer.visible === true && (
+            <>
+              <PostAlertModal
+                data={{
+                  feed: {
+                    selectedCat,
+                    description: document.querySelector("#description").value,
+                  },
+                }}
+                postConfession={postConfession}
+              />
+            </>
+          )
         : null}
 
       {/* Report post modal */}
       {reportPostModalReducer.visible && <ReportPostModal />}
 
       {/* Features modal */}
-      <Features visible={featuresState.visibile} closeModal={closeFeatures}
-      />
+      <Features visible={featuresState.visibile} closeModal={closeFeatures} />
 
       {/* Avatar intro modal */}
       <AvatarsIntroModal />
 
       {/* Friend req modal */}
-      {
-        friendReqModalReducer.visible === true &&
+      {friendReqModalReducer.visible === true && (
         <FriendReqModal
           changeCancelled={changeCancelled}
           closeFrReqModalFn={closeFRModal}
           toggleLoadingFn={toggleLoadingFn}
           changeRequested={changeRequested}
-        // _updateCanBeRequested={updateCanBeRequested}
         />
-      }
-
-
+      )}
+     
     </>
   );
 }
@@ -807,6 +821,6 @@ export default function Home({ userDetails }) {
 Home.additionalProps = {
   containsSideAd: true,
   meta: {
-    title: "Home"
-  }
+    title: "Home",
+  },
 };
