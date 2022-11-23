@@ -228,7 +228,9 @@ export default function CommentsGot(props) {
     }
 
     if (!serverSideData?.confession_id) {
-        return <h5 className='w-100'><ErrorFlash message="Confession not found" /></h5>
+        return <h5 className='w-100'>
+            <ErrorFlash message="Confession not found" />
+        </h5>
     }
 
     return (

@@ -64,7 +64,7 @@ const CommentBox = props => {
         isMyComment = isUserIdPresent ? (getKeyProfileLoc("user_id") === user?.user_id) : false
 
         link = (!is_post_as_anonymous && isUserIdPresent) ?
-            (isMyComment ? `/profile` : `${window.location.origin}/userProfile/${user?.user_id?.trim()}`) :
+            (isMyComment ? `/profile` : `${window.location.origin}/userprofile/${user?.user_id?.trim()}`) :
             "#";
         htmlToEmbed = link === "#" ? `<span contenteditable="false" class="tagged_user dr99${user?.user_id?.trim()}" >@${user?.name?.trim()}</span>` : `<a class="text-decoration-none tagged_user dr99${user?.user_id?.trim()}" contenteditable="false" target="_blank" href="${link}">@${user?.name?.trim()}</a>`;
 

@@ -36,7 +36,7 @@ export default function CommentGotModal({ categories, ...rest }) {
     const path = checkIsViewPage(router)
     const history = router.push;
     const { state } = useSelector(state => state.commentsModalReducer);
-    const [userDetails] = useState(auth() ? JSON.parse(localStorage.getItem("userDetails")) : '');
+    const [userDetails] = useState(false);
     const [confessionData, setConfessionData] = useState(false);
     const [shareReqPopUp, toggleShareReqPopUp, ShareRequestPopUp, closeShareReqPopUp] = useShareRequestPopUp();
     const [sharekit, toggleSharekit, ShareKit, hideShareKit] = useShareKit();
@@ -534,7 +534,7 @@ export default function CommentGotModal({ categories, ...rest }) {
                                                                     </span> :
                                                                     <Link className={`textDecNone postUserName`}
                                                                         to={confessionData.post_as_anonymous === 0 &&
-                                                                            (auth() ? (userDetails.profile.user_id === confessionData.user_id ? `/profile` : `/userProfile?user=${confessionData.user_id}`) : `/userProfile?user=${confessionData.user_id}`)
+                                                                            (auth() ? (userDetails.profile.user_id === confessionData.user_id ? `/profile` : `/userprofile?user=${confessionData.user_id}`) : `/userprofile?user=${confessionData.user_id}`)
                                                                         }>
                                                                         <span className="userName removeElipses">
                                                                             {confessionData.post_as_anonymous === 1 ? "Anonymous ." : confessionData.created_by}

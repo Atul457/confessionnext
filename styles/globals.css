@@ -5183,6 +5183,10 @@ i.viewPrevPostIn {
   width: 30px;
 }
 
+.user_profile .profilePicCont {
+  cursor: default;
+}
+
 .withInfo {
   position: relative;
 }
@@ -5986,6 +5990,10 @@ button.modalFootBtns.btn a:hover {
   margin-bottom: 10px;
 }
 
+.profile_page .leftColumn {
+  top: 0;
+}
+
 /* Forums */
 
 
@@ -6257,9 +6265,6 @@ button.modalFootBtns.btn a:hover {
     max-width: 30px;
   }
 
-  /* .singleChatCont{margin-bottom: 0px;padding: 5px 0px ;} */
-
-
   /* new designs */
   .leftColumn {
     width: 280px;
@@ -6280,6 +6285,10 @@ button.modalFootBtns.btn a:hover {
 
   .rightColumn {
     width: calc(100% - 280px);
+  }
+
+  .profile_page .rightColumn {
+    margin-left: 280px;
   }
 
   .linkBtns {
@@ -8143,6 +8152,27 @@ button.modalFootBtns.btn a:hover {
   .not_auth_page .rightColumn {
     margin-left: 0px;
   }
+
+  .profile_page .posFixedForHeader {
+    display: none;
+  }
+
+  .profile_page .rightColumn {
+    padding: 0px;
+  }
+
+  .profile_page .roundCorners {
+    bottom: -5px;
+  }
+
+  .profile_page .profileSidebar {
+    overflow: hidden !important;
+  }
+
+  .profile_page .leftColumnWrapper {
+    border-bottom: 1px solid #fff;
+  }
+
 }
 
 @media(max-width:575px) {

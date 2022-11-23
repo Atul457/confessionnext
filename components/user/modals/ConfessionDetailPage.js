@@ -459,7 +459,7 @@ export default function ConfessionDetailPage({ categories, updatePost, serverSid
                                         </span> :
                                         <Link className={`textDecNone postUserName`}
                                             href={serverSideData.post_as_anonymous === 0 &&
-                                                (session ? (userDetails.profile.user_id === serverSideData.user_id ? `/profile` : `/userProfile?user=${serverSideData.user_id}`) : `/userProfile?user=${serverSideData.user_id}`)
+                                                (session ? (session?.user?.user_id === serverSideData.user_id ? `/profile` : `/userprofile?user=${serverSideData.user_id}`) : `/userprofile?user=${serverSideData.user_id}`)
                                             }>
                                             <span className="userName removeElipses">
                                                 {serverSideData.post_as_anonymous === 1 ? "Anonymous ." : serverSideData.created_by}

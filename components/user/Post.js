@@ -33,16 +33,15 @@ import { http } from "../../utils/http";
 import { updateConfession } from "../../redux/actions/confession/confessionAc";
 import { openCFRModal } from "../../redux/actions/friendReqModal";
 
-const { getKeyProfileLoc, updateKeyProfileLoc, checkAuth } = auth;
+const { getKeyProfileLoc, updateKeyProfileLoc } = auth;
 
 const Post = (props) => {
+
   // Hooks and vars
   const userDetails = props?.userDetails;
   const post = props.post;
   const store = useSelector((store) => store);
   const [lightBox, setLightBox] = useState(false);
-  const router = useRouter();
-  const history = router.push;
   const dispatch = post?.dispatch ?? (() => { });
   const ShareReducer = store?.ShareReducer;
   const [requiredError, setRequiredError] = useState("");
@@ -70,7 +69,7 @@ const Post = (props) => {
   const [sharekit, toggleSharekit, ShareKit, hideShareKit] = useShareKit();
 
   useEffect(() => {
-    setAuthenticated(checkAuth());
+    setAuthenticated(userDetails ? true : false);
   }, []);
 
   // Functions
@@ -112,6 +111,7 @@ const Post = (props) => {
   };
 
   const _toggleShareReqPopUp = (id, value) => {
+    console.log({ id, value })
     dispatch(
       togglemenu({
         id,
@@ -196,10 +196,6 @@ const Post = (props) => {
     });
   };
 
-  // if (post?.index === 0) {
-  //   console.log(post)
-  // }
-
   // Open the modal to report the post
   const openReportPostModal = () => {
     dispatch(
@@ -241,11 +237,13 @@ const Post = (props) => {
       method: "post",
       url: "postcomment",
     };
+
     try {
       let data = {
         viewcount: post?.viewcount,
         no_of_comments: post?.no_of_comments + 1,
       };
+      console.log("updateConfession", { index: post?.index, data })
       dispatch(updateConfession({ index: post?.index, data }));
 
       const res = await http(obj);
@@ -259,9 +257,16 @@ const Post = (props) => {
     } catch (error) {
       console.log(error?.message);
     }
+
     preventDoubleClick(false);
 
   };
+
+  // console.log({
+  //   " ShareReducer.selectedPost?.id": ShareReducer.selectedPost?.id,
+  //   "post.confession_id": post.confession_id,
+  //   "ShareReducer.sharekitShow": ShareReducer.sharekitShow
+  // })
 
   return (
     <div className="postCont confession_cont" index={post.index}>
@@ -269,7 +274,7 @@ const Post = (props) => {
         ShareReducer.selectedPost?.id === post.confession_id &&
         ShareReducer.sharekitShow && <div className="shareKitSpace"></div>}
 
-      {checkAuth() && post.isReported !== 2 && (
+      {userDetails && post.isReported !== 2 && (
         <span className="reportPost" onClick={openReportPostModal}>
           <i
             className="fa fa-exclamation-circle reportComIcon"
@@ -558,21 +563,17 @@ const Post = (props) => {
             </div>
           </Link>
 
-          {post.hasOwnProperty("is_liked") ? (
+          {post.hasOwnProperty("is_liked") && !post.hasOwnProperty("myprofile") ? (
             <div className="iconsMainCont">
               <div className={`upvote_downvote_icons_cont buttonType`}>
                 {post?.is_liked === 1 ? (
-                  <Image
-                    width={20}
-                    height={20}
+                  <img
                     alt={"likeIcon"}
                     src="/images/upvoted.svg"
                     onClick={() => upvoteOrDownvote(false)}
                   />
                 ) : (
-                  <Image
-                    width={20}
-                    height={20}
+                  <img
                     alt={"dislikeIcon"}
                     src="/images/upvote.svg"
                     onClick={() => upvoteOrDownvote(true)}
@@ -584,7 +585,10 @@ const Post = (props) => {
           ) : (
             <div className="iconsMainCont">
               <div className={`upvote_downvote_icons_cont`}>
-                <Image width={20} height={20} alt={"likeIcon"} />
+                <img
+                  alt={"likeIcon"}
+                  src="/images/upvote.svg"
+                />
                 <span className="count">{post?.like}</span>
               </div>
             </div>

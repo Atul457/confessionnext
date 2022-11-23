@@ -92,14 +92,14 @@ export default function Home({ userDetails }) {
     confessions.length === 0 && confessionRed.status === apiStatus.LOADING;
 
   //CUSTOM HOOK
-  const [
-    commentsModalRun,
-    commentsModal,
-    changes,
-    handleChanges,
-    handleCommentsModal,
-    CommentGotModal,
-  ] = useCommentsModal();
+  // const [
+  //   commentsModalRun,
+  //   commentsModal,
+  //   changes,
+  //   handleChanges,
+  //   handleCommentsModal,
+  //   CommentGotModal,
+  // ] = useCommentsModal();
   const [closeFeatures, openFeatures, Features, featuresState] =
     useFeaturesModal();
 

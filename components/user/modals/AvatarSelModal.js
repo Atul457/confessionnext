@@ -7,6 +7,7 @@ import {
   toggleAvatarModal,
 } from "../../../redux/actions/avatarSelModalAC";
 import auth from "../../../utils/auth";
+import { isWindowPresent } from "../../../utils/checkDom";
 import { avatars } from "../../../utils/provider";
 
 const { getKeyProfileLoc } = auth;
@@ -18,6 +19,7 @@ const AvatarSelModal = ({ uploadImage }) => {
   const avatarModalReducer = useSelector((state) => state.avatarModalReducer);
   const [showImages, setShowImages] = useState(false);
   const isNotTypeSelected = avatarModalReducer.type === 1;
+  const profileImage = (session && isWindowPresent() ? JSON.parse(localStorage.getItem("userDetails") ?? "{ }") : false)?.image
 
   // Functions
 
@@ -43,7 +45,7 @@ const AvatarSelModal = ({ uploadImage }) => {
 
   const getAvatar = () => {
     if (avatarModalReducer.selected === null)
-      return avatarModalReducer.defaultImg;
+      return profileImage && profileImage !== "" ? profileImage : avatarModalReducer.defaultImg;
     let selected = avatarModalReducer.selected;
     return avatars[selected].src;
   };
@@ -137,11 +139,10 @@ const AvatarSelModal = ({ uploadImage }) => {
                         }
                       }}
                       src={avatar.src}
-                      className={`avatar ${
-                        avatarModalReducer.selected === index
+                      className={`avatar ${avatarModalReducer.selected === index
                           ? "currSelectedAvatar"
                           : ""
-                      } ${showImages ? "" : "hiddenAvatar"}`}
+                        } ${showImages ? "" : "hiddenAvatar"}`}
                       onClick={() => selectAvatar(index)}
                     />
 
@@ -155,9 +156,8 @@ const AvatarSelModal = ({ uploadImage }) => {
                   </span>
 
                   <div
-                    className={`avatarPlaceholderImages glow ${
-                      !showImages ? "" : "hiddenAvatar"
-                    }`}
+                    className={`avatarPlaceholderImages glow ${!showImages ? "" : "hiddenAvatar"
+                      }`}
                   ></div>
                 </div>
               );

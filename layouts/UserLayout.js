@@ -149,7 +149,7 @@ const UserLayout = ({ children, additionalProps = false }) => {
       }
     };
 
-    loadScriptByURL("recaptcha-key", envConfig.recaptchaKey, function () {});
+    loadScriptByURL("recaptcha-key", envConfig.recaptchaKey, function () { });
 
     // End of load recaptcha v3
     let { handleForumsTypesAcFn } = forumHandlers;
@@ -189,28 +189,30 @@ const UserLayout = ({ children, additionalProps = false }) => {
 
         <main className="container-fluid">
           <div
-            className={`row outerContWrapper${
-              !additionalProps?.authPage ? " not_auth_page" : ""
-            }`}
+            className={`row outerContWrapper${!additionalProps?.authPage ? " not_auth_page" : ""
+              }${additionalProps?.profilePage ? " profile_page" : ""}`}
           >
+
             {additionalProps?.authPage ? null : (
-              <Header userDetails={userDetails} />
+              <Header userDetails={userDetails} profilePage={additionalProps?.profilePage} />
             )}
 
-            {additionalProps?.authPage ? (
-              <LgSidebar {...additionalProps.sideBarProps} />
-            ) : (
-              <Sidebar />
-            )}
+            {!additionalProps?.profilePage ?
+              <>
+                {additionalProps?.authPage ? (
+                  <LgSidebar {...additionalProps.sideBarProps} />
+                ) : (
+                  <Sidebar />
+                )}
+              </>
+              : null}
 
             <div
-              className={`rightColumn${
-                additionalProps?.containsSideAd ? " side_ads_page" : ""
-              }${additionalProps?.authPage ? " auth_page" : ""}${
-                additionalProps?.containsSideAd && additionalProps?.authPage
+              className={`rightColumn${additionalProps?.containsSideAd ? " side_ads_page" : ""
+                }${additionalProps?.authPage ? " auth_page" : ""}${additionalProps?.containsSideAd && additionalProps?.authPage
                   ? " not_contains_sidead"
                   : ""
-              }`}
+                }`}
             >
               <div className="rightMainFormCont rightMainFormContFeed p-0">
                 {additionalProps?.authPage ? null : (

@@ -28,7 +28,7 @@ const VisitPrivilege = ({ post = {} }) => {
     if (isMyProfile)
         linkToVisit = "/profile"
     if (isUserProfile)
-        linkToVisit = `/userProfile/${slug}`
+        linkToVisit = `/userprofile/${slug}`
 
     if ((!isMyProfile && !isUserProfile) || post?.post_as_anonymous === 1) {
         html = (

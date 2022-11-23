@@ -126,13 +126,6 @@ const ForumDetailPage = ({ forum }) => {
             </div>
         )
 
-    // if (forumStatus === apiStatus.LOADING)
-    //     return (
-    //         <div className="text-center w-100">
-    //             <Loader />
-    //         </div>
-    //     )
-
     if (forumStatus === apiStatus.REJECTED)
         return (
             <div className="alert alert-danger w-100" role="alert">

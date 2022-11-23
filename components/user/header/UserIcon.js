@@ -17,26 +17,29 @@ import { http } from "../../../utils/http";
 import { EVerifyModal } from "../../../redux/actions/everify";
 import VerifyEmailModal from "../modals/VerifyEmailModal";
 import _ from "lodash";
+import { isWindowPresent } from "../../../utils/checkDom";
 
 const UserIcon = () => {
+
   // Hooks and vars
   const { getKeyProfileLoc, setAuth } = auth;
   const { data: session } = useSession();
   const [requestsIndicator, setRequestIndicator] = useState(0);
+  const [profileImage, setProfileImage] = useState(false)
+  const profileInLocalStorage = (session && isWindowPresent() ? JSON.parse(localStorage.getItem("userDetails") ?? "{ }") : false)?.image
   const [showEModal, setShowEModal] = useState(false);
   const store = useSelector((store) => store);
   const ShareReducer = store.ShareReducer;
   const SearchReducer = store.SearchReducer;
   const verifyEState = store.VerifyEmail;
   const searchBoxRef = useRef(null);
-  const image = getKeyProfileLoc("image");
   const name = getKeyProfileLoc("name");
-  const email = getKeyProfileLoc("email");
+  const email = session?.user?.email;
   const router = useRouter();
   const history = router.push;
   const dispatch = useDispatch();
   const notificationReducer = store.notificationReducer;
-  const [profile, setProfile] = useState({});
+  const [profile, setProfile] = useState(false);
   const [showProfileOption, setShowProfileOption] = useState(false);
   const [newCommentsCount, setNewCommentsCount] = useState(0);
 
@@ -46,7 +49,16 @@ const UserIcon = () => {
         ? parseInt(localStorage.getItem("requestsCount"))
         : 0
     );
-  }, []);
+    setProfile(session ? JSON.parse(localStorage.getItem("userDetails") ?? "{}") : false)
+  }, [session]);
+
+  useEffect(() => {
+    setProfile(session ? JSON.parse(localStorage.getItem("userDetails") ?? "{}") : false)
+  }, [])
+
+  useEffect(() => {
+    setProfileImage(profileInLocalStorage)
+  }, [profileInLocalStorage])
 
   useEffect(() => {
     if (ShareReducer.selectedPost?.value) {
@@ -319,9 +331,8 @@ const UserIcon = () => {
             {index > 0 && <hr className="m-0" />}
             <div
               type="button"
-              className={`takeActionOptions takeActionOptionsOnHov textDecNone py-2 ${
-                curr.is_unread === 1 ? "unread" : ""
-              }`}
+              className={`takeActionOptions takeActionOptionsOnHov textDecNone py-2 ${curr.is_unread === 1 ? "unread" : ""
+                }`}
             >
               {isForum ? (
                 <i
@@ -512,24 +523,15 @@ const UserIcon = () => {
 
           <div className="authProfileIcon" onClick={HandleShowHide}>
             <span className="requestsIndicatorNuserIconCont" type="button">
-              {/* console.log(first) */}
               <img
-                src={
-                  (!session?.user?.image && !image) || image === ""
-                    ? "/images/userAcc.svg"
-                    : image
-                }
+                src={profileImage && profileImage !== "" ? profileImage : "/images/userAcc.svg"}
                 alt="profileImage"
                 className="userAccIcon headerUserAccIcon"
               />
 
               <img
-                src={
-                  !image || image === ""
-                    ? "/images/mobileProfileIcon.svg"
-                    : image
-                }
-                alt="profileIcon"
+                src={profileImage && profileImage !== "" ? profileImage : "/images/userAcc.svg"}
+                alt="profileImage"
                 className="userAccIcon headerUserAccIcon mobIcon"
               />
 
@@ -537,7 +539,7 @@ const UserIcon = () => {
                 <span className="requestIndicator"></span>
               )}
 
-              {getKeyProfileLoc("email_verified") === 1 ? (
+              {profile?.email_verified === 1 ? (
                 <img
                   src="/images/verifiedIcon.svg"
                   title="Verified user"
@@ -556,15 +558,11 @@ const UserIcon = () => {
                   >
                     <span className="profileHeaderImage">
                       <img
-                        src={
-                          !session?.user?.image || (image && image === "")
-                            ? "/images/mobileProfileIcon.svg"
-                            : image
-                        }
+                        src={profileImage && profileImage !== "" ? profileImage : "/images/userAcc.svg"}
                         alt="profileIcon"
                       />
 
-                      {getKeyProfileLoc("email_verified") === 1 ? (
+                      {profile?.email_verified === 1 ? (
                         <img
                           src="/images/verifiedIcon.svg"
                           title="Verified user"

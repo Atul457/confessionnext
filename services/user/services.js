@@ -49,19 +49,29 @@ const getConfessionsService = async ({
     act = "all",
     page = 1,
     append = false,
-    dispatch
+    dispatch,
+    ...rest
 }) => {
 
     // Vars
+    var url = `getconfessions/${act}/${page}`
     var token = getKeyProfileLoc("token") ?? "";
+    const profilePage = rest?.profilePage
+
+    if (profilePage) url = `getmyconfessions`
 
     dispatch(setConfessions({ status: apiStatus.LOADING, message: "" }))
 
     let obj = {
-        data: {},
+        data: {
+            ...(profilePage && {
+                ...profilePage,
+                page
+            })
+        },
         token: token,
-        method: "get",
-        url: `getconfessions/${act}/${page}`
+        method: profilePage ? "post" : "get",
+        url
     }
 
     try {

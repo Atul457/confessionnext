@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-// import SiteLoader from "../../components/SiteLoader";
 import InfiniteScroll from "react-infinite-scroll-component";
-import useCommentsModal from "../../utils/hooks/useCommentsModal";
-// import RefreshButton from "../../../refreshButton/RefreshButton";
 import { useDispatch, useSelector } from "react-redux";
 
 import ProfileModal from "../../components/user/modals/ProfileModal";
@@ -20,6 +17,16 @@ import ReportCommentModal from "../../components/user/modals/ReportCommentModal"
 import { toggleAvatarModal } from "../../redux/actions/avatarSelModalAC";
 import AvatarSelModal from "../../components/user/modals/AvatarSelModal";
 import auth from "../../utils/auth";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "../api/auth/[...nextauth]";
+import Loader from "../../components/common/Loader";
+import AppLogo from "../../components/common/AppLogo";
+import { setConfessions } from "../../redux/actions/confession/confessionAc";
+import { getConfessionsService } from "../../services/user/services";
+import { apiStatus } from "../../utils/api";
+import ErrorFlash from "../../components/common/ErrorFlash";
+import { isWindowPresent } from "../../utils/checkDom";
+
 
 const { getKeyProfileLoc, checkAuth } = auth;
 
@@ -28,7 +35,8 @@ const deletePostModalIniVal = {
   data: { postId: null, index: null },
 };
 
-export default function Profile() {
+export default function Profile(props) {
+
   // Hooks and vars
   let maxRequestsToshow = 5;
   const { data: session } = useSession();
@@ -37,53 +45,29 @@ export default function Profile() {
   const history = router.push;
   const dispatch = useDispatch();
   const [goDownArrow, setGoDownArrow] = useState(false);
-  const [userDetails, setUserDetails] = useState(
-    // JSON.parse(localStorage.getItem("userDetails"))
-    "{}"
-  );
-  const { commentsModalReducer, avatarModalReducer } = useSelector(
-    (state) => state
-  );
+  const [userDetails, setUserDetails] = useState(props?.userDetails ?? false);
+  const { avatarModalReducer, confessionReducer } = useSelector(store => store);
   const [runOrNot, setRunOrNot] = useState(false);
   const [displayName, setDisplayName] = useState(false);
-  const [profile, setProfile] = useState(session ? session?.user : {});
-  const [myConfession, setMyConfession] = useState([]);
-  const [isConfLoading, setIsConfLoading] = useState(true);
-  const [isConfError, setIsConfError] = useState(false);
+  const [profile, setProfile] = useState(false);
+  const [myConfessions, setMyConfession] = useState([]);
+  const confessionRed = confessionReducer.confessions;
+  const myConfession = confessionRed?.data;
   const [showFriendsList, setShowFriendsList] = useState(false);
   const [showProfileEdit, setShowProfileEdit] = useState(false);
   const [myRequests, setMyRequests] = useState({ count: 0 }); //TO MAINTAIN THE DESIGN
   const [isReqLoading, setIsReqLoading] = useState(true);
   const [isReqError, setIsReqError] = useState(false);
-  const [confCount, setConfCount] = useState(0);
-  const [confData, setConfData] = useState(1);
   const [deletable, setDeletable] = useState(false);
   const [deleteConfModal, setDeleteConfModal] = useState(deletePostModalIniVal);
-  const [profileModal, setProfileModal] = useState({
-    visible: false,
-  });
-  //CUSTOM HOOK
-  const [
-    commentsModalRun,
-    commentsModal,
-    changes,
-    handleChanges,
-    handleCommentsModal,
-    CommentGotModal,
-  ] = useCommentsModal();
-  const [dataObj] = useState({
-    confData: {
-      profile_id: "",
-    },
-    requestsData: {
-      page: 1,
-    },
-  });
-  const [profileImg, setProfileImg] = useState({
-    isLoading: false,
-    data: getKeyProfileLoc("image") ?? "",
-    isError: false,
-  });
+  const [profileModal, setProfileModal] = useState({ visible: false, });
+  const [dataObj] = useState({ confData: { profile_id: "" }, requestsData: { page: 1 } });
+  const [profileImg, setProfileImg] = useState({ isLoading: false, data: undefined, isError: false });
+  const noConfessionsToShow =
+    myConfession.length === 0 && confessionRed.status === apiStatus.FULFILLED;
+  const confessionsLoading =
+    myConfession.length === 0 && confessionRed.status === apiStatus.LOADING;
+
 
   const [myFriends, setMyFriends] = useState({
     config: {
@@ -97,19 +81,29 @@ export default function Profile() {
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
-    if (!checkAuth()) router.push("/home");
     setProfile(session?.user ?? {});
   }, [session]);
 
   useEffect(() => {
+    setProfile(JSON.parse(localStorage?.getItem("userDetails") ?? "{}"))
     setProfileImg({
       ...profileImg,
-      data: getKeyProfileLoc("image") ?? "",
+      // isLoading: false,
+      data: getKeyProfileLoc("image"),
     });
+  }, []);
+
+
+  useEffect(() => {
+    getMyConfessions();
+    return () => {
+      dispatch(setConfessions({ reset: true }));
+    };
   }, []);
 
   // Functions
 
+  // Fetches friend list
   const getFriends = async (pageNo = 1, append = false) => {
     let data = {
       page: pageNo === "" ? 1 : pageNo,
@@ -142,7 +136,7 @@ export default function Profile() {
     }
   };
 
-  //SETS NAME AND POST AS ANONYMOUS
+  // Sets name and post as anonymous
   const handleProfile = (event) => {
     let { type } = event;
     if (type === "checkbox") {
@@ -179,9 +173,7 @@ export default function Profile() {
           let dataToSet = {
             token: getKeyProfileLoc("token"),
             ...res.data.user,
-            ...{
-              comments: res.data?.comments ?? getKeyProfileLoc("comments"),
-            },
+            comments: res.data?.comments ?? getKeyProfileLoc("comments"),
           };
           setUserDetails(dataToSet);
           setRunOrNot(false);
@@ -195,7 +187,8 @@ export default function Profile() {
         } else {
           console.log("failed to update");
         }
-      } catch {
+      } catch (err) {
+        console.log(err?.message)
         console.log("some error occured");
       }
     }
@@ -207,83 +200,102 @@ export default function Profile() {
     }
   }, [profile]);
 
-  async function getData(page = 1, append = false) {
-    let pageNo = page;
-    let data = {
-      profile_id: dataObj.confData.profile_id,
-      page: pageNo,
-      only_unread: parseInt(unread.current?.value),
-    };
+  // Fetches the confessions
+  // async function getConfessions(page = 1, append = false) {
+  //   let pageNo = page;
+  //   let data = {
+  //     profile_id: dataObj.confData.profile_id,
+  //     page: pageNo,
+  //     only_unread: parseInt(unread.current?.value),
+  //   };
 
-    let obj = {
-      data: data,
-      token: getKeyProfileLoc("token"),
-      method: "post",
-      url: "getmyconfessions",
-    };
+  //   let obj = {
+  //     data: data,
+  //     token: getKeyProfileLoc("token"),
+  //     method: "post",
+  //     url: "getmyconfessions",
+  //   };
 
-    try {
-      const res = await http(obj);
-      if (res.data.status === true) {
-        //WHETHER THE POSTS DELETABLE OR NOT
-        if (res.data.is_deleteable && res.data.is_deleteable === 1) {
-          setDeletable(true);
-        }
+  //   try {
+  //     const res = await http(obj);
+  //     if (res.data.status === true) {
+  //       //WHETHER THE POSTS DELETABLE OR NOT
+  //       if (res.data.is_deleteable && res.data.is_deleteable === 1) {
+  //         setDeletable(true);
+  //       }
 
-        if (append === true) {
-          //APPEND
-          let newConf = [...myConfession, ...res.data.confessions];
-          setMyConfession(newConf);
-          setConfData(page);
-        } //OVERWRITE
-        else {
-          setConfCount(res.data.count);
-          setMyConfession(res.data.confessions);
-        }
+  //       if (append === true) {
+  //         //APPEND
+  //         let newConf = [...myConfession, ...res.data.confessions];
+  //         setMyConfession(newConf);
+  //         setConfData(page);
+  //       } //OVERWRITE
+  //       else {
+  //         setConfCount(res.data.count);
+  //         setMyConfession(res.data.confessions);
+  //       }
+  //     }
+  //     setIsConfLoading(false);
+  //   } catch {
+  //     setIsConfError(true);
+  //     setIsConfLoading(false);
+  //   }
+  // }
+
+  const getMyConfessions = (append = false, page = 1) => {
+    getConfessionsService({
+      page,
+      dispatch,
+      append,
+      profilePage: {
+        myProfile: true,
+        profile_id: "",
+        only_unread: parseInt(unread.current?.value),
       }
-      setIsConfLoading(false);
-    } catch {
-      setIsConfError(true);
-      setIsConfLoading(false);
-    }
-  }
+    });
+  };
 
   //GET MY CONFESSIONS
   useEffect(() => {
-    getData();
+    getMyConfessions();
   }, [dataObj.confData, userDetails.token]);
 
   const confFilter = () => {
-    getData();
+    getMyConfessions();
   };
 
   // HANDLES SCROLL TO TOP BUTTON
   useEffect(() => {
-    const isMobile = window.innerWidth < 768;
-    const ref = isMobile ? document.getElementById("postsWrapper") : document;
+    let ref, handleArrow
 
-    const handleArrow = () => {
-      let scroll = isMobile
-        ? document.querySelector("#postsWrapper").scrollTop
-        : window?.scrollY;
-      if (scroll > 1000) {
-        setGoDownArrow(true);
-      } else {
-        setGoDownArrow(false);
-      }
-    };
+    if (isWindowPresent()) {
 
-    ref.addEventListener("scroll", handleArrow);
+      const isMobile = window.innerWidth < 768;
+      ref = isMobile ? document.getElementById("postsWrapper") : document;
+
+      handleArrow = () => {
+        let scroll = isMobile
+          ? document.querySelector("#postsWrapper").scrollTop
+          : window?.scrollY;
+        if (scroll > 1000) {
+          setGoDownArrow(true);
+        } else {
+          setGoDownArrow(false);
+        }
+      };
+
+      ref.addEventListener("scroll", handleArrow);
+    }
 
     return () => {
       ref.removeEventListener("scroll", handleArrow);
     };
-  }, []);
+  }, [isWindowPresent()]);
 
   //SCROLLS TO BOTTOM
   const goUp = () => {
     const isMobile = window?.innerWidth < 768;
-    let ref = isMobile ? document.getElementById("rightColumnFeed") : window;
+    let ref = isMobile ? document.getElementById("postsWrapper") : window;
     ref.scrollTo({ top: "0px", behavior: "smooth" });
   };
 
@@ -424,7 +436,7 @@ export default function Profile() {
   };
 
   const fetchMoreConfessions = () => {
-    getData(confData + 1, true);
+    getMyConfessions(true, confessionRed?.page + 1);
   };
 
   const fetchMoreFriends = () => {
@@ -512,8 +524,6 @@ export default function Profile() {
         }
       }
       deleteMyPost();
-    } else {
-      console.log({ confessionId, index });
     }
   };
 
@@ -537,19 +547,15 @@ export default function Profile() {
     });
   };
 
+  if (confessionRed.status === apiStatus.REJECTED)
+    return <ErrorFlash message={confessionRed.message} />;
+
   return (
     <div className="container-fluid toUp">
+
+
       {session ? (
         <div className="row">
-          {/* POPUP MODAL TO SHOW COMMENTS */}
-          {commentsModalReducer.visible && (
-            <CommentGotModal
-              handleChanges={handleChanges}
-              updateConfessionData={updateConfessionData}
-              state={commentsModal}
-              handleCommentsModal={handleCommentsModal}
-            />
-          )}
 
           {/* DELETECONFESSIONMODAL */}
           {deleteConfModal.visible && (
@@ -563,7 +569,9 @@ export default function Profile() {
           {/* Children to pass */}
           <div className="leftColumn leftColumnFeed mypriflelocc profileSidebar">
             <div className="leftColumnWrapper">
-              {/* <AppLogo /> */}
+
+              <div className="roundCorners">__</div>
+              <AppLogo />
 
               <div className="middleContLoginReg feedMiddleCont profile">
                 <div className="profileDetailsCont">
@@ -572,20 +580,11 @@ export default function Profile() {
                       <span className="round33">
                         <span className="profilePicCont">
                           {profileImg.isLoading ? (
-                            <div
-                              className="spinner-border text-white w-25 h-25"
-                              role="status"
-                            >
-                              <span className="sr-only">Loading...</span>
-                            </div>
+                            <Loader color="white" />
                           ) : (
                             <span className="profilePicCont">
                               <img
-                                src={
-                                  profileImg.data === ""
-                                    ? "/images/userAcc.png"
-                                    : profileImg.data
-                                }
+                                src={profileImg?.data ? profileImg.data : "/images/userAcc.png"}
                                 className="loggedInUserPic"
                                 type="button"
                                 alt="profile image"
@@ -632,9 +631,8 @@ export default function Profile() {
                   </span>
 
                   <div
-                    className={`editProfileCont ${
-                      showProfileEdit ? "" : "height0"
-                    }`}
+                    className={`editProfileCont ${showProfileEdit ? "" : "height0"
+                      }`}
                   >
                     {displayName === false ? (
                       <span
@@ -748,12 +746,11 @@ export default function Profile() {
                 </div>
 
                 <div
-                  className={`friendRequestsHeader ${
-                    myRequests.count === 0 &&
+                  className={`friendRequestsHeader ${myRequests.count === 0 &&
                     myFriends.data.friends.length === 0
-                      ? "d-none"
-                      : ""
-                  }`}
+                    ? "d-none"
+                    : ""
+                    }`}
                   type="button"
                   onClick={toggleFriendList}
                 >
@@ -769,12 +766,11 @@ export default function Profile() {
                 </div>
 
                 <div
-                  className={`${
-                    myRequests.count === 0 &&
+                  className={`${myRequests.count === 0 &&
                     myFriends.data.friends.length === 0
-                      ? "d-none"
-                      : ""
-                  } friendRequestsHeader toggleModal`}
+                    ? "d-none"
+                    : ""
+                    } friendRequestsHeader toggleModal`}
                   type="button"
                   onClick={showProfileModal}
                 >
@@ -786,19 +782,16 @@ export default function Profile() {
                 </div>
 
                 <div
-                  className={`requestnChatWrapper ${
-                    showFriendsList ? "" : "height0"
-                  } ${
-                    myRequests.count === 0 &&
-                    myFriends.data.friends.length === 0
+                  className={`requestnChatWrapper ${showFriendsList ? "" : "height0"
+                    } ${myRequests.count === 0 &&
+                      myFriends.data.friends.length === 0
                       ? "height0"
                       : ""
-                  }`}
+                    }`}
                 >
                   <div
-                    className={`d-none ${
-                      myRequests.count ? "d-md-block" : "d-md-none"
-                    }`}
+                    className={`d-none ${myRequests.count ? "d-md-block" : "d-md-none"
+                      }`}
                   >
                     {!isReqError ? (
                       !isReqLoading ? (
@@ -847,7 +840,8 @@ export default function Profile() {
                       <div className="alert alert-danger" role="alert">
                         Unable to get Requests
                       </div>
-                    )}
+                    )
+                    }
                   </div>
                   {/* edited */}
 
@@ -959,14 +953,6 @@ export default function Profile() {
           </div>
           {/* Children to pass */}
 
-          {/* <div className="preventHeader profile">preventHead</div> */}
-          {/* <div
-            className="rightColumn rightColumnFeed rightColumnFeedppage profile"
-            id="rightColumnFeed"
-          > */}
-
-          {/* Right side component */}
-          <div className="roundCorners">__</div>
           <div className="postsHeadingProfile profile">
             My Posts
             <div className="form-group createPostInputs filterByUnread createInputSelect mb-0">
@@ -993,113 +979,78 @@ export default function Profile() {
               <div className="col-12 container-fluid">
                 <div className="row flex-column-reverse flex-md-row">
                   <div
-                    className={`col-12 w-100 ${
-                      myConfession &&
+                    className={`col-12 w-100 ${myConfession &&
                       myConfession.length > 0 &&
                       myRequests.count === 0 &&
                       myFriends.data.friends.length === 0
-                        ? "col-md-12"
-                        : "col-md-12"
-                    } col-md-12 transition col-md-12 p-0`}
+                      ? "col-md-12"
+                      : "col-md-12"
+                      } col-md-12 transition col-md-12 p-0`}
                   >
                     {/* MYCONFESSIONS */}
 
-                    {!isConfError ? (
-                      !isConfLoading ? (
-                        myConfession && myConfession.length ? (
-                          <InfiniteScroll
-                            scrollableTarget={`${
-                              window.innerWidth - 13 > 768 ? "" : "postsWrapper"
-                            }`}
-                            endMessage={
-                              <div className="endListMessage mt-4 pb-3 text-center">
-                                End of Confessions
-                              </div>
-                            }
-                            dataLength={myConfession.length}
-                            next={fetchMoreConfessions}
-                            hasMore={myConfession.length < confCount}
-                            loader={
-                              <div className="w-100 text-center">
-                                <div
-                                  className="spinner-border pColor mt-4"
-                                  role="status"
-                                >
-                                  <span className="sr-only">Loading...</span>
-                                </div>
-                              </div>
-                            }
-                          >
-                            {myConfession.map((post, index) => {
-                              return (
-                                <Post
-                                  isReported={2}
-                                  post={post}
-                                  cover_image={post.cover_image ?? ""}
-                                  isNotFriend={post.isNotFriend}
-                                  key={index}
-                                  slug={post.slug}
-                                  deletable={deletable}
-                                  post_as_anonymous={false}
-                                  deletePostModal={deletePostModal}
-                                  index={index}
-                                  viewcount={post.viewcount}
-                                  handleCommentsModal={handleCommentsModal}
-                                  createdAt={post.created_at}
-                                  curid={null}
-                                  category_id={post.category_id}
-                                  profileImg={profile.image}
-                                  postId={post.confession_id}
-                                  imgUrl={
-                                    post.image === "" || null
-                                      ? null
-                                      : post.image
-                                  }
-                                  userName={post.created_by}
-                                  category={post.category_name}
-                                  updateConfessionData={updateConfessionData}
-                                  postedComment={post.description}
-                                  sharedBy={post.no_of_comments}
-                                  updatedConfessions={updatedConfessions}
-                                  is_viewed={post.is_viewed}
-                                  like={post.like}
-                                  dislike={post.dislike}
-                                  unread_comments={post.unread_comments}
-                                />
-                              );
-                            })}
-                          </InfiniteScroll>
-                        ) : (
-                          <div className="profile noConfessions endListMessage">
-                            {parseInt(unread.current?.value) === 1
-                              ? "No post found"
-                              : "You haven't created any post"}
-                          </div>
-                        )
-                      ) : (
-                        <div className="text-center">
-                          <div
-                            className="spinner-border pColor mt-4 text-center"
-                            role="status"
-                          >
-                            <span className="sr-only">Loading...</span>
-                          </div>
-                        </div>
-                      )
-                    ) : (
-                      <div className="alert alert-danger" role="alert">
-                        Unable to get confessions
+                    {confessionsLoading ? (
+                      <div className="text-center">
+                        <Loader size="sm" className="mx-auto" />
                       </div>
-                    )}
+                    ) : noConfessionsToShow ? (
+                      <h5 className="endListMessage noConfessions mx-auto">
+                        {parseInt(unread.current?.value) === 1 ?
+                          "No post found" :
+                          "You haven't created any post"}
+                      </h5>
+                    ) :
+                      <InfiniteScroll
+                        dataLength={myConfession.length}
+                        hasMore={myConfession.length < confessionRed?.count}
+                        scrollableTarget={`${isWindowPresent() && window.innerWidth - 13 > 768 ? "" : "postsWrapper"
+                          }`}
+                        endMessage={
+                          <div className="endListMessage mt-4 pb-3 text-center">
+                            End of Confessions
+                          </div>
+                        }
+                        next={fetchMoreConfessions}
+                        loader={
+                          <div className="w-100 text-center">
+                            <div
+                              className="spinner-border pColor mt-4"
+                              role="status"
+                            >
+                              <span className="sr-only">Loading...</span>
+                            </div>
+                          </div>
+                        }
+                      >
+                        {myConfession.map((post, index) => {
+                          return (
+                            <Post
+                              key={post?.confession_id}
+                              profileImg={profileImg.data}
+                              post={{
+                                ...post,
+                                index,
+                                myprofile: true,
+                                dispatch,
+                                isReported: 2,
+                                deletable: true,
+                                profileImg: profileImg.data
+                              }}
+                              userDetails={session}
+                              deletePostModal={deletePostModal}
+                            />
+                          );
+                        })}
+                      </InfiniteScroll>
+                    }
 
-                    {/* END OF MYCONFESSIONS */}
+                    {/* End of myconfessions */}
                   </div>
                 </div>
               </div>
             </div>
           </div>
           {/* Right side component */}
-          {/* </div> */}
 
           {/* REFRESH BUTTON */}
           {/* {commentsModal.visibility === false && changes && <RefreshButton />} */}
@@ -1115,9 +1066,8 @@ export default function Profile() {
           />
 
           <i
-            className={`fa fa-arrow-circle-o-up d-none goUpArrow ${
-              goDownArrow === true ? "d-block" : ""
-            }`}
+            className={`fa fa-arrow-circle-o-up d-none goUpArrow ${goDownArrow === true ? "d-block" : ""
+              }`}
             aria-hidden="true"
             type="button"
             onClick={goUp}
@@ -1125,15 +1075,18 @@ export default function Profile() {
         </div>
       ) : (
         <h1>Loading</h1>
-      )}
+      )
+      }
 
       {/* Modals */}
       <ReportCommentModal />
-      {avatarModalReducer.visible && (
-        <AvatarSelModal uploadImage={uploadImage} />
-      )}
+      {
+        avatarModalReducer.visible && (
+          <AvatarSelModal uploadImage={uploadImage} />
+        )
+      }
       {/* Modals */}
-    </div>
+    </div >
   );
 }
 
@@ -1141,10 +1094,26 @@ Profile.additionalProps = {
   meta: {
     title: "Profile",
   },
+  profilePage: true
 };
 
-export async function getServerSideProps(params) {
+export async function getServerSideProps(context) {
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    authOptions
+  );
+
+  if (!session)
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
   return {
-    props: {},
+    props: {
+      session
+    },
   };
 }

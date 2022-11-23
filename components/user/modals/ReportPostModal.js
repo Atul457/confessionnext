@@ -37,8 +37,6 @@ const ReportPostModal = () => {
             }
             dispatch(resetReportPostModal())
         }
-
-
     }
 
     // Update confession
@@ -80,8 +78,6 @@ const ReportPostModal = () => {
             console.log(err.message)
         }
     }
-
-    // console.log({ reportPostModalReducer, apiStatus })
 
 
     return (

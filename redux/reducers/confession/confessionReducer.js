@@ -57,6 +57,15 @@ const confessionReducer = (state = initialstate, action) => {
             }
         });
 
+        // Delete confession
+        case confAcs.DELETE_CONFESSION: return produce(state, draft => {
+            const confessions = current(draft.confessions.data)
+            let updatedConfessionArray = [...(confessions ?? [])]
+            updatedConfessionArray?.splice(action.payload.index, 1)
+            draft.confessions.data = updatedConfessionArray
+        });
+
+
         // Update a single confession
         case confAcs.UPDATE_CONFESSION: return produce(state, draft => {
             if (action.payload.multiple) {
@@ -74,6 +83,7 @@ const confessionReducer = (state = initialstate, action) => {
                 draft.confessions.data = updatedConfessionArray
                 return
             }
+
 
             draft.confessions.data[action.payload.index] = {
                 ...draft.confessions.data[action.payload.index],

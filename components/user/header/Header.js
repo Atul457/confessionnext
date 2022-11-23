@@ -53,6 +53,7 @@ const Header = (props) => {
             </span>
           </div>
 
+
           <div className="viewProfileIcon pr-md-0 pr-lg-4">
             <div className="row align-items-center justify-content-end m-0 navigationIcons">
               <HeadMenu />

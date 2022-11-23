@@ -6,7 +6,7 @@ const { getKeyProfileLoc, checkAuth } = auth
 const profileLinkToVisit = (obj) => {
     var isMyProfile = getKeyProfileLoc("user_id") === obj?.user_id
     if (!obj?.userslug) return "#"
-    var linkToOtherProfile = `/userProfile/${obj?.userslug}`
+    var linkToOtherProfile = `/userprofile/${obj?.userslug}`
     return `${(checkAuth() && isMyProfile) ? "/profile" : linkToOtherProfile}`
 }
 

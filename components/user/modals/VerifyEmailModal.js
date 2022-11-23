@@ -13,15 +13,20 @@ export default function VerifyEmailModal(props) {
     const dispatch = useDispatch();
     const [email, setEmail] = useState("");
     const [error, setError] = useState({ visible: true, content: "" });
-    const [userDetails] = useState(() => {
-        if (session) {
-            let userDetails = localStorage.getItem("userDetails") ?? "{}";
-            userDetails = JSON.parse(userDetails);
-            return userDetails;
-        } else {
-            return false
-        }
-    });
+    const [userDetails, setUserDetails] = useState(false);
+
+    useEffect(() => {
+        setUserDetails(() => {
+            if (session) {
+                let userDetails = localStorage.getItem("userDetails") ?? "{}";
+                userDetails = JSON.parse(userDetails);
+                return userDetails;
+            } else {
+                return false
+            }
+        })
+    }, [])
+
 
     const hideEModalFn = () => {
         dispatch(EVerifyModal({

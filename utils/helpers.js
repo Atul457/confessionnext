@@ -4,6 +4,7 @@ import { isWindowPresent } from "./checkDom";
 import { apiStatus } from "./api";
 import axios from "axios";
 import auth from "./auth";
+import { avatars } from "./provider";
 
 const { isUserLoggedIn, getKeyProfileLoc, checkAuth } = auth;
 
@@ -24,7 +25,7 @@ const getIP = async () => {
 const profileLinkToVisit = (obj) => {
   var isMyProfile = getKeyProfileLoc("user_id") === obj?.user_id;
   if (!obj?.userslug) return "#";
-  var linkToOtherProfile = `/userProfile/${obj?.userslug}`;
+  var linkToOtherProfile = `/userprofile/${obj?.userslug}`;
   return `${isUserLoggedIn && isMyProfile ? "/profile" : linkToOtherProfile}`;
 };
 
@@ -208,8 +209,7 @@ const isAvatarSelectedCurr = () => {
     check;
   if (isUserLoggedIn) {
     imgurl = getKeyProfileLoc("image");
-    console.log({ imgurl });
-    if (imgurl && imgurl?.indexOf("avatar") !== -1)
+    if (imgurl && typeof imgurl === "string" && imgurl?.indexOf("avatar") !== -1)
       avatars.forEach((curr, index) => {
         let src = curr.src;
         src = src.split("/");

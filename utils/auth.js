@@ -34,9 +34,9 @@ import { isWindowPresent } from "./checkDom";
 //   } else return false;
 // };
 
-const checkAuth = () => {
+const checkAuth = (consoleTest) => {
   if (isWindowPresent()) {
-    const localStorageR = localStorage.getItem("userDetails")?.user_id;
+    let localStorageR = JSON.parse(localStorage.getItem("userDetails") ?? "{}")?.user_id;
     return localStorageR ? true : false;
   }
 };
@@ -127,10 +127,13 @@ const updateKeyProfileLoc = (key, value, isToken = false) => {
   }
 };
 
-const getKeyProfileLoc = (key, isAdmin = false) => {
-  if (isWindowPresent() && (adminAuthCheck() || checkAuth())) {
+const getKeyProfileLoc = (key, consoleOnMyOnly) => {
+  // const getKeyProfileLoc = (key, isAdmin = false) => {
+  // if (isWindowPresent() && (adminAuthCheck() || checkAuth())) {
+  if (isWindowPresent() && checkAuth()) {
     let userData = "";
-    userData = localStorage.getItem(isAdmin ? "adminDetails" : "userDetails");
+    // userData = localStorage.getItem(isAdmin ? "adminDetails" : "userDetails");
+    userData = localStorage.getItem("userDetails");
     userData = JSON.parse(userData);
     if (userData && key in userData) userData = userData[key];
     return userData;
