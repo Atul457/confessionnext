@@ -6,7 +6,7 @@ const scrollToTop = ({ isFeedPage = false }) => {
     // Feed page
     if (isFeedPage) {
       const elem = document.querySelector("#postConfessionCont");
-      top = elem.clientHeight;
+      top = elem?.clientHeight;
     }
 
     window.scrollTo({

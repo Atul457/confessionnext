@@ -54,7 +54,7 @@ const getConfessionsService = async ({
 }) => {
 
     // Vars
-    var url = `getconfessions/${act}/${page}`
+    var url = `getconfessions/${act}/${page ?? 1}`
     var token = getKeyProfileLoc("token") ?? "";
     const profilePage = rest?.profilePage
 

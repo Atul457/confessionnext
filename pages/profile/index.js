@@ -28,7 +28,7 @@ import ErrorFlash from "../../components/common/ErrorFlash";
 import { isWindowPresent } from "../../utils/checkDom";
 
 
-const { getKeyProfileLoc, checkAuth } = auth;
+const { getKeyProfileLoc } = auth;
 
 const deletePostModalIniVal = {
   visible: false,
@@ -199,48 +199,6 @@ export default function Profile(props) {
       updateProfile();
     }
   }, [profile]);
-
-  // Fetches the confessions
-  // async function getConfessions(page = 1, append = false) {
-  //   let pageNo = page;
-  //   let data = {
-  //     profile_id: dataObj.confData.profile_id,
-  //     page: pageNo,
-  //     only_unread: parseInt(unread.current?.value),
-  //   };
-
-  //   let obj = {
-  //     data: data,
-  //     token: getKeyProfileLoc("token"),
-  //     method: "post",
-  //     url: "getmyconfessions",
-  //   };
-
-  //   try {
-  //     const res = await http(obj);
-  //     if (res.data.status === true) {
-  //       //WHETHER THE POSTS DELETABLE OR NOT
-  //       if (res.data.is_deleteable && res.data.is_deleteable === 1) {
-  //         setDeletable(true);
-  //       }
-
-  //       if (append === true) {
-  //         //APPEND
-  //         let newConf = [...myConfession, ...res.data.confessions];
-  //         setMyConfession(newConf);
-  //         setConfData(page);
-  //       } //OVERWRITE
-  //       else {
-  //         setConfCount(res.data.count);
-  //         setMyConfession(res.data.confessions);
-  //       }
-  //     }
-  //     setIsConfLoading(false);
-  //   } catch {
-  //     setIsConfError(true);
-  //     setIsConfLoading(false);
-  //   }
-  // }
 
   const getMyConfessions = (append = false, page = 1) => {
     getConfessionsService({
@@ -683,7 +641,7 @@ export default function Profile(props) {
                       name="post_as_anonymous"
                       id="postAnanonymsly"
                       defaultChecked={
-                        parseInt(profile.post_as_anonymous) === 0 ? false : true
+                        parseInt(getKeyProfileLoc("post_as_anonymous")) == 0 ? false : true
                       }
                       onChange={(e) => handleProfile(e.target)}
                     />

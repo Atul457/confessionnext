@@ -46,6 +46,7 @@ import {
   toggleLoadingFn,
 } from "../redux/actions/friendReqModal";
 import postAlertActionCreators from "../redux/actions/postAlert";
+import { setPostBoxState } from "../redux/actions/postBoxState";
 
 // Modals
 import PrivacyModal from "../components/user/modals/PrivacyModal";
@@ -59,6 +60,7 @@ import { FriendReqModal } from "../components/user/modals/FriendReqModal";
 const { checkAuth } = auth;
 
 export default function Home({ userDetails }) {
+
   // Hooks and vars
   let noOfChar = maxCharAllowedOnPostComment;
   const [submittable, setSubmittable] = useState(true);
@@ -72,7 +74,6 @@ export default function Home({ userDetails }) {
   const store = useSelector((store) => store);
   const confessionRed = store?.confessionReducer.confessions;
   const confessions = confessionRed?.data;
-  // const reportModalReducer = store.reportComModalReducer;
   const postBoxStateReducer = store.postBoxStateReducer.feed;
   const reportPostModalReducer = store.reportPostModalReducer;
   const [selectedCat, setSelectedCat] = useState(
@@ -90,18 +91,7 @@ export default function Home({ userDetails }) {
     confessions.length === 0 && confessionRed.status === apiStatus.FULFILLED;
   const confessionsLoading =
     confessions.length === 0 && confessionRed.status === apiStatus.LOADING;
-
-  //CUSTOM HOOK
-  // const [
-  //   commentsModalRun,
-  //   commentsModal,
-  //   changes,
-  //   handleChanges,
-  //   handleCommentsModal,
-  //   CommentGotModal,
-  // ] = useCommentsModal();
-  const [closeFeatures, openFeatures, Features, featuresState] =
-    useFeaturesModal();
+  const [closeFeatures, openFeatures, Features, featuresState] = useFeaturesModal();
 
   // Privacy Modal
   const [privacyModal, setPrivacyModal] = useState({
@@ -392,6 +382,26 @@ export default function Home({ userDetails }) {
     if (confessionRed?.page) getConfessions(true, confessionRed?.page + 1);
   };
 
+  // Remove uploaded image
+  const removeImg = (indexToBeRemoved) => {
+    setSubmittable(false);
+
+    let base64SrcArr = base64Src.filter((elem, index) => {
+      return index !== indexToBeRemoved && elem
+    })
+
+    let imgPathArrN = imgPathArr.filter((elem, index) => {
+      return index !== indexToBeRemoved && elem
+    })
+
+    setBase64Src(base64SrcArr);
+    setImgPathArr(imgPathArrN);
+
+    setTimeout(() => {
+      setSubmittable(true);
+    }, 1200);
+  }
+
   //IN PROGRESS
   const toBase64 = (e, isCalledByInputElem) => {
     if (!isCalledByInputElem) {
@@ -547,9 +557,8 @@ export default function Home({ userDetails }) {
                 <div className="wrapperBtnsImages">
                   {/* Upload images cont */}
                   <div
-                    className={`cstmUploadFileCont feedPage ${
-                      base64Src.length > 0 ? "feedMb15" : ""
-                    }`}
+                    className={`cstmUploadFileCont feedPage ${base64Src.length > 0 ? "feedMb15" : ""
+                      }`}
                   >
                     <div className="uploadImgFeedCont">
                       <label
@@ -632,9 +641,8 @@ export default function Home({ userDetails }) {
               {/* error view in mobile */}
               <div className="w-100 errorFieldsCPost p-0 text-center d-block d-md-none">
                 <div
-                  className={`responseCont mt-0 ${
-                    errorOrSuccess ? "text-success" : "text-danger"
-                  }`}
+                  className={`responseCont mt-0 ${errorOrSuccess ? "text-success" : "text-danger"
+                    }`}
                   id="responseCont"
                 ></div>
               </div>
@@ -713,9 +721,8 @@ export default function Home({ userDetails }) {
           {/* Error view in Web */}
           <div className="d-none d-md-block w-100 errorFieldsCPost p-0">
             <div
-              className={`responseCont mt-0 ${
-                errorOrSuccess ? "text-success" : "text-danger"
-              }`}
+              className={`responseCont mt-0 ${errorOrSuccess ? "text-success" : "text-danger"
+                }`}
               id="responseCont"
             ></div>
           </div>
@@ -755,15 +762,15 @@ export default function Home({ userDetails }) {
                 <Post
                   userDetails={userDetails}
                   key={`fConf${index}`}
-                  post={{ ...post, index, dispatch }}
+                  post={{ ...post, index, dispatch, profileImg: post?.profile_image }}
                 />
 
                 {/* {((index + 1) % showAdsAfter_Feed === 0) &&
-              <div className="mb-4">
-                {envConfig?.isProdMode ? <AdSense_ /> :
-                  <AdMob mainContId={`adIndex${index}`} setAddSlots={setAdSlots} slots={adSlots} />}
-              </div>
-            } */}
+                <div className="mb-4">
+                  {envConfig?.isProdMode ? <AdSense_ /> :
+                    <AdMob mainContId={`adIndex${index}`} setAddSlots={setAdSlots} slots={adSlots} />}
+                </div>
+              } */}
               </div>
             );
           })}
@@ -779,20 +786,20 @@ export default function Home({ userDetails }) {
       {/* PRIVACY MODAL */}
       {isWindowPresent()
         ? document.querySelector("#description") &&
-          document.querySelector("#description").value !== "" &&
-          postAlertReducer.visible === true && (
-            <>
-              <PostAlertModal
-                data={{
-                  feed: {
-                    selectedCat,
-                    description: document.querySelector("#description").value,
-                  },
-                }}
-                postConfession={postConfession}
-              />
-            </>
-          )
+        document.querySelector("#description").value !== "" &&
+        postAlertReducer.visible === true && (
+          <>
+            <PostAlertModal
+              data={{
+                feed: {
+                  selectedCat,
+                  description: document.querySelector("#description").value,
+                },
+              }}
+              postConfession={postConfession}
+            />
+          </>
+        )
         : null}
 
       {/* Report post modal */}
@@ -813,7 +820,7 @@ export default function Home({ userDetails }) {
           changeRequested={changeRequested}
         />
       )}
-     
+
     </>
   );
 }

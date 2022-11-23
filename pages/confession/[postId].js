@@ -241,8 +241,8 @@ export default function CommentsGot(props) {
                     <meta name="description" content={serverSideData?.description} />
                     <meta property="og:description" content={serverSideData?.description} />
                     <meta property="twitter:description" content={serverSideData?.description} />
-                    <meta property="og:title" content={`${serverSideData?.title} - The Talk Place`} />
-                    <meta name="twitter:title" content={`${serverSideData?.title} - The Talk Place`} />
+                    <meta property="og:title" content={`${serverSideData?.description} - The Talk Place`} />
+                    <meta name="twitter:title" content={`${serverSideData?.description} - The Talk Place`} />
                 </Head> : null}
 
             {serverSideData

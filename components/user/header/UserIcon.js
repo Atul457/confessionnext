@@ -18,6 +18,8 @@ import { EVerifyModal } from "../../../redux/actions/everify";
 import VerifyEmailModal from "../modals/VerifyEmailModal";
 import _ from "lodash";
 import { isWindowPresent } from "../../../utils/checkDom";
+import { getForumsNConfessions } from "../../../services/user/forumServices";
+
 
 const UserIcon = () => {
 
@@ -36,6 +38,7 @@ const UserIcon = () => {
   const name = getKeyProfileLoc("name");
   const email = session?.user?.email;
   const router = useRouter();
+  const pathname = router.pathname.replace("/")
   const history = router.push;
   const dispatch = useDispatch();
   const notificationReducer = store.notificationReducer;
