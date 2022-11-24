@@ -2,7 +2,6 @@ import React from 'react'
 import { useForm } from 'react-hook-form'
 
 const CustomComp = React.forwardRef(({ dd, ...rest }, ref) => {
-    console.log(dd)
     return <input type="text" className='w-100 form-control mb-3' ref={ref} {...rest} />
 })
 
@@ -10,10 +9,7 @@ const CustomForm = () => {
 
     const { register, handleSubmit, formState: { errors } } = useForm()
 
-    const onSubmit = (data) => {
-        console.log(data)
-    }
-    console.log(errors)
+    const onSubmit = () => { }
     return (<form style={{
         width: "50%",
         textAlign: "center"

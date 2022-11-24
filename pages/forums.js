@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import RightSideComp from '../components/user/forums/RightSideComp'
 import { forumHandlers } from '../redux/actions/forumsAc/forumsAc'
+import { pageCategoryTypes } from '../utils/provider'
 
 
 const Forums = () => {
@@ -43,5 +44,7 @@ Forums.additionalProps = {
     containsSideAd: true,
     meta: {
         title: "Forums"
-    }
+    },
+    pageCategory: pageCategoryTypes.forum,
+    mobileCategories: true
 }

@@ -5,7 +5,7 @@ import AppLogo from '../../common/AppLogo'
 import Categories from '../Categories'
 import SocialIcons from './SocialIcons'
 
-const Sidebar = () => {
+const Sidebar = (props) => {
     return (
         <div className="leftColumn leftColumnFeed">
             <div className="leftColumnWrapper">
@@ -14,7 +14,7 @@ const Sidebar = () => {
                 <div className="middleContLoginReg feedMiddleCont">
                     {/* CATEGORYCONT */}
                     <aside className="posSticky">
-                        <Categories />
+                        <Categories pageCategory={props?.pageCategory} />
                     </aside>
                     {/* CATEGORYCONT */}
                 </div>

@@ -354,4 +354,5 @@ export {
   isAvatarSelectedCurr,
   profileLinkToVisit,
   isAllowedToComment,
+  subComIniVal
 };

@@ -2366,9 +2366,30 @@ span.offlineColor {
   align-items: center;
 }
 
+
 .footLinkName {
   color: var(--whiteColor);
   text-align: center;
+}
+
+.active .footLinkName {
+  color: var(--orangeColor)
+}
+
+.foot_icon {
+  display: flex;
+}
+
+.foot_icon.active_icon {
+  display: none;
+}
+
+.active .foot_icon.active_icon {
+  display: flex;
+}
+
+.active .foot_icon {
+  display: none;
 }
 
 .errorCont {

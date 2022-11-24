@@ -111,7 +111,6 @@ const Post = (props) => {
   };
 
   const _toggleShareReqPopUp = (id, value) => {
-    console.log({ id, value })
     dispatch(
       togglemenu({
         id,
@@ -243,7 +242,7 @@ const Post = (props) => {
         viewcount: post?.viewcount,
         no_of_comments: post?.no_of_comments + 1,
       };
-      console.log("updateConfession", { index: post?.index, data })
+
       dispatch(updateConfession({ index: post?.index, data }));
 
       const res = await http(obj);
@@ -261,12 +260,6 @@ const Post = (props) => {
     preventDoubleClick(false);
 
   };
-
-  // console.log({
-  //   " ShareReducer.selectedPost?.id": ShareReducer.selectedPost?.id,
-  //   "post.confession_id": post.confession_id,
-  //   "ShareReducer.sharekitShow": ShareReducer.sharekitShow
-  // })
 
   return (
     <div className="postCont confession_cont" index={post.index}>
@@ -391,6 +384,7 @@ const Post = (props) => {
         <span className="leftContofPostCont">
           <span className="userImage userImageFeed">
             <ProfileIcon
+              email_verified={post?.email_verified}
               openFrReqModalFn_Post={openFrReqModalFn_Post}
               profileImg={post?.profileImg}
               isNotFriend={post?.isNotFriend}

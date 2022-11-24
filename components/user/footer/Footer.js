@@ -3,23 +3,22 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import auth from "../../../utils/auth";
-import { isWindowPresent } from "../../../utils/checkDom";
 import NavLink from "../../../utils/NavLink";
+import { useSession } from "next-auth/react"
 
 const Footer = (props) => {
+
   const router = useRouter();
-  const { isUserLoggedIn } = auth;
-  const [authenticated, setAuthenticated] = useState(false);
-  const [currUrl, setCurrUrl] = useState("__");
-  let currentUrl = currUrl;
-  const location = router.pathname;
-  currentUrl = currentUrl?.split("/");
-  currentUrl = currentUrl[currentUrl.length - 1];
+  const { data: session } = useSession()
+  // const [currUrl, setCurrUrl] = useState("__");
+  // let currentUrl = currUrl;
+  // const location = router.pathname;
+  // currentUrl = currentUrl?.split("/");
+  // currentUrl = currentUrl[currentUrl.length - 1];
   const notificationReducer = useSelector((store) => store.notificationReducer);
 
   useEffect(() => {
-    setCurrUrl(window.location.href);
-    setAuthenticated(isUserLoggedIn)
+    // setCurrUrl(window.location.href);
   }, []);
 
   return (
@@ -28,21 +27,19 @@ const Footer = (props) => {
         <div className="linkBtns" onClick={props?.refreshFeed}>
           <NavLink href="/" className="linkBtnsAnchor">
             <span className="headIconCont">
-              <Image
-                width={20}
-                height={20}
-                src={
-                  currentUrl === ""
-                    ? "/images/homeIcon.svg"
-                    : "/images/homeIconM.svg"
-                }
+              <img
+                src={"/images/homeIconM.svg"}
+                className="foot_icon"
+                alt="homeIcon"
+              />
+              <img
+                src={"/images/homeIcon.svg"}
+                className="foot_icon active_icon"
                 alt="homeIcon"
               />
             </span>
             <span
-              className={`footLinkName ${
-                currentUrl === "home" ? "activeLinkOfHeader" : ""
-              }`}
+              className="footLinkName"
             >
               Home
             </span>
@@ -52,52 +49,46 @@ const Footer = (props) => {
         <div className="linkBtns">
           <NavLink href="/forums" className="linkBtnsAnchor">
             <span className="headIconCont">
-              <Image
-                width={20}
-                height={20}
+              <img
                 src="/images/confessIconActive.svg"
                 alt="confessIconActive"
-                className="active"
+                className="foot_icon active_icon"
               />
-              <Image
-                width={20}
-                height={20}
+              <img
                 src="/images/confessIconM.svg"
                 alt="confessIcon"
-                className="inactive"
+                className="foot_icon"
               />
             </span>
             <span
-              className={`footLinkName ${
-                location.startsWith("/forum") ? "activeLinkOfHeader" : ""
-              }`}
+              className={`footLinkName`}
             >
               Forums
             </span>
           </NavLink>
         </div>
 
-        {authenticated ? (
+        {session ? (
           <div className="linkBtns">
             <NavLink href="/chat" className="linkBtnsAnchor chatLink">
               <span className="headIconCont">
-                <Image
-                  width={20}
-                  height={20}
-                  src={
-                    currentUrl === "chat"
-                      ? "/images/inboxIconActive.svg"
-                      : "/images/inboxIconM.png"
-                  }
-                  alt="inboxIconM"
+                <img
+                  src="/images/inboxIconM.png"
+                  alt="inboxIcon"
+                  className="foot_icon"
                 />
+                <img
+                  src="/images/inboxIconActive.svg"
+                  alt="active_inboxIcon"
+                  className="foot_icon active_icon"
+                />
+
               </span>
               <span
-                className={`footLinkName ${
-                  notificationReducer.messagesCount > 0
-                    ? "newInboxMessages"
-                    : ""
-                } ${currentUrl === "chat" ? "activeLinkOfHeader" : ""}`}
+                className={`footLinkName ${notificationReducer.messagesCount > 0
+                  ? "newInboxMessages"
+                  : ""
+                  }`}
               >
                 Chat
               </span>
@@ -107,22 +98,19 @@ const Footer = (props) => {
           <div className="linkBtns">
             <NavLink href="/report" className="linkBtnsAnchor">
               <span className="headIconCont">
-                <Image
-                  width={20}
-                  height={20}
-                  className="contactUsIcon"
-                  src={
-                    currentUrl === "report"
-                      ? "/images/contactUsIconActive.svg"
-                      : "/images/contactUsMobIcon.svg"
-                  }
+                <img
+                  className="contactUsIcon foot_icon"
+                  src="/images/contactUsMobIcon.svg"
                   alt="contactUsIcon"
+                />
+                <img
+                  className="contactUsIcon active_icon foot_icon"
+                  src="/images/contactUsIconActive.svg"
+                  alt="contactUsActiveIcon"
                 />
               </span>
               <span
-                className={`footLinkName ${
-                  currentUrl === "report" ? "activeLinkOfHeader" : ""
-                }`}
+                className="footLinkName"
               >
                 Contact us
               </span>

@@ -132,8 +132,6 @@ const Login = () => {
                 console.log(err?.message)
             }
 
-        } else {
-            console.log(data);
         }
     };
 
@@ -196,8 +194,6 @@ const Login = () => {
                 profileResponseCont.innerHTML = "something went wrong"
                 console.log(err?.message)
             }
-        } else {
-            console.log(response);
         }
     };
 

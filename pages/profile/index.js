@@ -474,8 +474,6 @@ export default function Profile(props) {
             updatedConfessionArray = [...myConfession];
             updatedConfessionArray.splice(index, 1);
             setMyConfession(updatedConfessionArray);
-          } else {
-            console.log(res);
           }
         } catch (err) {
           console.log(err);

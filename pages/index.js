@@ -27,7 +27,6 @@ import AdMob, { AdSense_ } from "../components/user/ads/AdMob";
 import { setConfessions } from "../redux/actions/confession/confessionAc";
 
 // Utils
-import useCommentsModal from "../utils/hooks/useCommentsModal";
 import useFeaturesModal from "../utils/hooks/useFeaturesModal";
 import { isWindowPresent } from "../utils/checkDom";
 import {
@@ -56,6 +55,7 @@ import ReportPostModal from "../components/user/modals/ReportPostModal";
 import AvatarsIntroModal from "../components/user/modals/AvatarsIntroModal";
 import { toggleAvatarIntroModal } from "../redux/actions/avatarsIntroModalAc/avatarsIntroModalAc";
 import { FriendReqModal } from "../components/user/modals/FriendReqModal";
+import { ExpandableForumCats } from "../components/user/Categories";
 
 const { checkAuth } = auth;
 
@@ -730,6 +730,8 @@ export default function Home({ userDetails }) {
         </div>
       </div>
       {/* POST MAIN CONT START */}
+
+      <ExpandableForumCats classNames="mb-4" />
 
       {confessionsLoading ? (
         <Loader size="sm" className="mx-auto" />

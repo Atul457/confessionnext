@@ -6,16 +6,17 @@ import { searchAcFn } from '../../redux/actions/searchAc/searchAc'
 import { getForumsNConfessions } from '../../services/user/forumServices'
 import { apiStatus } from '../../utils/api'
 import { isWindowPresent } from '../../utils/checkDom'
+import { pageCategoryTypes } from '../../utils/provider'
 import ErrorFlash from '../common/ErrorFlash'
 import Loader from '../common/Loader'
+import { searchTypes } from './forums/detailPage/comments/ForumCommProvider'
 
 const Categories = ({
   setShowCat = () => { },
   isExpandable = false,
   classNames = "",
-  onlyForForums = false,
-  isSearchPage = false,
-  forumpage = (isWindowPresent() && window.location.pathname.includes("forum"))
+  forumpage = (isWindowPresent() && window.location.pathname.includes("forum")),
+  pageCategory = pageCategoryTypes.confession
 }) => {
 
   // Hooks and vars
@@ -79,9 +80,10 @@ const Categories = ({
 
       <div className="categoriesContainer w-100">
         {categories.map((category, cindex) => {
-          if (onlyForForums === true && category?.is_forum === 0) return
-          if (isSearchPage === true && SearchReducer.type === searchTypes.FORUM && category.is_confession === 1 && category.is_forum === 0) return
-          if (isSearchPage === true && SearchReducer.type === searchTypes.POST && category.is_confession === 0 && category.is_forum === 1) return
+          if (pageCategory === pageCategoryTypes.forum && category?.is_forum === 0) return
+          if (pageCategory === pageCategoryTypes.search && SearchReducer.type === searchTypes.FORUM && category.is_confession === 1 && category.is_forum === 0) return
+          if (pageCategory === pageCategoryTypes.search && SearchReducer.type === searchTypes.POST && category.is_confession === 0 && category.is_forum === 1) return
+          if (pageCategory === pageCategoryTypes.confession && category.is_confession === 0) return
           return <Category
             {...categoryCompProps}
             key={`forumsCategory${cindex}${category?.id}`}
@@ -99,13 +101,18 @@ const Categories = ({
   )
 }
 
-const ExpandableForumCats = ({ classNames = "", onlyForForums = false, isSearchPage = false }) => {
+const ExpandableForumCats = ({
+  classNames = "",
+  onlyForForums = false,
+  isSearchPage = false,
+  pageCategory = pageCategoryTypes.confession
+}) => {
 
   const [showCat, setShowCat] = useState(false)
   return (
-    <div className={`expandableCategory d-block ${classNames}`}>
+    <div className={`expandableCategory d-block d-md-none ${classNames}`}>
       <div className="head" onClick={() => setShowCat(!showCat)}>
-        Choose a Category to filter forums
+        Choose a Category to filter {pageCategory === pageCategoryTypes.forum ? "forums" : "posts"}
         <span>
           <i aria-hidden="true" className={`fa fa-chevron-down categoryDownIcon ${showCat ? "rotateUpsideDown" : ""}`}></i>
         </span>
@@ -113,11 +120,12 @@ const ExpandableForumCats = ({ classNames = "", onlyForForums = false, isSearchP
       {showCat && <div className="body">
         {/* CATEGORYCONT */}
         <aside className="col-12 col-md-4 posSticky mobileViewCategories d-none">
-          <ForumCategories
+          <Categories
             setShowCat={setShowCat}
             isSearchPage={isSearchPage}
             isExpandable={true}
             onlyForForums={onlyForForums}
+            pageCategory={pageCategory}
           />
         </aside>
         {/* CATEGORYCONT */}

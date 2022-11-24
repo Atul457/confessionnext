@@ -24,6 +24,7 @@ import { http } from '../../utils/http'
 import { useDispatch, useSelector } from 'react-redux'
 import { forumHandlers } from '../../redux/actions/forumsAc/forumsAc'
 import Loader from '../../components/common/Loader'
+import { pageCategoryTypes } from '../../utils/provider'
 
 
 const { getKeyProfileLoc } = auth
@@ -200,7 +201,8 @@ export async function getServerSideProps(context) {
 
 ForumDetailPage.additionalProps = {
     serverSidePage: true,
-    removeDefaultMeta: true
+    removeDefaultMeta: true,
+    pageCategory: pageCategoryTypes.forum
 }
 
 export default ForumDetailPage

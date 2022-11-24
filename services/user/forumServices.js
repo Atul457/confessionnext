@@ -385,7 +385,7 @@ const getForumsNConfessions = async ({ SearchReducer, selectedCategory }) => {
             search: searchedWith,
             type,
             page,
-            "category_id": selectedCategory ?? activeCategory
+            "category_id": (selectedCategory ?? (activeCategory === 0 ? "all" : activeCategory))
         }
 
     obj = {

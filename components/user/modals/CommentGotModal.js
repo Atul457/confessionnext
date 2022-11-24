@@ -397,13 +397,7 @@ export default function CommentGotModal({ categories, ...rest }) {
                 rest.updatedConfessions(state.index, data)
                 dispatch(updateCModalState(data))
 
-                const res = await http(obj)
-
-                if (res.data.status === true) {
-
-                } else {
-                    console.log(res);
-                }
+                await http(obj)
             } catch (error) {
                 console.log(error);
                 console.log("Some error occured");

@@ -89,7 +89,6 @@ const WhatsNew = () => {
             console.log(error)
         }
 
-        if (0) console.log(append)
     }
 
     // Render forums

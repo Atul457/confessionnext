@@ -10,6 +10,7 @@ import { apiStatus } from '../utils/api';
 import { useSession } from 'next-auth/react';
 import { searchAcFn } from '../redux/actions/searchAc/searchAc';
 import { getForumsNConfessions } from '../services/user/forumServices';
+import { pageCategoryTypes } from '../utils/provider';
 
 const messages = ["No results found", "No Posts found", "No Forums found", "No Tags found"]
 
@@ -205,6 +206,11 @@ const Search = () => {
             {nfsw_modal.isVisible && <NfswAlertModal nfsw_modal={nfsw_modal} />}
         </>
     )
+}
+
+Search.additionalProps = {
+    meta: { title: "Search" },
+    pageCategory: pageCategoryTypes.search
 }
 
 export default Search

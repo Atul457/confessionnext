@@ -107,7 +107,6 @@ const UpdatePasswordModal = () => {
                 return dispatch(UpdateUPassActionCreators.updateErrorUpassModal(res.data?.message));
             }
         } catch (err) {
-            console.log(err.status);
             return dispatch(UpdateUPassActionCreators.updateErrorUpassModal("Something went wrong."));
         }
 

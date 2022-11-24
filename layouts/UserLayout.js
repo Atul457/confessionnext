@@ -40,6 +40,7 @@ import LgSidebar from "../components/common/LgSidebar";
 import { authOptions } from "../pages/api/auth/[...nextauth]";
 import { next_auth_status } from "../utils/provider";
 import { resHandler } from "../utils/api";
+import { ExpandableForumCats } from "../components/user/Categories";
 
 // Google tag manager
 if (isWindowPresent()) {
@@ -202,7 +203,7 @@ const UserLayout = ({ children, additionalProps = false }) => {
                 {additionalProps?.authPage ? (
                   <LgSidebar {...additionalProps.sideBarProps} />
                 ) : (
-                  <Sidebar />
+                  <Sidebar pageCategory={additionalProps?.pageCategory} />
                 )}
               </>
               : null}

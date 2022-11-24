@@ -81,7 +81,6 @@ const ForumComp = (props) => {
 
   // Opens nfsw modal
   const openNsfwModal = () => {
-    console.log(currForum?.forum_id)
     dispatch(toggleNfswModal({
       isVisible: true, forum_link: `/forums/${slug}`, forum_id: currForum?.forum_id, forum_index, is_calledfrom_searchPage: true
     }))

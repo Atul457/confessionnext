@@ -87,7 +87,6 @@ const ShareWithLoveModal = ({ getConfessions }) => {
                     }))
                     getConfessionsService({ act: "all", page: 1, append: false, dispatch })
                 } else {
-                    console.log(res.data)
                     dispatch(toggleShareWithLoveModal({ status: apiStatus.REJECTED, message: res.data.message }))
                 }
 

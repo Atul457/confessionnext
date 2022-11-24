@@ -10,7 +10,6 @@ const ProfileModal = (props) => {
   // Hooks and vars
   const dispatch = useDispatch();
   const history = useRouter().push;
-  // console.log({ requests: props.myRequests.requests})
 
   return (
     <Modal

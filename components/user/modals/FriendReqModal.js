@@ -49,14 +49,10 @@ export const FriendReqModal = ({ userId, closeFrReqModalFn, toggleLoadingFn, can
             url: "sendfriendrequest"
         }
 
-        // console.log(obj);
-
         try {
             const res = await http(obj)
             if (res.data.status === true) {
                 is_cancelled === 0 ? dispatch(changeRequested()) : dispatch(changeCancelled());
-            } else {
-                console.log(res);
             }
         } catch (err) {
             console.log(err);

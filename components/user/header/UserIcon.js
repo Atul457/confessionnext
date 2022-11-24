@@ -106,6 +106,7 @@ const UserIcon = () => {
     };
     if (SearchReducer.visible) {
       document.addEventListener("click", listener);
+      if (searchBoxRef) searchBoxRef.current.focus()
     }
     return () => {
       document.removeEventListener("click", listener);

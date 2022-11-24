@@ -9,6 +9,7 @@ import WhatsNew from './forumPageComp/WhatsNew'
 import Link from 'next/link'
 import { useSession } from "next-auth/react";
 import { useRouter } from 'next/router'
+import { pageCategoryTypes } from '../../../utils/provider'
 
 
 const RightSideComp = () => {
@@ -37,10 +38,10 @@ const RightSideComp = () => {
 
     return (
         <>
-            <Tabs activeTab={activeTab} setActiveTab={changeActiveTab} session={session}/>
+            <Tabs activeTab={activeTab} setActiveTab={changeActiveTab} session={session} />
 
             {activeTab !== myForumsIndex ?
-                <ExpandableForumCats classNames='mb-3 d-block d-md-none' onlyForForums={true} /> : null}
+                <ExpandableForumCats classNames='mb-3 d-block d-md-none' pageCategory={pageCategoryTypes.forum} /> : null}
 
             <div className='forums_tabs_comps_holder'>
                 {ActiveTab}

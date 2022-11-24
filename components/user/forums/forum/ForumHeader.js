@@ -140,7 +140,7 @@ const ForumHeader = props => {
         const private_and_joined = isPrivateForum && joined
         const returnLink = isMyForum || (!session && !isNfswTypeContent) || (!isPrivateForum && !isNfswTypeContent)
             || (private_and_joined && !isNfswTypeContent) || (isCalledFromSearchPage && isPublicForum && !isNfswTypeContent)
-        const forum_slug = returnLink ? `/forums/${serverSideData?.slug}` : "#"
+        const forum_slug = returnLink ? `/forums/${serverSideData?.slug || currForum?.slug}` : "#"
         let Html = ""
 
         Html = (
@@ -155,7 +155,7 @@ const ForumHeader = props => {
                     {name}
                 </div>
                 <div className="category_name">
-                    {(category_name).charAt(0) + ((category_name).slice(1).toLowerCase())}
+                    {(category_name)?.charAt(0) + ((category_name)?.slice(1)?.toLowerCase())}
                 </div>
                 <div className="forum_timestamp postCreatedTime">
                     {created_at ? dateConverter(created_at) : null}

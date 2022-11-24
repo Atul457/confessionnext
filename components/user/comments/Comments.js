@@ -284,8 +284,6 @@ export default function Comments(props) {
             const res = await http(obj)
             if (res.data.status === true) {
                 return setSubComments({ loading: false, data: res.data.body.comments })
-            } else {
-                console.log(res);
             }
             setSubComments({ ...subComments, loading: false })
         } catch (err) {

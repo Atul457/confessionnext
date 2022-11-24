@@ -62,7 +62,10 @@ const ConfessionComp = (props) => {
 
         <span className="leftContofPostCont">
           <span className="userImage userImageFeed">
-            <ProfileIcon profileImg={props.profileImg} isNotFriend={props.isNotFriend} />
+            <ProfileIcon
+              profileImg={props.profileImg}
+              isNotFriend={props.isNotFriend}
+              email_verified={currPost.email_verified} />
           </span>
 
           {/* NOT ANONYMOUS :: OPENS CURRENT LOGGED IN USER'S PROFILE,
@@ -78,7 +81,7 @@ const ConfessionComp = (props) => {
           </span>}
 
           <span className="postCreatedTime">
-            {dateConverter(props.createdAt)}
+            {dateConverter(props?.createdAt)}
           </span>
 
         </span>

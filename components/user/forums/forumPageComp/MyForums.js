@@ -82,8 +82,6 @@ const MyForums = () => {
     } catch (error) {
       console.log(error)
     }
-
-    if (0) console.log(append)
   }
 
   const fetchMoreData = () => {

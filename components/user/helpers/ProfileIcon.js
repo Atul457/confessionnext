@@ -1,6 +1,7 @@
 export const ProfileIcon = ({
     profileImg = "",
     isNotFriend = 0,
+    email_verified = 0,
     openFrReqModalFn_Post = () => { }
 }) => {
 
@@ -74,5 +75,11 @@ export const ProfileIcon = ({
 
 
     profileBPlate = getHtml();
+    if (email_verified === 1)
+        profileBPlate = (
+            <>
+                {profileBPlate}
+                <img src="/images/verifiedIcon.svg" title="Verified user" className="verified_user_icon" alt="verified_user_icon" />
+            </>)
     return profileBPlate;
 }
