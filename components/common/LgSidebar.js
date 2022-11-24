@@ -25,7 +25,7 @@ export default function LgSidebar(props) {
                 </Link>
 
                 <div className={`bottomContLoginReg ${props.hidden === true && "hiddenImg"}`}>
-                    <Link href={`${props?.removeLink ? "#" : "/createPost"}`} className='textDecNone'>
+                    <Link href={`${props?.removeLink ? "#" : "/"}`} className='textDecNone'>
                         <img src={props.bottomLogo} alt="bottomLogo" />
                     </Link>
                 </div>
