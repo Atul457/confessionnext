@@ -4037,7 +4037,7 @@ span.facebookMobIcon {
 
 .blank_layout .rightColumn {
   width: 100%;
-  margin-left: 0px;
+  margin-left: 0px !important;
 }
 
 .blank_layout .outerContWrapper {
@@ -4823,8 +4823,8 @@ a.headerNavLinks.active::after {
 }
 
 /* .chatOutestCont { */
-  /* height: calc(100vh - 60px); */
-  /* height: calc(100vh - 110px); */
+/* height: calc(100vh - 60px); */
+/* height: calc(100vh - 110px); */
 /* } */
 
 .iconsMainCont {
@@ -6118,7 +6118,7 @@ button.modalFootBtns.btn a:hover {
   }
 
   .side_ads_page {
-    width: calc(100% - 380px) !important;
+    width: calc(100% - 280px) !important;
   }
 
   .shareIconAndUpImgCont {
@@ -6164,6 +6164,10 @@ button.modalFootBtns.btn a:hover {
   .modal-dialog {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .not_auth_page .rightColumn {
+    margin-left: 280px;
   }
 }
 
@@ -6805,6 +6809,7 @@ button.modalFootBtns.btn a:hover {
     justify-content: center;
     min-height: initial;
     padding: 25px 0px 0px 0px;
+    visibility: hidden;
   }
 
   .leftColumn,
@@ -7246,7 +7251,7 @@ button.modalFootBtns.btn a:hover {
   }
 
   .chatOutestCont {
-        margin-top: 90px;
+    margin-top: 90px;
     /* height: calc(100vh - 120px - 75px); */
     padding-left: 0px !important;
     padding-right: 0px !important;

@@ -74,6 +74,7 @@ if (isWindowPresent()) {
 }
 
 const UserLayout = ({ children, additionalProps = false }) => {
+  
   // Hooks and vars
   const router = useRouter();
   const loaderRef = useRef(null);
@@ -196,9 +197,10 @@ const UserLayout = ({ children, additionalProps = false }) => {
             {additionalProps?.authPage ? null : (
               <Header
                 userDetails={userDetails}
+                additionalProps={additionalProps}
                 profilePage={additionalProps?.profilePage} />
             )}
-            
+
             {!additionalProps?.profilePage && !(additionalProps?.layout === layoutTypes.blank) ?
               (<>
                 {additionalProps?.authPage ? (

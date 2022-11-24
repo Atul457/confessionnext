@@ -16,17 +16,19 @@ const Header = (props) => {
   // };
 
   // Hooks and vars
-  const { socialLinksModalReducer } = useSelector(store => store)
+  const store = useSelector(store => store)
+  const { socialLinksModalReducer, notificationReducer } = store
   const dispatch = useDispatch()
   const heartCompRef = useRef(null)
+
 
   // Handles scroll to top button
   useEffect(() => {
     const scroll = () => {
-      let secondPostElem = document.querySelector("html")
+      let htmlPostElem = document.querySelector("html")
       if (heartCompRef?.current) {
-        if (secondPostElem?.scrollTop > 600) heartCompRef?.current?.classList?.remove("hideHeartComp")
-        else heartCompRef?.current?.classList?.add("hideHeartComp")
+        if (htmlPostElem?.scrollTop > 600) heartCompRef?.current?.classList?.remove("hideHeartComp")
+        else if (htmlPostElem.crollHeight > 1000) heartCompRef?.current?.classList?.add("hideHeartComp")
       }
     }
 
@@ -35,6 +37,12 @@ const Header = (props) => {
       window.removeEventListener("scroll", scroll);
     }
   }, [props])
+
+  useEffect(() => {
+    let htmlPostElem = document.querySelector("html")
+    if (htmlPostElem?.scrollHeight < 1000) heartCompRef?.current?.classList?.remove("hideHeartComp")
+    else heartCompRef?.current?.classList?.add("hideHeartComp")
+  }, [store])
 
   // Functions
 
