@@ -74,7 +74,7 @@ if (isWindowPresent()) {
 }
 
 const UserLayout = ({ children, additionalProps = false }) => {
-  
+
   // Hooks and vars
   const router = useRouter();
   const loaderRef = useRef(null);
@@ -188,10 +188,9 @@ const UserLayout = ({ children, additionalProps = false }) => {
           removeDefaultMeta={additionalProps?.removeDefaultMeta}
         />
 
-        <main className={`container-fluid ${additionalProps?.layout ?? ""}`}>
+        <main className={`container-fluid ${additionalProps?.layout ?? ""} ${additionalProps?.authPage ? " auth_page" : "not_auth_page"}`}>
           <div
-            className={`row outerContWrapper${!additionalProps?.authPage ? " not_auth_page" : ""
-              }${additionalProps?.profilePage ? " profile_page" : ""}`}
+            className={`row outerContWrapper${additionalProps?.profilePage ? " profile_page" : ""}`}
           >
 
             {additionalProps?.authPage ? null : (

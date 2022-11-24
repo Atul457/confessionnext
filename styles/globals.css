@@ -6809,6 +6809,9 @@ button.modalFootBtns.btn a:hover {
     justify-content: center;
     min-height: initial;
     padding: 25px 0px 0px 0px;
+  }
+
+  .not_auth_page.leftColumn {
     visibility: hidden;
   }
 
