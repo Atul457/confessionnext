@@ -1,31 +1,9 @@
-// ** Initial State
-// const initialState = {
-//     data: [],
-//     total: 1,
-//     params: {},
-//     allData: []
-// }
-
-// const ChatTable = (state = initialState, action) => {
-//     switch (action.type) {
-//         case 'GET_DATA':
-//             return {
-//                 ...state,
-//                 allData: action.allData,
-//                 data: action.data,
-//                 total: action.totalPages,
-//             }
-//         default:
-//             return state
-//     }
-// }
-
-// export default ChatTable;
 const initialState = {
     data: [],
     total: 1,
     params: {},
-    allData: []
+    allData: [],
+    chatVisible: false
 }
 
 const ChatTable = (state = initialState, action) => {
@@ -34,6 +12,11 @@ const ChatTable = (state = initialState, action) => {
             return {
                 ...state,
                 data: action.data,
+            }
+        case 'TOGGLE_CHAT_F':
+            return {
+                ...state,
+                chatVisible: action.payload.chatVisible,
             }
         default:
             return state

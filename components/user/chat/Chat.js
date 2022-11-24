@@ -14,6 +14,7 @@ import auth from '../../../utils/auth';
 import { dateConverter } from '../../../utils/helpers';
 import UnFriendModal from '../modals/UnFriendModal';
 import { unFriendActionCreators } from '../../../redux/actions/unFriendReqModal';
+import { toggleChat } from '../../../redux/actions/chats';
 
 const { getToken } = auth
 
@@ -100,11 +101,9 @@ export default function Chat() {
 
 
     useEffect(() => {
-        document.querySelector("body").classList.add("bounceOff")
-        return () => {
-            document.querySelector("body").classList.remove("bounceOff")
-        }
-    }, [])
+        if (toggleView.messages) dispatch(toggleChat({ chatVisible: true }))
+        else dispatch(toggleChat({ chatVisible: false }))
+    }, [toggleView.messages])
 
 
     //SHOWS FRIEND REQUESTS

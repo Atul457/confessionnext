@@ -23,8 +23,10 @@ import { forumsReducer } from './forumsReducer/forumsReducer';
 import SearchReducer from './searchReducer/searchReducer';
 import modalsReducer from './modals';
 import { confessionReducer } from './confession/confessionReducer';
+import chatReducer from './chatReducer';
 
 const rootReducer = combineReducers({
+    chatReducer,
     confessionReducer,
     modalsReducer,
     SearchReducer,

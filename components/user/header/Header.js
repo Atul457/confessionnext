@@ -17,7 +17,7 @@ const Header = (props) => {
 
   // Hooks and vars
   const store = useSelector(store => store)
-  const { socialLinksModalReducer, notificationReducer } = store
+  const { socialLinksModalReducer, chatReducer } = store
   const dispatch = useDispatch()
   const heartCompRef = useRef(null)
 
@@ -27,7 +27,7 @@ const Header = (props) => {
     const scroll = () => {
       let htmlPostElem = document.querySelector("html")
       if (heartCompRef?.current) {
-        if (htmlPostElem?.scrollTop > 600) heartCompRef?.current?.classList?.remove("hideHeartComp")
+        if (htmlPostElem?.scrollTop > 600 && !chatReducer.chatVisible) heartCompRef?.current?.classList?.remove("hideHeartComp")
         else if (htmlPostElem.crollHeight > 1000) heartCompRef?.current?.classList?.add("hideHeartComp")
       }
     }
@@ -40,9 +40,12 @@ const Header = (props) => {
 
   useEffect(() => {
     let htmlPostElem = document.querySelector("html")
-    if (htmlPostElem?.scrollHeight < 1000) heartCompRef?.current?.classList?.remove("hideHeartComp")
-    else heartCompRef?.current?.classList?.add("hideHeartComp")
+    if (heartCompRef?.current) {
+      if (htmlPostElem?.scrollHeight < 1000 && !chatReducer.chatVisible) heartCompRef?.current?.classList?.remove("hideHeartComp")
+      else heartCompRef?.current?.classList?.add("hideHeartComp")
+    }
   }, [store])
+  
 
   // Functions
 
