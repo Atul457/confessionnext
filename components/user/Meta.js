@@ -14,7 +14,7 @@ const Meta = (props) => {
 
   return (
     <Head>
-      <meta charset="utf-8" />
+      <meta charSet="utf-8" />
       <link rel="icon" href="/favicon.ico" />
 
       {/* HTML Meta Tags */}
