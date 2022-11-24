@@ -1,12 +1,9 @@
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
-// import { http } from '../../../commonApi';
-// import { forgotUPassActionCreators } from '../../../redux/actions/forgotUPassword';
-// import statuses from '../../../redux/reducers/forgotUpReducer';
 import { Modal } from 'react-bootstrap';
 import { http } from '../../../utils/http';
 import statuses from '../../../redux/reducers/forgotUpReducer';
-// import { forgotUPassActionCreators } from '../../../redux/actions/forgotUPassword';
+import { forgotUPassActionCreators } from '../../../redux/actions/forgotUPassword';
 
 const ForgotPassModal = () => {
 

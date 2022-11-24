@@ -1,8 +1,9 @@
 import React, { useRef, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleShareWithLoveModal } from "../../../redux/actions/shareWithLoveAc/shareWithLoveAc";
 import AppLogo from "../../common/AppLogo";
 import { HeartComponent, ShareWithLoveModal, AppreciationModal } from "../modals/Sharepostwithlove";
+import SocialLinksModal from "../modals/SocialLinksModal";
 import HeadMenu from "./HeadMenus";
 import UserIcon from "./UserIcon";
 
@@ -15,6 +16,7 @@ const Header = (props) => {
   // };
 
   // Hooks and vars
+  const { socialLinksModalReducer } = useSelector(store => store)
   const dispatch = useDispatch()
   const heartCompRef = useRef(null)
 
@@ -48,7 +50,7 @@ const Header = (props) => {
       <header className="mainHead col-12 posFixedForHeader">
         <div className="insideHeader">
           <div className="headerLeftCol pl-0">
-            <span to="/home" className="homeHeaderLink">
+            <span to="/" className="homeHeaderLink">
               <AppLogo />
             </span>
           </div>
@@ -84,6 +86,12 @@ const Header = (props) => {
         ref={heartCompRef}>
         <HeartComponent />
       </div>
+
+
+      {/* SOCIAL LINKS MODAL */}
+      <SocialLinksModal
+        visible={socialLinksModalReducer.visible}
+      />
     </>
   );
 };

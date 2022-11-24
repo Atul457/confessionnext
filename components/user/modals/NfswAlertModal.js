@@ -120,7 +120,7 @@ const NfswAlertModal = ({ nfsw_modal, ...rest }) => {
     const getCloseBtn = () => {
         const closeBtnHtml = (
             <button
-                className="reqModalFootBtns"
+                className="reqModalFootBtns text-white"
                 variant="primary"
                 onClick={() => closeModal(false)}
             >

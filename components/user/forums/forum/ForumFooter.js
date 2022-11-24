@@ -11,6 +11,8 @@ import { forum_types, requestedStatus } from '../detailPage/comments/ForumCommPr
 import { toggleNfswModal } from '../../../../redux/actions/modals/ModalsAc';
 import { reqToJoinModalAcFn } from '../../../../redux/actions/forumsAc/forumsAc';
 
+import Link from 'next/link';
+
 const { checkAuth } = auth
 
 const ForumFooter = (props) => {
@@ -97,7 +99,9 @@ const ForumFooter = (props) => {
             <>
                 {!session && is_calledfrom_detailPage ?
                     <span className="feedPageLoginBtnCont postLoginBtnCont">
-                        <div className="categoryOfUser enhancedStyle mb-0" type="button">Login to comment</div>
+                        <Link href="/login">
+                            <div className="categoryOfUser enhancedStyle mb-0" type="button">Login to comment</div>
+                        </Link>
                     </span>
                     : ""}
                 <pre className="preToNormal post cursor_pointer" onClick={() => {

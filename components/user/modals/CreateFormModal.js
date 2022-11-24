@@ -338,7 +338,7 @@ const CreateFormModal = () => {
               : null}
 
             <button
-              className="reqModalFootBtns"
+              className="reqModalFootBtns text-white"
               variant="primary"
               type="submit"
               disabled={isLoading}

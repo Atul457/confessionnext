@@ -969,7 +969,7 @@ a.create_forum_btn:hover {
 
 .confessImgContInCaptha {
   width: 100%;
-  height: 167px;
+  text-align: center;
 }
 
 
@@ -1013,7 +1013,10 @@ a.create_forum_btn:hover {
 }
 
 .confessImgContInCaptha img {
-  width: 100%;
+  max-height: 140px;
+  width: auto;
+  margin: 0 auto;
+  max-width: 100%;
 }
 
 .doPostBtn {
@@ -2077,12 +2080,12 @@ span.offlineColor {
 .friendRequestsHImgCont {
   all: unset;
   width: 40px;
+  min-width: 40px;
   height: 40px;
   position: relative;
   border-radius: 50%;
 }
 
-/* .friendRequestsHImgCont{width: 50px;height: 50px;border-radius: 50%;overflow: hidden;} */
 
 .editProfile {
   text-decoration: underline;
@@ -5312,6 +5315,7 @@ i.viewPrevPostIn:hover+.ljkdjfkl {
   width: 60%;
   margin: 10px auto;
   overflow: hidden;
+  height: fit-content;
 }
 
 .replyContainer .textAreaToComment {
@@ -8153,10 +8157,6 @@ button.modalFootBtns.btn a:hover {
 
   .admin .category {
     padding-right: 30px;
-  }
-
-  .confessImgContInCaptha {
-    height: 70px;
   }
 
   .seach_boxinput::placeholder {

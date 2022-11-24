@@ -262,74 +262,75 @@ const Post = (props) => {
   };
 
   return (
-    <div className="postCont confession_cont" index={post.index}>
-      {ShareReducer &&
-        ShareReducer.selectedPost?.id === post.confession_id &&
-        ShareReducer.sharekitShow && <div className="shareKitSpace"></div>}
-
-      {userDetails && post.isReported !== 2 && (
-        <span className="reportPost" onClick={openReportPostModal}>
-          <i
-            className="fa fa-exclamation-circle reportComIcon"
-            aria-hidden="true"
-          ></i>
-        </span>
-      )}
-
-      <span
-        type="button"
-        className={`sharekitdots withBg ${sharekit === false ? "justify-content-end" : ""
-          } ${!post.deletable ? "resetRight" : ""}`}
-        onClick={() =>
-          _toggleShareReqPopUp(
-            post.confession_id,
-            ShareReducer.selectedPost?.id === post.confession_id
-              ? !ShareReducer.selectedPost?.value
-              : true
-          )
-        }
-      >
+    <>
+      {post ? <div className="postCont confession_cont" index={post.index}>
         {ShareReducer &&
           ShareReducer.selectedPost?.id === post.confession_id &&
-          ShareReducer.selectedPost?.isPost === true &&
-          ShareReducer.sharekitShow && (
-            <ShareKit
-              postData={{
-                confession_id: post.slug,
-                description: post.description,
-              }}
-              closeShareReqPopUp={closeShareReqPopUp}
-            />
-          )}
-        <Image
-          src="/images/actionIconImg.svg"
-          width={20}
-          height={20}
-          alt="shareKit"
-          className="shareKitImgIcon"
-        />
-      </span>
+          ShareReducer.sharekitShow && <div className="shareKitSpace"></div>}
 
-      {/* Share/Request popup */}
-
-      {ShareReducer &&
-        ShareReducer.selectedPost?.id === post.confession_id &&
-        ShareReducer.selectedPost?.value === true &&
-        ShareReducer.selectedPost?.isPost === true && (
-          <ShareRequestPopUp
-            toggleSharekit={() =>
-              _toggleSharekit(
-                post.confession_id,
-                !ShareReducer.sharekitShow?.value
-              )
-            }
-            isNotFriend={post.isNotFriend}
-            openFrReqModalFn={openFrReqModalFn_Post}
-            closeShareMenu={closeShareMenu}
-          />
+        {userDetails && post.isReported !== 2 && (
+          <span className="reportPost" onClick={openReportPostModal}>
+            <i
+              className="fa fa-exclamation-circle reportComIcon"
+              aria-hidden="true"
+            ></i>
+          </span>
         )}
 
-      {/*
+        <span
+          type="button"
+          className={`sharekitdots withBg ${sharekit === false ? "justify-content-end" : ""
+            } ${!post.deletable ? "resetRight" : ""}`}
+          onClick={() =>
+            _toggleShareReqPopUp(
+              post.confession_id,
+              ShareReducer.selectedPost?.id === post.confession_id
+                ? !ShareReducer.selectedPost?.value
+                : true
+            )
+          }
+        >
+          {ShareReducer &&
+            ShareReducer.selectedPost?.id === post.confession_id &&
+            ShareReducer.selectedPost?.isPost === true &&
+            ShareReducer.sharekitShow && (
+              <ShareKit
+                postData={{
+                  confession_id: post.slug,
+                  description: post.description,
+                }}
+                closeShareReqPopUp={closeShareReqPopUp}
+              />
+            )}
+          <Image
+            src="/images/actionIconImg.svg"
+            width={20}
+            height={20}
+            alt="shareKit"
+            className="shareKitImgIcon"
+          />
+        </span>
+
+        {/* Share/Request popup */}
+
+        {ShareReducer &&
+          ShareReducer.selectedPost?.id === post.confession_id &&
+          ShareReducer.selectedPost?.value === true &&
+          ShareReducer.selectedPost?.isPost === true && (
+            <ShareRequestPopUp
+              toggleSharekit={() =>
+                _toggleSharekit(
+                  post.confession_id,
+                  !ShareReducer.sharekitShow?.value
+                )
+              }
+              isNotFriend={post.isNotFriend}
+              openFrReqModalFn={openFrReqModalFn_Post}
+              closeShareMenu={closeShareMenu}
+            />
+          )}
+
+        {/*
           Cancelreq :
           0 : Show nothing
           1 : Show request
@@ -337,259 +338,259 @@ const Post = (props) => {
           3: Already friend
       */}
 
-      {/* If post is deletable the delete icon will be shown */}
+        {/* If post is deletable the delete icon will be shown */}
 
-      {post.deletable === true && (
-        <i
-          className="fa fa-trash pr-3 deletePostIcon"
-          type="button"
-          aria-hidden="true"
-          onClick={deletePost}
-        ></i>
-      )}
+        {post.deletable === true && (
+          <i
+            className="fa fa-trash pr-3 deletePostIcon"
+            type="button"
+            aria-hidden="true"
+            onClick={deletePost}
+          ></i>
+        )}
 
-      {/* Shows unread comments on post */}
+        {/* Shows unread comments on post */}
 
-      {post.unread_comments && post.unread_comments !== 0 ? (
-        <span className="unreadPostCommentCount">
-          {post.unread_comments}{" "}
-          {post?.unread_comments === 1 ? "New Reply" : "New Replies"}
-        </span>
-      ) : (
-        ""
-      )}
-
-      <div className="postContHeader">
-        {
-          lightBox &&
-          post?.image &&
-          (post?.image).length !== 0 &&
-          ((post?.image).length > 1 ? (
-            <Lightbox
-              images={post?.image}
-              onClose={() => {
-                handleLightBoxFn(false);
-              }}
-            /> //Multiple images
-          ) : (
-            <Lightbox
-              image={post?.image}
-              onClose={() => {
-                handleLightBoxFn(false);
-              }}
-            />
-          )) //Single image
-        }
-
-        <span className="leftContofPostCont">
-          <span className="userImage userImageFeed">
-            <ProfileIcon
-              email_verified={post?.email_verified}
-              openFrReqModalFn_Post={openFrReqModalFn_Post}
-              profileImg={post?.profileImg}
-              isNotFriend={post?.isNotFriend}
-            />
+        {post.unread_comments && post.unread_comments !== 0 ? (
+          <span className="unreadPostCommentCount">
+            {post.unread_comments}{" "}
+            {post?.unread_comments === 1 ? "New Reply" : "New Replies"}
           </span>
+        ) : (
+          ""
+        )}
 
-          {/* Not anonymous :: Opens current logged in user's profile,
+        <div className="postContHeader">
+          {
+            lightBox &&
+            post?.image &&
+            (post?.image).length !== 0 &&
+            ((post?.image).length > 1 ? (
+              <Lightbox
+                images={post?.image}
+                onClose={() => {
+                  handleLightBoxFn(false);
+                }}
+              /> //Multiple images
+            ) : (
+              <Lightbox
+                image={post?.image}
+                onClose={() => {
+                  handleLightBoxFn(false);
+                }}
+              />
+            )) //Single image
+          }
+
+          <span className="leftContofPostCont">
+            <span className="userImage userImageFeed">
+              <ProfileIcon
+                email_verified={post?.email_verified}
+                openFrReqModalFn_Post={openFrReqModalFn_Post}
+                profileImg={post?.profileImg}
+                isNotFriend={post?.isNotFriend}
+              />
+            </span>
+
+            {/* Not anonymous :: Opens current logged in user's profile,
                 if the post is posted by the logged in user, and he had not posted the post as anonymous,
                 else this will open the profile of the user, who have posted the post, not as anonymous
                 Anonymous :: Will not do any thing
                 */}
 
-          <VisitPrivilege post={post} />
+            <VisitPrivilege post={post} />
 
-          <Badge points={post?.points} />
+            <Badge points={post?.points} />
 
-          {!isCoverTypePost && (
-            <span className="catCommentBtnCont">
-              <div className="categoryOfUser">
-                {post?.category_name?.charAt(0) +
-                  post?.category_name?.slice(1)?.toLowerCase()}
+            {!isCoverTypePost && (
+              <span className="catCommentBtnCont">
+                <div className="categoryOfUser">
+                  {post?.category_name?.charAt(0) +
+                    post?.category_name?.slice(1)?.toLowerCase()}
+                </div>
+              </span>
+            )}
+
+            <span className="postCreatedTime">
+              {dateConverter(post?.created_at)}
+            </span>
+
+          </span>
+        </div>
+        <div
+          className={`postBody ${isCoverTypePost ? "coverTypePost" : ""} ${isAnyUnreadComment ? "addMargin" : ""
+            }`}
+          style={postBg}
+        >
+          <Link className="links text-dark" href={`/confession/${post?.slug}`}>
+            <div className="postedPost mb-2">
+              <pre className="preToNormal post">{post.description}</pre>
+              {post?.description?.split("").length >= noOfWords[0] ||
+                post?.description?.split("\n").length > 5 ? (
+                <>
+                  {post?.description?.split("").length >= noOfWords[0] &&
+                    post?.description?.split("\n").length < 5 && (
+                      <span className="ellipsesStyle">... </span>
+                    )}
+                  <span
+                    toberedirectedhref={post.confession_id}
+                    className="viewMoreBtn pl-1"
+                  >
+                    view more
+                  </span>
+                </>
+              ) : (
+                ""
+              )}
+            </div>
+          </Link>
+
+          {/* If img url will be string then images will not be shown */}
+
+          {post.image !== null &&
+            post.image?.length > 0 &&
+            typeof post?.image !== "string" && (
+              <div className="form-group imgPreviewCont mt-2 mb-0">
+                <div
+                  className="imgContForPreviewImg fetched"
+                  type="button"
+                  onClick={() => {
+                    handleLightBoxFn(true);
+                  }}
+                >
+                  {post.image.map((srcg, index) => {
+                    return (
+                      <span
+                        className="uploadeImgWrapper fetched"
+                        key={`uploadeImgWrapper${index}`}
+                      >
+                        <img
+                          key={"srcg" + index}
+                          src={srcg}
+                          alt=""
+                          className="previewImg"
+                        />
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
+            )}
+        </div>
+
+        {userDetails && (
+          <>
+            <div className="container-fluid inputWithForwardCont">
+              <div className="textAreaToComment w-100">
+                <TextareaAutosize
+                  type="text"
+                  maxLength={maxChar}
+                  row="1"
+                  value={comment}
+                  onKeyDown={(e) => {
+                    checkKeyPressed(e);
+                  }}
+                  onChange={(e) => {
+                    setComment(e.target.value);
+                  }}
+                  className="form-control"
+                ></TextareaAutosize>
+              </div>
+              <div
+                className="arrowToAddComment"
+                id="userPostCommentIcon"
+                type="button"
+                onClick={() => {
+                  doComment();
+                }}
+              >
+                <img
+                  src="/images/forwardIcon.svg"
+                  alt="forwardIcon"
+                  className="forwardIconContImg"
+                />
+              </div>
+            </div>
+            <span className="d-block errorCont text-danger mb-2 moveUp">
+              {requiredError}
+            </span>
+          </>
+        )}
+
+        <div className="postFoot">
+          {!userDetails && (
+            <span className="feedPageLoginBtnCont postLoginBtnCont">
+              <Link href="/login">
+                <div className="categoryOfUser enhancedStyle mb-0" type="button">
+                  Login to comment
+                </div>
+              </Link>
             </span>
           )}
 
-          <span className="postCreatedTime">
-            {dateConverter(post?.created_at)}
-          </span>
-
-        </span>
-      </div>
-      <div
-        className={`postBody ${isCoverTypePost ? "coverTypePost" : ""} ${isAnyUnreadComment ? "addMargin" : ""
-          }`}
-        style={postBg}
-      >
-        <Link className="links text-dark" href={`/confession/${post?.slug}`}>
-          <div className="postedPost mb-2">
-            <pre className="preToNormal post">{post.description}</pre>
-            {post.description.split("").length >= noOfWords[0] ||
-              post.description.split("\n").length > 5 ? (
-              <>
-                {post.description.split("").length >= noOfWords[0] &&
-                  post.description.split("\n").length < 5 && (
-                    <span className="ellipsesStyle">... </span>
-                  )}
-                <span
-                  toberedirectedhref={post.confession_id}
-                  className="viewMoreBtn pl-1"
-                >
-                  view more
-                </span>
-              </>
-            ) : (
-              ""
-            )}
-          </div>
-        </Link>
-
-        {/* If img url will be string then images will not be shown */}
-
-        {post.image !== null &&
-          post.image.length > 0 &&
-          typeof post.image !== "string" && (
-            <div className="form-group imgPreviewCont mt-2 mb-0">
+          <div
+            className={`iconsCont ${authenticated === false ? "mainDesignOnWrap" : ""
+              }`}
+          >
+            <Link className="links text-dark" href={`/confession/${post?.slug}`}>
               <div
-                className="imgContForPreviewImg fetched"
+                className="upvote_downvote_icons_cont underlineShareCount ml-0"
                 type="button"
-                onClick={() => {
-                  handleLightBoxFn(true);
-                }}
               >
-                {post.image.map((srcg, index) => {
-                  return (
-                    <span
-                      className="uploadeImgWrapper fetched"
-                      key={`uploadeImgWrapper${index}`}
-                    >
-                      <img
-                        key={"srcg" + index}
-                        src={srcg}
-                        alt=""
-                        className="previewImg"
-                      />
-                    </span>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-      </div>
-
-      {userDetails && (
-        <>
-          <div className="container-fluid inputWithForwardCont">
-            <div className="textAreaToComment w-100">
-              <TextareaAutosize
-                type="text"
-                maxLength={maxChar}
-                row="1"
-                value={comment}
-                onKeyDown={(e) => {
-                  checkKeyPressed(e);
-                }}
-                onChange={(e) => {
-                  setComment(e.target.value);
-                }}
-                className="form-control"
-              ></TextareaAutosize>
-            </div>
-            <div
-              className="arrowToAddComment"
-              id="userPostCommentIcon"
-              type="button"
-              onClick={() => {
-                doComment();
-              }}
-            >
-              <img
-                src="/images/forwardIcon.svg"
-                alt="forwardIcon"
-                className="forwardIconContImg"
-              />
-            </div>
-          </div>
-          <span className="d-block errorCont text-danger mb-2 moveUp">
-            {requiredError}
-          </span>
-        </>
-      )}
-
-      <div className="postFoot">
-        {!userDetails && (
-          <span className="feedPageLoginBtnCont postLoginBtnCont">
-            <Link href="/login">
-              <div className="categoryOfUser enhancedStyle mb-0" type="button">
-                Login to comment
+                <Image
+                  src="/images/viewsCountIcon.svg"
+                  alt="viewCount"
+                  width={20}
+                  height={20}
+                />
+                <span className="count">{post?.viewcount ?? 0}</span>
               </div>
             </Link>
-          </span>
-        )}
+            <Link className="links text-dark" href={`/confession/${post?.slug}`}>
+              <div className="upvote_downvote_icons_cont" type="button">
+                <Image
+                  src="/images/commentCountIcon.svg"
+                  alt="commentCount"
+                  width={20}
+                  height={20}
+                />
+                <span className="count">{post?.no_of_comments ?? 0}</span>
+              </div>
+            </Link>
 
-        <div
-          className={`iconsCont ${authenticated === false ? "mainDesignOnWrap" : ""
-            }`}
-        >
-          <Link className="links text-dark" href={`/confession/${post?.slug}`}>
-            <div
-              className="upvote_downvote_icons_cont underlineShareCount ml-0"
-              type="button"
-            >
-              <Image
-                src="/images/viewsCountIcon.svg"
-                alt="viewCount"
-                width={20}
-                height={20}
-              />
-              <span className="count">{post?.viewcount ?? 0}</span>
-            </div>
-          </Link>
-          <Link className="links text-dark" href={`/confession/${post?.slug}`}>
-            <div className="upvote_downvote_icons_cont" type="button">
-              <Image
-                src="/images/commentCountIcon.svg"
-                alt="commentCount"
-                width={20}
-                height={20}
-              />
-              <span className="count">{post?.no_of_comments ?? 0}</span>
-            </div>
-          </Link>
-
-          {post.hasOwnProperty("is_liked") && !post.hasOwnProperty("myprofile") ? (
-            <div className="iconsMainCont">
-              <div className={`upvote_downvote_icons_cont buttonType`}>
-                {post?.is_liked === 1 ? (
+            {post.hasOwnProperty("is_liked") && !post.hasOwnProperty("myprofile") ? (
+              <div className="iconsMainCont">
+                <div className={`upvote_downvote_icons_cont buttonType`}>
+                  {post?.is_liked === 1 ? (
+                    <img
+                      alt={"likeIcon"}
+                      src="/images/upvoted.svg"
+                      onClick={() => upvoteOrDownvote(false)}
+                    />
+                  ) : (
+                    <img
+                      alt={"dislikeIcon"}
+                      src="/images/upvote.svg"
+                      onClick={() => upvoteOrDownvote(true)}
+                    />
+                  )}
+                  <span className="count">{post?.like}</span>
+                </div>
+              </div>
+            ) : (
+              <div className="iconsMainCont">
+                <div className={`upvote_downvote_icons_cont`}>
                   <img
                     alt={"likeIcon"}
-                    src="/images/upvoted.svg"
-                    onClick={() => upvoteOrDownvote(false)}
-                  />
-                ) : (
-                  <img
-                    alt={"dislikeIcon"}
                     src="/images/upvote.svg"
-                    onClick={() => upvoteOrDownvote(true)}
                   />
-                )}
-                <span className="count">{post?.like}</span>
+                  <span className="count">{post?.like}</span>
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="iconsMainCont">
-              <div className={`upvote_downvote_icons_cont`}>
-                <img
-                  alt={"likeIcon"}
-                  src="/images/upvote.svg"
-                />
-                <span className="count">{post?.like}</span>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-      </div>
-    </div>
+      </div> : null}</>
   );
 };
 

@@ -1,10 +1,9 @@
 import React from 'react';
 import { Modal } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
-import instaSocial from '../../../images/instaSocial.svg'
-import TwitterSocial from '../../../images/TwitterSocial.svg'
-import tiktokSocial from '../../../images/tiktokSocial.svg'
-import fbSocial from '../../../images/fbSocial.svg'
+// import TwitterSocial from '../../../images/TwitterSocial.svg'
+// import tiktokSocial from '../../../images/tiktokSocial.svg'
+// import fbSocial from '../../../images/fbSocial.svg'
 import openSLinksModalActionCreators from '../../../redux/actions/socialLinksModal';
 
 
@@ -26,22 +25,22 @@ const SocialLinksModal = (props) => {
                     <ul>
                         <li>
                             <a target="blank" href="https://www.facebook.com/TheTalkPlaceOfficial">
-                                <img src={fbSocial} alt="fbSocialIcon" />
+                                <img src="/images/fbSocial.svg" alt="fbSocialIcon" />
                             </a>
                         </li>
                         <li>
                             <a target="blank" href="http://twitter.com/the_talkplace">
-                                <img src={TwitterSocial} alt="TwitterSocialIcon" />
+                                <img src="/images/TwitterSocial.svg" alt="TwitterSocialIcon" />
                             </a>
                         </li>
                         <li>
                             <a target="blank" href="https://www.instagram.com/the_talkplace_official/">
-                                <img src={instaSocial} alt="instaSocialIcon" />
+                                <img src="/images/instaSocial.svg" alt="instaSocialIcon" />
                             </a>
                         </li>
                         <li>
                             <a target="blank" href="http://TikTok.com/@the_talkplace">
-                                <img src={tiktokSocial} alt="tiktokSocialIcon" />
+                                <img src="/images/tiktokSocial.svg" alt="tiktokSocialIcon" />
                             </a>
                         </li>
                     </ul>

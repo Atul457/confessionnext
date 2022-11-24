@@ -209,7 +209,7 @@ export default function CommentsGot(props) {
 
     // TAKES YOU TO THE HOME PAGE, AND LOADS THE ACTIVECAT CONFESSION DATA
     const updateActiveCategory = (activeCat) => {
-        history(`/home`, { state: { active: activeCat } });
+        history(`/`, { state: { active: activeCat } });
     }
 
     // UPDATES THE CONFESSION DATA ON THE COMMENTS GOT PAGE

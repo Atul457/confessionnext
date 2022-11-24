@@ -13,7 +13,7 @@ export default function LgSidebar(props) {
                     <AppLogo />
                 </div>
 
-                <Link href={`${props?.removeLink === true ? "#" : "/home"}`} className='textDecNone'>
+                <Link href={`${props?.removeLink === true ? "#" : "/"}`} className='textDecNone'>
                     <div className="middleContLoginReg">
                         <div className="confesstText">
                             {props.middleTitle}

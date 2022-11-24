@@ -19,6 +19,7 @@ import VerifyEmailModal from "../modals/VerifyEmailModal";
 import _ from "lodash";
 import { isWindowPresent } from "../../../utils/checkDom";
 import { getForumsNConfessions } from "../../../services/user/forumServices";
+import openSLinksModalActionCreators from "../../../redux/actions/socialLinksModal";
 
 
 const UserIcon = () => {
@@ -449,6 +450,16 @@ const UserIcon = () => {
 
   return (
     <>
+
+      {!session ? <div
+        className='socialLinksIconWrapper authProfileIcon'
+        pulsate='07-07-22,pulsatingIcon mobile'>
+        <img
+          src="/images/socialLinksIcon.svg"
+          alt="socialLinksIcon"
+          onClick={openSocialLinksModal} />
+      </div> : null}
+
       {session ? (
         <>
           {/* Email verification modal */}

@@ -282,7 +282,7 @@ export default function Home({ userDetails }) {
             category_id: selectedCat,
             post_as_anonymous: post_as_anonymous,
             image: JSON.stringify(imgPathArr),
-            code: token === "" ? recapToken : "",
+            code: token === "" ? recapToken : ""
           };
 
           //PRIVAY MODAL :: RUNS IF NOT AUTHENTICATED
@@ -324,12 +324,15 @@ export default function Home({ userDetails }) {
               setErrorOrSuccess(true);
               description.value = "";
               setSelectedCat("");
-              getConfessions(false, activeCategory, 1);
+              getConfessions(false, 1, activeCategory);
               feedPostConfResponseCont.innerHTML = response.data.message;
               if (base64Src.length) setBase64Src([]);
               if (imgPathArr) setImgPathArr([]);
             } else {
               setErrorOrSuccess(false);
+              responseCont.forEach((singleResCont) => {
+                singleResCont.innerText = response.data.message;
+              });
               feedPostConfResponseCont.innerHTML = response.data.message;
             }
 
@@ -344,7 +347,7 @@ export default function Home({ userDetails }) {
               feedPostConfResponseCont.innerHTML = "";
             }, 2000);
           } catch (err) {
-            console.log(err);
+            console.log(err?.message ?? "something went wrong");
             setErrorOrSuccess(false);
             updatePostBtn(false);
             setIsLoading(false);
@@ -505,12 +508,9 @@ export default function Home({ userDetails }) {
         resolve();
       }, 200);
     });
-    if (activeCategory === "all") return getConfessions(false, "all", 1);
+    if (activeCategory === "all") return getConfessions(false, 1, "all");
     setActiveCategory("all");
   };
-
-  // if (confessions.length === 0 && confessionRed.status === apiStatus.LOADING)
-  //   return <Loader size="sm" className="mx-auto" />;
 
   if (confessionRed.status === apiStatus.REJECTED)
     return <ErrorFlash message={confessionRed.message} />;
@@ -525,10 +525,9 @@ export default function Home({ userDetails }) {
             like minds. Get answers to questions. You are Anonymous
           </div>
           <div className="confessImgContInCaptha">
-            <Image
+            <img
               src="/images/confessionBanner.png"
               alt="confessionBanner"
-              fill={true}
             />
           </div>
         </div>
