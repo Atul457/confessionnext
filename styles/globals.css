@@ -4829,7 +4829,8 @@ a.headerNavLinks.active::after {
 }
 
 .chatOutestCont {
-  height: calc(100vh - 60px);
+  /* height: calc(100vh - 60px); */
+  height: calc(100vh - 110px);
 }
 
 .iconsMainCont {
@@ -7640,6 +7641,7 @@ button.modalFootBtns.btn a:hover {
 
   .goDownArrowWrapper {
     position: fixed;
+    left: 0px;
     max-width: 540px;
     bottom: 60px;
     z-index: 10;
