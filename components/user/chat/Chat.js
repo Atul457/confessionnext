@@ -772,7 +772,7 @@ export default function Chat() {
                                 <div className={`allChatsCont scrollbar ${toggleView.chat ? "d-block" : " d-none"} d-md-block`} id="style-2" height={`${window.innerWidth - 13}`}>
 
                                     <InfiniteScroll
-                                        scrollableTarget={`${((window.innerWidth - 13) > 768) ? 'style-2' : ''}`}
+                                        scrollableTarget={`style-2`}
                                         endMessage={<div className="endListMessage text-center chatEndListMessage mt-2">End of Chat List</div>}
                                         dataLength={myFriends.data.count}
                                         next={fetchMoreFriends}

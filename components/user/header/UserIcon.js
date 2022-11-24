@@ -93,6 +93,11 @@ const UserIcon = () => {
     getNotiStatus();
   }, [notificationReducer.data]);
 
+  // GETS THE COUNT OF NEW REQUESTS
+  useEffect(() => {
+    if (session) getUnreadCommentsCount();
+  }, [session])
+
   useEffect(() => {
     const listener = (e) => {
       const toIgnore = ["seach_boxinput", "headerUserAccIcon", "search_box"];

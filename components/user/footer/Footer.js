@@ -8,19 +8,9 @@ import { useSession } from "next-auth/react"
 
 const Footer = (props) => {
 
-  const router = useRouter();
   const { data: session } = useSession()
-  // const [currUrl, setCurrUrl] = useState("__");
-  // let currentUrl = currUrl;
-  // const location = router.pathname;
-  // currentUrl = currentUrl?.split("/");
-  // currentUrl = currentUrl[currentUrl.length - 1];
   const notificationReducer = useSelector((store) => store.notificationReducer);
-
-  useEffect(() => {
-    // setCurrUrl(window.location.href);
-  }, []);
-
+  
   return (
     <footer className="col-12 d-block d-md-none footer">
       <div className="linksCont container-fluid">
