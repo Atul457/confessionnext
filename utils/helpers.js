@@ -17,7 +17,7 @@ const getIP = async () => {
       }
     }
   } catch (err) {
-    console.log(err?.message, "ip could not be loaded");
+    console.log(err?.message, "ip could not be loaded.");
   }
 };
 
