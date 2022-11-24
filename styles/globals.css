@@ -28,12 +28,6 @@
   margin-left: 380px;
 }
 
-.bounceOff {
-  position: fixed;
-  overflow: hidden;
-  width: 100%;
-}
-
 @font-face {
   font-family: 'playballregular';
   src: url('/fonts/playball_400-webfont.woff') format('woff2'),
@@ -1936,7 +1930,7 @@ span.offlineColor {
   position: relative;
   color: var(--whiteColor);
   border-radius: 10px;
-  z-index: -1;
+  /* z-index: -1; */
   background-color: var(--primaryColor);
   margin-right: 20px;
 }
@@ -4828,10 +4822,10 @@ a.headerNavLinks.active::after {
   border: 1px solid var(--orangeColor)
 }
 
-.chatOutestCont {
+/* .chatOutestCont { */
   /* height: calc(100vh - 60px); */
-  height: calc(100vh - 110px);
-}
+  /* height: calc(100vh - 110px); */
+/* } */
 
 .iconsMainCont {
   display: flex;
@@ -7253,6 +7247,8 @@ button.modalFootBtns.btn a:hover {
 
   .chatOutestCont {
     /* height: calc(100vh - 120px - 75px); */
+    padding-left: 0px !important;
+    padding-right: 0px !important;
     height: calc(100vh - 270px);
     margin-top: 120px;
     padding-bottom: 0px !important;
@@ -8208,6 +8204,13 @@ button.modalFootBtns.btn a:hover {
   .profile_page .leftColumnWrapper {
     border-bottom: 1px solid #fff;
   }
+
+  .bounceOff {
+    position: fixed;
+    overflow: hidden;
+    width: 100%;
+  }
+
 
 }
 

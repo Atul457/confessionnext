@@ -16,7 +16,6 @@ const HeadMenus = (props) => {
   const store = useSelector((store) => store);
   const notificationReducer = store.notificationReducer;
 
-
   return (
     <div className="d-none d-md-block pr-0">
       <div className={`linksCont container-fluid`}>

@@ -17,11 +17,11 @@ import { unFriendActionCreators } from '../../../redux/actions/unFriendReqModal'
 
 const { getToken } = auth
 
-export default function Chat({ session }) {
+export default function Chat() {
 
+    // Hooks and vars
     const router = useRouter()
     const params = router.query;
-
     const [showFriendsList, setShowFriendsList] = useState(false);
     const dispatch = useDispatch();
     const chatRef = useRef();
@@ -97,6 +97,14 @@ export default function Chat({ session }) {
         }
 
     }, [store])
+
+
+    useEffect(() => {
+        document.querySelector("body").classList.add("bounceOff")
+        return () => {
+            document.querySelector("body").classList.remove("bounceOff")
+        }
+    }, [])
 
 
     //SHOWS FRIEND REQUESTS
