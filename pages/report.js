@@ -87,20 +87,20 @@ export default function Report() {
 
         const executePostConfession = async () => {
 
-            token = session ? (!getKeyProfileLoc("token") ? recapToken : getKeyProfileLoc("token")) : recapToken;
+            token = getKeyProfileLoc("token") === false || !getKeyProfileLoc("token") ? "" : getKeyProfileLoc("token");
             setIsLoading(true);
 
             let createReportArr = {
                 ...data,
                 "message": data.description,
-                "code": token,
+                "code": recapToken,
                 "image": JSON.stringify(imgPathArr),
             };
 
 
             let obj = {
                 data: createReportArr,
-                token: session ? token : "",
+                token,
                 method: "post",
                 url: "postcomplains"
             }
