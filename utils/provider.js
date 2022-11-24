@@ -267,6 +267,11 @@ const avatars = envConfig.isProdMode
     },
   ];
 
+const layoutTypes = {
+  blank: "blank_layout",
+  userlayout: "user_layout"
+}
+
 export {
   showAdsAfter_Feed,
   maxCharAllowedOnPostComment,
@@ -275,5 +280,6 @@ export {
   next_auth_status,
   sharePWLTiles,
   avatars,
-  pageCategoryTypes
+  pageCategoryTypes,
+  layoutTypes
 };

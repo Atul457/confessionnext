@@ -38,9 +38,8 @@ import { forumHandlers } from "../redux/actions/forumsAc/forumsAc";
 import forumTypes from "../utils/data/forumTypes.json";
 import LgSidebar from "../components/common/LgSidebar";
 import { authOptions } from "../pages/api/auth/[...nextauth]";
-import { next_auth_status } from "../utils/provider";
+import { layoutTypes, next_auth_status } from "../utils/provider";
 import { resHandler } from "../utils/api";
-import { ExpandableForumCats } from "../components/user/Categories";
 
 // Google tag manager
 if (isWindowPresent()) {
@@ -54,7 +53,7 @@ if (isWindowPresent()) {
 
 // Meta-pixel
 if (envConfig.isProdMode) {
-  const options = { autoConfig: true, debug: false };
+  // const options = { autoConfig: true, debug: false };
   if (isWindowPresent()) {
     // ReactPixel.init(envConfig.pixelId, null, options);
     // ReactPixel.fbq('track', 'PageView');
@@ -188,24 +187,26 @@ const UserLayout = ({ children, additionalProps = false }) => {
           removeDefaultMeta={additionalProps?.removeDefaultMeta}
         />
 
-        <main className="container-fluid">
+        <main className={`container-fluid ${additionalProps?.layout ?? ""}`}>
           <div
             className={`row outerContWrapper${!additionalProps?.authPage ? " not_auth_page" : ""
               }${additionalProps?.profilePage ? " profile_page" : ""}`}
           >
 
             {additionalProps?.authPage ? null : (
-              <Header userDetails={userDetails} profilePage={additionalProps?.profilePage} />
+              <Header
+                userDetails={userDetails}
+                profilePage={additionalProps?.profilePage} />
             )}
-
-            {!additionalProps?.profilePage ?
-              <>
+            
+            {!additionalProps?.profilePage && !(additionalProps?.layout === layoutTypes.blank) ?
+              (<>
                 {additionalProps?.authPage ? (
                   <LgSidebar {...additionalProps.sideBarProps} />
                 ) : (
                   <Sidebar pageCategory={additionalProps?.pageCategory} />
                 )}
-              </>
+              </>)
               : null}
 
             <div

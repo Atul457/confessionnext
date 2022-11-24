@@ -1,0 +1,28 @@
+[
+    {
+        "id": 1,
+        "name": "Rude Behaviour"
+    },
+    {
+        "id": 2,
+        "name": "Communication Delay"
+    },
+    {
+        "id": 3,
+        "name": "Malfunction or Bug"
+    },
+    {
+        "id": 4,
+        "name": "Language Problem"
+    }
+    ,
+    {
+        "id": 5,
+        "name": "General enquiry"
+    }
+    ,
+    {
+        "id": 6,
+        "name": "Request a Feature"
+    }
+]
