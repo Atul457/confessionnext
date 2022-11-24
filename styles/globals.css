@@ -7589,8 +7589,8 @@ button.modalFootBtns.btn a:hover {
   .resetHeight {
     height: calc(100vh - 120px - 95px) !important;
     padding-bottom: 0px !important;
-    margin: 0px auto !important;
-    margin-top: 120px !important;
+    /* margin: 0px auto !important; */
+    /* margin-top: 120px !important; */
   }
 
   .rightSectionChat {
