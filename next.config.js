@@ -24,7 +24,11 @@ const nextConfig = {
   },
   images: {
     domains: ['cloudart.com.au'],
+    unoptimized: true,
   },
+  basePath: '/confessionnext',
+  assetPrefix: "/confessionnext",
+  distDir: 'build'
 }
 
 module.exports = nextConfig
