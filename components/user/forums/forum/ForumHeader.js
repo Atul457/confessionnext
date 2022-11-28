@@ -74,7 +74,7 @@ const ForumHeader = props => {
     const openNsfwModal = () => {
         dispatch(toggleNfswModal({
             isVisible: true,
-            forum_link: `/forums/${serverSideData?.slug}`,
+            forum_link: `/forums/${serverSideData?.slug ?? currForum?.slug}`,
             forum_id,
             rememberScrollPos,
             pageName,
