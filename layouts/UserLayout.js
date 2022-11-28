@@ -86,10 +86,12 @@ const UserLayout = ({ children, additionalProps = false }) => {
   });
 
   const dispatch = useDispatch();
-
-  console.log(session)
+  const loginPagePath = "/login"
 
   useEffect(() => {
+    if (session && router.pathname === loginPagePath) {
+      router.push("/")
+    }
     if (session && status === next_auth_status.authenticated) {
       const getProfileData = async () => {
         // Means that may have been inactivated or deleted form db

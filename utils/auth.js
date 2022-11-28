@@ -156,9 +156,9 @@ const logout = async () => {
   };
   try {
     await http(obj);
-    window.location.href = window.location.origin+"/login";
+    window.location.href = window.location.origin + "/login";
   } catch (err) {
-    window.location.href = window.location.origin+"/login";
+    window.location.href = window.location.origin + "/login";
   }
 };
 

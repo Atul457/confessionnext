@@ -13,6 +13,7 @@ const VerifyInfoModal = (props) => {
         SetAuth(0)
         window.location.href = window.location.origin + "/login"
     }
+    
     return (
         <>
             <Modal show={props.visible} centered size="md">

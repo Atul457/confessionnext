@@ -448,7 +448,7 @@ const UserIcon = () => {
 
   // Logs the user out
   const logout = async () => {
-    await signOut({ redirect: true, callbackUrl: "/login" });
+    await signOut({ redirect: true, callbackUrl: window.location.origin + "/login" });
     setAuth(0);
     localStorage.clear();
   };
