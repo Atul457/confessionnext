@@ -1,10 +1,13 @@
+import { useSession } from 'next-auth/react';
 import React, { useState } from 'react'
 import { Modal } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { UpdateUPassActionCreators } from '../../../redux/actions/updateUserPassword';
 import statuses from '../../../redux/reducers/updateUserPassReducer';
-import { fetchData } from '../../../commonApi';
-import auth from '../../behindScenes/Auth/AuthCheck';
+import auth from '../../../utils/auth';
+import { http } from '../../../utils/http';
+
+const { getKeyProfileLoc } = auth
 
 const passIniState = {
     pass: { value: '', type: "password" },
@@ -17,7 +20,7 @@ const UpdatePasswordModal = () => {
     const updateUserPassReducer = useSelector(store => store.updateUserPassReducer);
     const [password, setPassword] = useState(passIniState);
     const dispatch = useDispatch();
-
+    const session = useSession()
 
     const closeModal = () => {
         setPassword(passIniState);
@@ -68,23 +71,22 @@ const UpdatePasswordModal = () => {
 
         let token = '';
 
-        
+
         if (password.cpass.value === '' || password.pass.value === '' || password.old.value === '') {
             return dispatch(UpdateUPassActionCreators.updateErrorUpassModal("All fields are required"));
         }
 
 
-        if (password.pass.value.length < 6 || password.pass.value.length > 20){
+        if (password.pass.value.length < 6 || password.pass.value.length > 20) {
             return dispatch(UpdateUPassActionCreators.updateErrorUpassModal("Password length should be in between 6 to 20"));
         }
-        
+
         if (password.cpass.value !== password.pass.value) {
             return dispatch(UpdateUPassActionCreators.updateErrorUpassModal("Password and confirm password should be same"));
         }
 
-        if (auth()) {
-            token = localStorage.getItem("userDetails");
-            token = (JSON.parse(token)).token;
+        if (session) {
+            token = getKeyProfileLoc("token")
         }
 
         let data = {
@@ -100,7 +102,7 @@ const UpdatePasswordModal = () => {
         }
         try {
             dispatch(UpdateUPassActionCreators.changeStatusUPassModal(statuses.LOADING))
-            const res = await fetchData(obj)
+            const res = await http(obj)
             if (res.data.status === true) {
                 closeModal();
             } else {

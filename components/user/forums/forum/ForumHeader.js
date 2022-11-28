@@ -12,9 +12,6 @@ import { toggleNfswModal } from '../../../../redux/actions/modals/ModalsAc';
 import { forum_types, reportedFormStatus, requestedStatus } from '../detailPage/comments/ForumCommProvider';
 import ShareKit from '../../helpers/ShareKit';
 import { apiStatus } from '../../../../utils/api';
-import auth from '../../../../utils/auth';
-
-const { checkAuth } = auth
 
 
 const ForumHeader = props => {

@@ -52,6 +52,7 @@ const Forum = (props) => {
         category_name: currForum?.category_name,
         rememberScrollPos,
         pageName,
+        session,
         created_at: currForum?.created_at,
         name: currForum?.title,
         forum_id: currForum?.forum_id,
@@ -71,14 +72,13 @@ const Forum = (props) => {
         isMyForumPage
     }
 
-    // console.log(currForum)
-
     const requested = currForum?.is_requested === requestedStatus
     const forumFooterProps = {
         no_of_comments: currForum?.no_of_comments,
         viewcount: currForum?.viewcount ?? 0,
         forum_type,
         pageName,
+        session,
         isPinned,
         rememberScrollPos,
         showPin,

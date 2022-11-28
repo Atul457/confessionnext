@@ -4,6 +4,7 @@ import { toggleShareWithLoveModal } from "../../../redux/actions/shareWithLoveAc
 import AppLogo from "../../common/AppLogo";
 import { HeartComponent, ShareWithLoveModal, AppreciationModal } from "../modals/Sharepostwithlove";
 import SocialLinksModal from "../modals/SocialLinksModal";
+import UpdatePasswordModal from "../modals/UpdatePasswordModal";
 import HeadMenu from "./HeadMenus";
 import UserIcon from "./UserIcon";
 
@@ -103,6 +104,9 @@ const Header = (props) => {
       <SocialLinksModal
         visible={socialLinksModalReducer.visible}
       />
+
+      {/* UPDATE PASSWORD MODAL */}
+      <UpdatePasswordModal />
     </>
   );
 };

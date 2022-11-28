@@ -20,6 +20,7 @@ import _ from "lodash";
 import { isWindowPresent } from "../../../utils/checkDom";
 import { getForumsNConfessions } from "../../../services/user/forumServices";
 import openSLinksModalActionCreators from "../../../redux/actions/socialLinksModal";
+import { UpdateUPassActionCreators } from "../../../redux/actions/updateUserPassword";
 
 
 const UserIcon = () => {
@@ -448,7 +449,8 @@ const UserIcon = () => {
 
   // Logs the user out
   const logout = async () => {
-    await signOut({ redirect: true, callbackUrl: window.location.origin + "/login" });
+    alert({ callbackUrl: `${window.location.origin}/login` })
+    await signOut({ redirect: true, callbackUrl: `${window.location.origin}/login` });
     setAuth(0);
     localStorage.clear();
   };

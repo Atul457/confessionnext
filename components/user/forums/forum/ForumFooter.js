@@ -22,7 +22,6 @@ const ForumFooter = (props) => {
         no_of_comments,
         session,
         forum_type,
-        serverSideData,
         currForum,
         pageName = "",
         rememberScrollPos,

@@ -145,7 +145,7 @@ const SendRequestModal = () => {
 
             <ShowResComponent isError={isError} message={message} classList="w-100 text-center pb-2" />
             <button
-              className="reqModalFootBtns mt-3"
+              className="reqModalFootBtns mt-3 text-white"
               variant="primary"
               type="submit"
             >
