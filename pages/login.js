@@ -208,6 +208,7 @@ const Login = () => {
   };
 
   const register = async () => {
+
     let loginResponseCont = document.getElementById("loginResponseCont");
     if (privacyModal.accepted === true) {
       setIsLoading(true);
@@ -221,6 +222,8 @@ const Login = () => {
         source_id: sourceId,
       };
 
+      console.log(registerFromData)
+
       try {
         const res = await signIn("credentials", {
           ...registerFromData,
@@ -233,6 +236,7 @@ const Login = () => {
 
         if (res?.error) {
           loginResponseCont.innerHTML = res?.error;
+          console.log(JSON.stringify(res?.error))
           setErrorOrSuccess(false);
           return setIsLoading(false);
         }

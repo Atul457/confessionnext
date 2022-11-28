@@ -87,6 +87,8 @@ const UserLayout = ({ children, additionalProps = false }) => {
 
   const dispatch = useDispatch();
 
+  console.log(session)
+
   useEffect(() => {
     if (session && status === next_auth_status.authenticated) {
       const getProfileData = async () => {
