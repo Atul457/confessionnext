@@ -83,6 +83,7 @@ const SingleForum = props => {
         is_calledfrom_detailPage: true,
         isPinned,
         serverSideData,
+        push: router.push,
         session,
         showPin,
         forum_tags: serverSideData?.tags,

@@ -190,7 +190,7 @@ const UserLayout = ({ children, additionalProps = false }) => {
 
         <main className={`container-fluid ${additionalProps?.layout ?? ""} ${additionalProps?.authPage ? " auth_page" : "not_auth_page"}`}>
           <div
-            className={`row outerContWrapper${additionalProps?.profilePage ? " profile_page" : ""}`}
+            className={`row outerContWrapper${additionalProps?.profilePage ? " profile_page" : ""} ${additionalProps?.authPage ? " auth_page" : "not_auth_page"}`}
           >
 
             {additionalProps?.authPage ? null : (
@@ -225,7 +225,7 @@ const UserLayout = ({ children, additionalProps = false }) => {
                 {additionalProps?.authPage ? (
                   <>{updatedChildren}</>
                 ) : (
-                  <div className="w-100 py-md-4 p-0 p-md-3 preventFooter">
+                  <div className="w-100 py-md-4 p-0 p-md-3">
                     <div className="row forPosSticky">{updatedChildren}</div>
                   </div>
                 )}
@@ -239,6 +239,8 @@ const UserLayout = ({ children, additionalProps = false }) => {
             ) : null}
           </div>
         </main>
+
+        <div className="preventFooter"></div>
 
         <Footer />
         <LoadingBar color="#FC997C" ref={loaderRef} />

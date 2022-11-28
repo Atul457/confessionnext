@@ -26,8 +26,6 @@ const nextConfig = {
     domains: ['cloudart.com.au'],
     unoptimized: true,
   },
-  basePath: '/confessionnext',
-  assetPrefix: "/confessionnext",
   distDir: 'build'
 }
 

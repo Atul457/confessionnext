@@ -18,6 +18,7 @@ import { http } from '../../../../utils/http'
 import { scrollDetails, scrollToTop } from '../../../../utils/dom'
 import auth from '../../../../utils/auth'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/router'
 // import { WhatsNewAds } from '../../../user/pageElements/components/AdMob'
 
 const { getKeyProfileLoc } = auth
@@ -30,6 +31,7 @@ const MyForums = () => {
     forumTypes,
     modals
   } = useSelector(state => state.forumsReducer)
+  const router = useRouter()
   const { data: session } = useSession()
   const { requestToJoinModal, reportForumModal, deleteForumModal } = modals
   const cameback = scrollDetails.getScrollDetails()?.pageName === "myforums"
@@ -98,6 +100,7 @@ const MyForums = () => {
         return (<div key={`forumNo${cfIndex}`}>
           <Forum
             session={session}
+            push={router.push}
             isMyForumPage={true}
             dispatch={dispatch}
             forum_index={cfIndex}

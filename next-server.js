@@ -14,7 +14,7 @@ const dev = process.env.NODE_ENV === 'production' ? false : true;
 const app = next({ dev });
 const handle = app.getRequestHandler();
 // Start Server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 2000;
 
 app.prepare().then(() => {
     server.use(express.static(path.join(__dirname, 'public')))

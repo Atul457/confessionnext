@@ -5,6 +5,8 @@ import { scrollDetails } from './dom'
 
 const WithLinkComp = ({ children, link, className = "", ...rest }) => {
 
+    // console.log(link)
+
     const classList = className === "" ? "" : ` ${className} `
     const props = {
         ...(rest?.rememberScrollPos === true && {

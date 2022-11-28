@@ -578,7 +578,7 @@ const UserIcon = () => {
                   >
                     <span className="profileHeaderImage">
                       <img
-                        src={profileImage && profileImage !== "" ? profileImage : "/images/userAcc.svg"}
+                        src={profileImage && profileImage !== "" ? profileImage : "/images/mobileProfileIcon.svg"}
                         alt="profileIcon"
                       />
 

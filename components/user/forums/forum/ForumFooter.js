@@ -13,18 +13,16 @@ import { reqToJoinModalAcFn } from '../../../../redux/actions/forumsAc/forumsAc'
 
 import Link from 'next/link';
 
-const { checkAuth } = auth
-
 const ForumFooter = (props) => {
 
     // Hooks and vars
     const {
         viewcount,
-        serverSideData,
         is_only_to_show = false,
         no_of_comments,
         session,
         forum_type,
+        serverSideData,
         currForum,
         pageName = "",
         rememberScrollPos,
@@ -43,11 +41,12 @@ const ForumFooter = (props) => {
             background: forum_type.color_code,
             border: `1px solid ${forum_type?.color_code}`
         },
-        showTagsSection = forum_tags.length
+        showTagsSection = forum_tags?.length
+
     const requested = is_requested === requestedStatus.is_requested
     const isPublicForum = currForum?.type === forum_types.public
-    const joined = currForum?.is_requested === requestedStatus.approved
     const isPrivateForum = currForum?.type === forum_types.private
+    const joined = currForum?.is_requested === requestedStatus.approved
     const isNfswTypeContent = currForum?.is_nsw === 1
 
     // // Pins/Unpins the forum
@@ -138,7 +137,7 @@ const ForumFooter = (props) => {
         <div className="postFoot forum_footer">
             <div className="forum_details_cont">
                 <div className="type_view_and_com_count">
-                    {getBody()}
+                    {currForum?.forum_id ? getBody() : null}
                     <span
                         className="category_name forum_type"
                         style={forumTypeStyle}

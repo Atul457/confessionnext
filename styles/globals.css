@@ -4054,6 +4054,10 @@ span.facebookMobIcon {
   border-radius: 25px 0px 0px 25px;
 }
 
+.outerContWrapper.auth_page {
+  border-radius: 0px;
+}
+
 .feed_page .rightColumn,
 .confession_detail_page .rightColumn {
   width: calc(100% - 600px);

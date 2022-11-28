@@ -71,6 +71,8 @@ const Forum = (props) => {
         isMyForumPage
     }
 
+    // console.log(currForum)
+
     const requested = currForum?.is_requested === requestedStatus
     const forumFooterProps = {
         no_of_comments: currForum?.no_of_comments,
